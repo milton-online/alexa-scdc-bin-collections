@@ -1,0 +1,57 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:643132677536:function:a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0:Release_0"
+        },
+        "interfaces": []
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::devices:all:address:full:read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "locales": {
+        "en-GB": {
+          "privacyPolicyUrl": "https://www.thecutts.org/bin-collections/privacy.shtml"
+        }
+      },
+      "allowsPurchases": false,
+      "usesPersonalInfo": true,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
+    },
+    "publishingInformation": {
+      "locales": {
+        "en-GB": {
+          "name": "South Cambridgeshire Bin Collection Information",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/85a3/2af6af2898aa495da05844ef6db9c3ae/APP_ICON?versionId=1H2tLcLU_VldaNral3xuUSC6JWSimc5_&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200128T103005Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20200128%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=af49c7c6dd991d62d5929aa8a69c4a6d41f18a1f5cd4367f4b1962e3f045f867",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a4af/6b4dd828e54e425097585f1b769a52d3/APP_ICON_LARGE?versionId=EaH_V1vlUXea.Cy8CYow4pY_djmojWgO&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200128T103005Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20200128%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=aae7cc790ae418b03fefbe7f5fe0999c7eb2c0c5ca5a816cea3f8f46f0598558",
+          "summary": "Tells you when your next bin collection is, and what type",
+          "description": "This skill uses the address configured in your Alexa device to look up your upcoming waste collections on South Cambridgeshire District Council's website.  You need to be resident in South Cambridgeshire for this to be useful.\n\nThe skill is a community project, and is not a product of, or supported by, South Cambridgeshire District Council.",
+          "examplePhrases": [
+            "Alexa, launch bin collections",
+            "Alexa, ask bin collections when is the next glass collection?",
+            "Alexa, ask bin collections which bin is it today?"
+          ],
+          "keywords": [
+            "bins",
+            "rubbish",
+            "recycling"
+          ]
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "You will need a device with a configured address and post code within South Cambridgeshire.  Check that the selected address returns appropriate bin collection times at the web site https://www.scambs.gov.uk/bins/find-your-household-bin-collection-day/ which uses the same back-end service as this skill,
+      "category": "HOME_SERVICES",
+      "distributionCountries": [
+        "GB"
+      ]
+    }
+  }
+}

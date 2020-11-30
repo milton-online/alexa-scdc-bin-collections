@@ -1,0 +1,201 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "bin collections",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "NextColourBinIntent",
+          "slots": [
+            {
+              "name": "binType",
+              "type": "binType"
+            }
+          ],
+          "samples": [
+            "when is the next {binType} bin collection",
+            "what about {binType}",
+            "When should I put my {binType} bin out",
+            "When is my {binType} due",
+            "When is the {binType} collection",
+            "When is the next {binType} collection"
+          ]
+        },
+        {
+          "name": "MissedBinCollectionIntent",
+          "slots": [],
+          "samples": [
+            "what about the one after",
+            "they've already been",
+            "I missed that one",
+            "I've missed it"
+          ]
+        },
+        {
+          "name": "NextBinCollectionIntent",
+          "slots": [],
+          "samples": [
+            "what type of bin is it",
+            "which bin is being collected",
+            "which bin colour is it this week"
+          ]
+        },
+        {
+          "name": "GetFreshDataIntent",
+          "slots": [],
+          "samples": [
+            "get fresh data",
+            "get new data",
+            "update your data",
+            "update"
+          ]
+        },
+        {
+          "name": "WhichBinTodayIntent",
+          "slots": [],
+          "samples": [
+            "which bin is it today",
+            "what colour bin is it today",
+            "which bin is collected today"
+          ]
+        },
+        {
+          "name": "WhoPutTheBinsOutIntent",
+          "slots": [],
+          "samples": [
+            "who put the bins out"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "id": "RECYCLE",
+              "name": {
+                "value": "RECYCLE",
+                "synonyms": [
+                  "tins",
+                  "cans",
+                  "jars",
+                  "bottles",
+                  "card",
+                  "paper",
+                  "recycling",
+                  "glass",
+                  "plastic",
+                  "blue"
+                ]
+              }
+            },
+            {
+              "id": "DOMESTIC",
+              "name": {
+                "value": "DOMESTIC",
+                "synonyms": [
+                  "sanitary towels",
+                  "nappies",
+                  "garbage",
+                  "trash",
+                  "landfill",
+                  "refuse",
+                  "black",
+                  "rubbish"
+                ]
+              }
+            },
+            {
+              "id": "ORGANIC",
+              "name": {
+                "value": "ORGANIC",
+                "synonyms": [
+                  "grass",
+                  "food",
+                  "compost",
+                  "green",
+                  "garden waste"
+                ]
+              }
+            }
+          ],
+          "name": "binType"
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "NextColourBinIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "binType",
+              "type": "binType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.879766938514.476001925169"
+              },
+              "validations": [
+                {
+                  "type": "hasEntityResolutionMatch",
+                  "prompt": "Slot.Validation.198606852423.623811244995.267818375068"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.879766938514.476001925169",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which colour of bin are you after.  Blue, black or green."
+          },
+          {
+            "type": "PlainText",
+            "value": "Which type of bin collection did you want.  Organic, recycling or rubbish?"
+          }
+        ]
+      },
+      {
+        "id": "Slot.Validation.198606852423.623811244995.267818375068",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What sort of bin. You can ask for the colour of the bin, whether it's for recycling, compost or landfill, or you can ask by material you put in the bin, such as glass."
+          }
+        ]
+      }
+    ]
+  },
+  "version": "20"
+}

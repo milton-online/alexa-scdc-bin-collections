@@ -1,0 +1,19 @@
+{
+  "name": "bin-collections",
+  "version": "0.0.1",
+  "description": "alexa skill for querying south cambs bin collections",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Tim Cutts <tim@thecutts.org>",
+  "license": "ISC",
+  "dependencies": {
+    "ask-sdk-core": "^2.6.0",
+    "ask-sdk-model": "^1.18.0",
+    "aws-sdk": "^2.751.0",
+    "ask-sdk-s3-persistence-adapter": "^2.0.0",
+    "node-fetch": "^2.6.1",
+    "abort-controller": "^3.0.0"
+  }
+}
