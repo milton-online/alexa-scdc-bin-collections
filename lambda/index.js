@@ -39,7 +39,7 @@ const LaunchRequestHandler = {
                (Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NextBinCollectionIntent'));
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         let { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
@@ -90,7 +90,7 @@ const NextColourBinIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'NextColourBinIntent';
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         let { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
@@ -133,7 +133,7 @@ const MissedBinCollectionIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'MissedBinCollectionIntent';
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         const { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
@@ -175,7 +175,7 @@ const WhichBinTodayIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'WhichBinTodayIntent';
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         let { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
@@ -348,7 +348,7 @@ const YesIntentHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent'
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         if (attributes.missedQuestion) {
             return MissedBinCollectionIntentHandler.handle(handlerInput)
@@ -368,7 +368,7 @@ const NoIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent'
             &&  attributes.missedQuestion === true
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         return handlerInput.responseBuilder
             .speak(messages.BYE_THEN)
             .withShouldEndSession(true)
