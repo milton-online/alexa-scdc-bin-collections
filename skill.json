@@ -47,7 +47,7 @@
         }
       },
       "isAvailableWorldwide": false,
-      "testingInstructions": "You will need a device with a configured address and post code within South Cambridgeshire.  Check that the selected address returns appropriate bin collection times at the web site https://www.scambs.gov.uk/bins/find-your-household-bin-collection-day/ which uses the same back-end service as this skill,
+      "testingInstructions": "You will need a device with a configured address and post code within South Cambridgeshire.  Check that the selected address returns appropriate bin collection times at the web site https://www.scambs.gov.uk/bins/find-your-household-bin-collection-day/ which uses the same back-end service as this skill",
       "category": "HOME_SERVICES",
       "distributionCountries": [
         "GB"
