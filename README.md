@@ -1,6 +1,6 @@
 # Description
 
-This project contains and Alexa Skill which contacts an Azure web service run by
+This project contains an Alexa Skill which contacts an Azure web service run by
 South Cambridgeshire District Council.  It looks up your address and reports
 information about upcoming kerbside refuse collections.
 
