@@ -15,6 +15,7 @@
 
 const alexaTest = require("alexa-skill-test-framework")
 const { messages } = require("../lambda/messages.js")
+const SpeakableDate = require ("../lambda/speakabledate.js")
 
 const DEVICE_ID = "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
@@ -25,6 +26,7 @@ alexaTest.initialize(
     DEVICE_ID
 );
 
+const today = new SpeakableDate().setToMidnight().getTime()
 const yesterday = Date.now() - 86400000
 
 datedAttributes = { collections:
@@ -40,12 +42,12 @@ datedAttributes = { collections:
   currentBinType: null }
 
 todayAttributes = { collections:
-     [ { date: Date.now()+300,
+     [ { date: today,
          roundTypes: ['DOMESTIC'],
          slippedCollection: false },
-       { date: Date.now() + 7*86400000,
-         roundTypes: ['DOMESTIC', 'RECYCLE' ],
-         slippedCollection: false },
+       { date: today + 7*86400000,
+         roundTypes: ['RECYCLE', 'DOMESTIC'],
+         slippedCollection: true },
      ],
     currentCollectionIndex: 0,
     deviceId: DEVICE_ID,
@@ -53,7 +55,7 @@ todayAttributes = { collections:
     currentBinType: "DOMESTIC" }
 
 tomorrowAttributes = { collections:
-       [ { date: Date.now() + 86400000,
+       [ { date: today + 86400000,
            roundTypes: ['RECYCLE'],
            slippedCollection: false }
        ],
@@ -73,6 +75,8 @@ describe("Bin Collections Skill", function() {
                 withSessionAttributes: datedAttributes,
                 hasAttributes: {
                     missedQuestion: false,
+                    currentBinType: "DOMESTIC",
+                    currentCollectionIndex: 0,
                 },
             },
         ])
@@ -90,6 +94,8 @@ describe("Bin Collections Skill", function() {
                 withSessionAttributes: todayAttributes,
                 hasAttributes: {
                     missedQuestion: true,
+                    currentBinType: "DOMESTIC",
+                    currentCollectionIndex: 0,
                 },
             },
             {
@@ -99,6 +105,11 @@ describe("Bin Collections Skill", function() {
                 hasCardTextLike: "The next black landfill collection will be",
                 repromptsNothing: true,
                 shouldEndSession: true,
+                hasAttributes: {
+                    missedQuestion: false,
+                    currentBinType: "DOMESTIC",
+                    currentCollectionIndex: 1,
+                },
             },
         ])
     })
@@ -124,7 +135,12 @@ describe("Bin Collections Skill", function() {
                 says: `Your next blue recycling collection is on Sat Sep 24 .${messages.SLIPPED_COLLECTION}`,
                 repromptsNothing: true,
                 shouldEndSession: true,
-                withSessionAttributes: datedAttributes
+                withSessionAttributes: datedAttributes,
+                hasAttributes: {
+                    missedQuestion: false,
+                    currentBinType: "RECYCLE",
+                    currentCollectionIndex: 0,
+                },
             }
         ])
     })
