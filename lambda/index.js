@@ -153,15 +153,18 @@ const MissedBinCollectionIntentHandler = {
 
         let nextCollection = new BinCollection(attributes.nextCollections[attributes.currentCollectionIndex])
 
+        const binName = BinCollection.getNameForBinType(attributes.currentBinType)
+
         let speakOutput = [
             'The next',
-            BinCollection.getColourForBinType(attributes.currentBinType), BinCollection.getNameForBinType(attributes.currentBinType),
+            BinCollection.getColourForBinType(attributes.currentBinType),
+            binName,
             'collection will be',
             nextCollection.getDateSpeech()
         ].join(" ");
 
         return handlerInput.responseBuilder
-            .withStandardCard(`Next ${nextCollection.getName()} collection`,
+            .withStandardCard(`Next ${binName} collection`,
                 speakOutput,
                 nextCollection.getSmallImageUrl(),
                 nextCollection.getLargeImageUrl())
