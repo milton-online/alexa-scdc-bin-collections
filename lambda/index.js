@@ -299,6 +299,28 @@ const ErrorHandler = {
    }
 };
 
+const PersistenceSavingInterceptor = {
+    process(handlerInput) {
+        const {attributesManager} = handlerInput
+        return new Promise((resolve, reject) => {
+            let attributes = attributesManager.getSessionAttributes()
+            if (attributes.areDirty) {
+                attributes.savePersistentAttributes()
+                    .then(() => {
+                        attributes.areDirty = false
+                        attributesManager.setSessionAttributes(attributes)
+                        resolve();
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            } else {
+                resolve();
+            }
+        });
+    }
+}
+
 const LoadBinCollectionsInterceptor = {
     async process(handlerInput) {
         const {requestEnvelope, attributesManager} = handlerInput
@@ -306,6 +328,7 @@ const LoadBinCollectionsInterceptor = {
         let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
+          attributes.areDirty = false
           attributesManager.setSessionAttributes(attributes)
         }
 
@@ -341,9 +364,9 @@ async function getFreshAttributes(handlerInput) {
     const attributesManager = handlerInput.attributesManager
     let attributes = await getFreshSessionData(handlerInput)
     attributes.missedQuestion = false;
+    attributes.areDirty = true
     attributesManager.setSessionAttributes(attributes)
     attributesManager.setPersistentAttributes(attributes)
-    await attributesManager.savePersistentAttributes()
 }
 
 const YesIntentHandler = {
@@ -416,6 +439,9 @@ exports.handler = Alexa.SkillBuilders.custom()
     )
     .addRequestInterceptors(
         LoadBinCollectionsInterceptor
+    )
+    .addResponseInterceptors(
+        PersistenceSavingInterceptor
     )
     .addErrorHandlers(
         ErrorHandler,
