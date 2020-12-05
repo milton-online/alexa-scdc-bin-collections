@@ -39,6 +39,7 @@ describe('sessiondata', function() {
     let results
     let locationList
     describe("getPostcodeSearchFromSCDCWeb()", function(){
+        this.slow(5000)
         it('fetching results - might fail if SCDC web is down',
             async function() {
             results = await Internal().getPostcodeSearchFromSCDCWeb('CB246ZD')
