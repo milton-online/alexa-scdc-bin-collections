@@ -305,7 +305,7 @@ const PersistenceSavingInterceptor = {
         return new Promise((resolve, reject) => {
             let attributes = attributesManager.getSessionAttributes()
             if (attributes.areDirty) {
-                attributes.savePersistentAttributes()
+                attributesManager.savePersistentAttributes()
                     .then(() => {
                         attributes.areDirty = false
                         attributesManager.setSessionAttributes(attributes)
