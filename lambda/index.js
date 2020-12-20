@@ -53,12 +53,17 @@ const LaunchRequestHandler = {
         let speakOutput = "Your next collection is the "
         speakOutput += nextCollection.getColoursSpeech();
         speakOutput += ', ' + nextCollection.getDateSpeech();
+        
+        const oldQuestionState = attributes.missedQuestion;
+
         if (nextCollection.isToday()) {
             responseBuilder = responseBuilder.withShouldEndSession(false)
             attributes.missedQuestion = true;
         } else {
             attributes.missedQuestion = false;
         }
+
+        attributes.areDirty = (attributes.missedQuestion !== oldQuestionState)
 
         attributesManager.setSessionAttributes(attributes);
 
@@ -105,12 +110,16 @@ const NextColourBinIntentHandler = {
 
         let nextCollection = new BinCollection(attributes.nextCollections[0])
 
+        const oldQuestionState = attributes.missedQuestion;
+
         if (nextCollection.isToday()) {
-            responseBuilder = responseBuilder.withShouldEndSession(false);
-            attributes.missedQuestion = true
+            responseBuilder = responseBuilder.withShouldEndSession(false)
+            attributes.missedQuestion = true;
         } else {
-            attributes.missedQuestion = false
+            attributes.missedQuestion = false;
         }
+
+        attributes.areDirty = (attributes.missedQuestion !== oldQuestionState)
 
         attributesManager.setSessionAttributes(attributes);
 
@@ -187,6 +196,7 @@ const WhichBinTodayIntentHandler = {
         attributes.currentBinType = nextCollection.roundTypes[0];
         attributes.currentCollectionIndex = 0;
         attributes.lastIntent = requestEnvelope.request.intent;
+        attributes.missedQuestion = false
 
         let speakOutput;
 
@@ -328,7 +338,6 @@ const LoadBinCollectionsInterceptor = {
         let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
-          attributes.areDirty = false
           attributesManager.setSessionAttributes(attributes)
         }
 
