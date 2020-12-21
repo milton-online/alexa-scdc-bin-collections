@@ -20,7 +20,34 @@ const SpeakableDate = require ("../lambda/speakabledate.js")
 const today = new SpeakableDate().setToMidnight().getTime()
 const yesterday = Date.now() - 86400000
 
-datedAttributes = { collections:
+const datedAttributes = { collections:
+   [ { date: '1971-09-18T00:00:00Z',
+       roundTypes: ['DOMESTIC'],
+       slippedCollection: false,
+       ordinal: "zeroth"
+     },
+     { date: '2501-09-18T00:00:00Z',
+       roundTypes: ['DOMESTIC'],
+       slippedCollection: false,
+       ordinal: "first"
+     },
+     { date: '2501-09-24T00:00:00Z',
+       roundTypes: ['RECYCLE','ORGANIC'],
+       slippedCollection: true,
+       ordinal: "second"
+     } ,
+     { date: '2501-09-27T00:00:00Z',
+       roundTypes: ['DOMESTIC'],
+       slippedCollection: false,
+       ordinal: "third"
+   } ],
+  lastReportedBinTime: 0,
+  fetchedOnDate: yesterday,
+  currentBinType: null,
+  midnightToday: today
+}
+
+const datedAttributes2 = { collections:
    [ { date: '1971-09-18T00:00:00Z',
        roundTypes: ['DOMESTIC'],
        slippedCollection: false,
@@ -52,7 +79,7 @@ describe ('searchcollections', function() {
         it('returnsFirst', function() {
             let c = getNextCollection(datedAttributes)
             c.ordinal.should.equal("first")
-            datedAttributes.lastReportedBinTime = c.date.getTime()
+            datedAttributes.lastReportedBinTime = new SpeakableDate(c.date).getTime()
         })
         it('returnsSecond', function() {
             let c = getNextCollection(datedAttributes)
@@ -62,12 +89,12 @@ describe ('searchcollections', function() {
     })
     describe('getNextCollectionOfType()', function() {
         it('returnsFirst', function() {
-            let c = getNextCollectionOfType(datedAttributes, 'DOMESTIC')
+            let c = getNextCollectionOfType(datedAttributes2, 'DOMESTIC')
             c.ordinal.should.equal("first")
-            datedAttributes.lastReportedBinTime = c.date.getTime()
+            datedAttributes2.lastReportedBinTime = new SpeakableDate(c.date).getTime()
         })
         it('returnsThird', function() {
-            let c = getNextCollectionOfType(datedAttributes, 'DOMESTIC')
+            let c = getNextCollectionOfType(datedAttributes2, 'DOMESTIC')
             c.ordinal.should.equal("third")
         })
     })
