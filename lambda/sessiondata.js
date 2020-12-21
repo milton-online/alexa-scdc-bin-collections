@@ -148,7 +148,6 @@ exports.getFreshSessionData = function (handlerInput) {
         .catch(err => console.log(err))
 
     const consentToken = getConsentToken(requestEnvelope)
-    const deviceId = requestEnvelope.context.System.device.deviceId
 
     return new Promise((resolve, reject) => {
         getLocationList(handlerInput)
@@ -160,7 +159,6 @@ exports.getFreshSessionData = function (handlerInput) {
                     midnightToday: new SpeakableDate().setToMidnight().getTime(),
                     lastReportedBinTime: 0,
                     currentBinType: null,
-                    deviceId: deviceId,
                     fetchedOnDate: Date.now()
                 })
                 resolve(data)
