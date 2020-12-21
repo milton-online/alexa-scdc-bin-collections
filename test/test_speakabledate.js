@@ -63,4 +63,12 @@ describe('SpeakableDate', function() {
             jan31_a.getDateSpeech().should.equal('on Fri Jan 31 .')
         })
     })
+    describe('addDays()', function() {
+        it('2020-01-31T00:00:00Z + 1 day', function() {
+            jan31_a.addDays(1).getDateSpeech().should.equal('on Sat Feb 01 .')
+        })
+        it('2020-02-01T00:00:00Z - 1 day', function() {
+            feb1.addDays(-1).getDateSpeech().should.equal('on Fri Jan 31 .')
+        })
+    })
 })

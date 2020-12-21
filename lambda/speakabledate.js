@@ -15,6 +15,12 @@
 
 module.exports = class SpeakableDate extends Date {
 
+  addDays(days) {
+    let result = new SpeakableDate(this);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
   setToMidnight() {
       this.setHours(0)
       this.setMinutes(0)
