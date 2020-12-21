@@ -342,6 +342,9 @@ const LoadBinCollectionsInterceptor = {
             const midnightToday = new SpeakableDate().setToMidnight().getTime();
             attributes.midnightToday = midnightToday;
 
+            console.log(`oldDev: ${attributes.deviceId}`)
+            console.log(`newDev: ${requestEnvelope.context.System.device.deviceId}`)
+
             if (attributes.deviceId === requestEnvelope.context.System.device.deviceId) {
                 console.log("Same device as before")
                 const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
