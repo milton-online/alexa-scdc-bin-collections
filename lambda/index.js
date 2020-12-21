@@ -53,7 +53,7 @@ const LaunchRequestHandler = {
         let speakOutput = "Your next collection is the "
         speakOutput += nextCollection.getColoursSpeech();
         speakOutput += ', ' + nextCollection.getDateSpeech();
-        
+
         const oldQuestionState = attributes.missedQuestion;
 
         if (nextCollection.isToday()) {
@@ -315,6 +315,7 @@ const PersistenceSavingInterceptor = {
         return new Promise((resolve, reject) => {
             let attributes = attributesManager.getSessionAttributes()
             if (attributes.areDirty) {
+                console.log("Saving attributes")
                 attributesManager.savePersistentAttributes()
                     .then(() => {
                         attributes.areDirty = false
@@ -347,6 +348,7 @@ const LoadBinCollectionsInterceptor = {
         if (attributes.collections) {
 
             if (attributes.missedQuestion === true) {
+                console.log("Not refreshing:  missedQuestion is true")
                 return
             }
 
@@ -357,6 +359,7 @@ const LoadBinCollectionsInterceptor = {
                     const aWeekAgo = midnightToday - 7*86400000
 
                     if (attributes.fetchedOnDate > aWeekAgo) {
+                        console.log("Not refreshing:  data is less than a week old")
                         return
                     }
                 }
