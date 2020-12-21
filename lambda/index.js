@@ -333,7 +333,7 @@ const LoadBinCollectionsInterceptor = {
         // or where the first collection is in the past)
 
         if (attributes.collections) {
-
+            console.log("Found collections")
             if (attributes.missedQuestion === true) {
                 console.log("Not refreshing:  missedQuestion is true")
                 return
@@ -343,8 +343,11 @@ const LoadBinCollectionsInterceptor = {
             attributes.midnightToday = midnightToday;
 
             if (attributes.deviceId === requestEnvelope.context.System.device.deviceId) {
+                console.log("Same device as before")
                 const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
                 if (firstCollectionDate >= midnightToday) {
+
+                    console.log(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`)
                     const aWeekAgo = midnightToday - 7*86400000
 
                     if (attributes.fetchedOnDate > aWeekAgo) {
