@@ -21,17 +21,11 @@ const { messages } = require("./messages.js")
 const { getFreshSessionData } = require("./sessiondata.js")
 const { getJSON } = require("./getJSON.js")
 const SpeakableDate = require("./speakabledate.js")
+const { getNextCollection, getNextCollectionOfType } = require("./searchcollections.js")
 
 "use strict"
 
 const PERMISSIONS = ['read::alexa:device:all:address'];
-
-function getNextCollectionsOfType(sessionData, binType) {
-  let r = sessionData.collections.filter(function(item) {
-    return item.roundTypes.indexOf(binType) !== -1
-  })
-  return r
-}
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -45,18 +39,18 @@ const LaunchRequestHandler = {
 
         let attributes = attributesManager.getSessionAttributes();
 
-        let nextCollection = new BinCollection(attributes.collections[0])
-        attributes.currentBinType = nextCollection.roundTypes[0];
-        attributes.currentCollectionIndex = 0;
+        let collection = getNextCollection(attributes)
+        attributes.currentBinType = collection.roundTypes[0];
         attributes.lastIntent = requestEnvelope.request.intent;
+        attributes.lastReportedBinTime = collection.date.getTime();
 
         let speakOutput = "Your next collection is the "
-        speakOutput += nextCollection.getColoursSpeech();
-        speakOutput += ', ' + nextCollection.getDateSpeech();
+        speakOutput += collection.getColoursSpeech();
+        speakOutput += ', ' + collection.getDateSpeech();
 
         const oldQuestionState = attributes.missedQuestion;
 
-        if (nextCollection.isToday()) {
+        if (collection.isToday()) {
             responseBuilder = responseBuilder.withShouldEndSession(false)
             attributes.missedQuestion = true;
         } else {
@@ -70,8 +64,8 @@ const LaunchRequestHandler = {
         return responseBuilder
             .speak(speakOutput)
             .withStandardCard("Next collection", speakOutput,
-            nextCollection.getSmallImageUrl(),
-            nextCollection.getLargeImageUrl()
+            collection.getSmallImageUrl(),
+            collection.getLargeImageUrl()
             )
             .getResponse();
     }
@@ -104,22 +98,16 @@ const NextColourBinIntentHandler = {
         let attributes = attributesManager.getSessionAttributes();
 
         attributes.currentBinType = binType;
-        attributes.currentCollectionIndex = 0;
-        attributes.nextCollections = getNextCollectionsOfType(attributes, binType);
+        const collection = getNextCollectionOfType(attributes, binType);
+        attributes.lastReportedBinTime = collection.date.getTime();
         attributes.lastIntent = requestEnvelope.request.intent;
 
-        let nextCollection = new BinCollection(attributes.nextCollections[0])
-
-        const oldQuestionState = attributes.missedQuestion;
-
-        if (nextCollection.isToday()) {
+        if (collection.isToday()) {
             responseBuilder = responseBuilder.withShouldEndSession(false)
             attributes.missedQuestion = true;
         } else {
             attributes.missedQuestion = false;
         }
-
-        attributes.areDirty = (attributes.missedQuestion !== oldQuestionState)
 
         attributesManager.setSessionAttributes(attributes);
 
@@ -128,7 +116,7 @@ const NextColourBinIntentHandler = {
             BinCollection.getColourForBinType(binType),
             BinCollection.getNameForBinType(binType),
             'collection is',
-            nextCollection.getDateSpeech()
+            collection.getDateSpeech()
         ].join(" ");
 
         return responseBuilder
@@ -148,19 +136,18 @@ const MissedBinCollectionIntentHandler = {
 
         let attributes = attributesManager.getSessionAttributes();
 
-        attributes.currentCollectionIndex++;
-        attributes.nextCollections = getNextCollectionsOfType(attributes, attributes.currentBinType);
-        attributes.lastIntent = null;
-        attributes.missedQuestion = false;
-        attributesManager.setSessionAttributes(attributes);
+        const collection = getNextCollectionOfType(attributes, attributes.currentBinType);
 
-        if (attributes.currentCollectionIndex >= attributes.nextCollections.length) {
+        if (! collection) {
             return handlerInput.responseBuilder
                 .speak(messages.NO_MORE)
                 .getResponse();
         }
 
-        let nextCollection = new BinCollection(attributes.nextCollections[attributes.currentCollectionIndex])
+        attributes.lastReportedBinTime = collection.date.getTime();
+        attributes.lastIntent = null;
+        attributes.missedQuestion = false;
+        attributesManager.setSessionAttributes(attributes);
 
         const binName = BinCollection.getNameForBinType(attributes.currentBinType)
 
@@ -169,14 +156,14 @@ const MissedBinCollectionIntentHandler = {
             BinCollection.getColourForBinType(attributes.currentBinType),
             binName,
             'collection will be',
-            nextCollection.getDateSpeech()
+            collection.getDateSpeech()
         ].join(" ");
 
         return handlerInput.responseBuilder
             .withStandardCard(`Next ${binName} collection`,
                 speakOutput,
-                nextCollection.getSmallImageUrl(),
-                nextCollection.getLargeImageUrl())
+                collection.getSmallImageUrl(),
+                collection.getLargeImageUrl())
             .speak('OK then.  ' + speakOutput)
             .getResponse();
     }
@@ -192,24 +179,24 @@ const WhichBinTodayIntentHandler = {
                 responseBuilder, attributesManager } = handlerInput;
 
         let attributes = attributesManager.getSessionAttributes();
-        let nextCollection = new BinCollection(attributes.collections[0])
-        attributes.currentBinType = nextCollection.roundTypes[0];
-        attributes.currentCollectionIndex = 0;
+        let collection = new BinCollection(attributes.collections[0])
+        attributes.currentBinType = collection.roundTypes[0];
+        attributes.lastReportedBinTime = collection.date.getTime()
         attributes.lastIntent = requestEnvelope.request.intent;
         attributes.missedQuestion = false
 
         let speakOutput;
 
-        if (nextCollection.isToday()) {
-            speakOutput = "Today's bin collection is the " + nextCollection.getColoursSpeech();
+        if (collection.isToday()) {
+            speakOutput = "Today's bin collection is the " + collection.getColoursSpeech();
             responseBuilder = responseBuilder.withStandardCard(
                 "Collection today", speakOutput,
-                nextCollection.getSmallImageUrl(),
-                nextCollection.getLargeImageUrl())
+                collection.getSmallImageUrl(),
+                collection.getLargeImageUrl())
         } else {
             speakOutput = "There is no bin collection due today."
-            if (nextCollection.isTomorrow()) {
-                speakOutput += "  But there is tomorrow.  It's the " + nextCollection.getColoursSpeech();
+            if (collection.isTomorrow()) {
+                speakOutput += "  But there is tomorrow.  It's the " + collection.getColoursSpeech();
                 responseBuilder = responseBuilder.withStandardCard(
                     "Collection tomorrow", speakOutput)
             } else {
@@ -352,8 +339,10 @@ const LoadBinCollectionsInterceptor = {
                 return
             }
 
+            const midnightToday = new SpeakableDate().setToMidnight().getTime();
+            attributes.midnightToday = midnightToday;
+
             if (attributes.deviceId === requestEnvelope.context.System.device.deviceId) {
-                const midnightToday = new SpeakableDate().setToMidnight().getTime();
                 const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
                 if (firstCollectionDate >= midnightToday) {
                     const aWeekAgo = midnightToday - 7*86400000
@@ -375,8 +364,7 @@ async function getFreshAttributes(handlerInput) {
     console.info("Fetching new persistent data")
     const attributesManager = handlerInput.attributesManager
     let attributes = await getFreshSessionData(handlerInput)
-    attributes.missedQuestion = false;
-    attributes.areDirty = true
+
     attributesManager.setSessionAttributes(attributes)
     attributesManager.setPersistentAttributes(attributes)
 }

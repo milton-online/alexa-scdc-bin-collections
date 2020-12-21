@@ -16,6 +16,7 @@
 const { getJSON } = require("./getJSON.js")
 const DataError = require("./dataerror.js")
 const { messages } = require("./messages.js")
+const SpeakableDate = require("./speakabledate.js")
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
 const numberOfCollections = 12
@@ -154,7 +155,10 @@ exports.getFreshSessionData = function (handlerInput) {
             .then(locationList => getCollectionsFromLocationList(locationList))
             .then((data) => {
                 Object.assign(data, {
-                    currentCollectionIndex: 0,
+                    missedQuestion: false,
+                    areDirty: true,
+                    midnightToday: new SpeakableDate().setToMidnight().getTime(),
+                    lastReportedBinTime: 0,
                     currentBinType: null,
                     deviceId: deviceId,
                     fetchedOnDate: Date.now()

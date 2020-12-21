@@ -26,7 +26,7 @@ alexaTest.initialize(
     DEVICE_ID
 );
 
-const today = new SpeakableDate().setToMidnight().getTime()
+const today = new SpeakableDate().setToMidnight()
 const yesterday = Date.now() - 86400000
 
 datedAttributes = { collections:
@@ -36,30 +36,30 @@ datedAttributes = { collections:
      { date: '2501-09-24T00:00:00Z',
        roundTypes: ['RECYCLE','ORGANIC'],
        slippedCollection: true } ],
-  currentCollectionIndex: 0,
+  lastReportedBinTime: 0,
   fetchedOnDate: yesterday,
   deviceId: DEVICE_ID,
   currentBinType: null }
 
 todayAttributes = { collections:
-     [ { date: today,
+     [ { date: today.toISOString(),
          roundTypes: ['DOMESTIC'],
          slippedCollection: false },
-       { date: today + 7*86400000,
+       { date: today.addDays(7).toISOString(),
          roundTypes: ['RECYCLE', 'DOMESTIC'],
          slippedCollection: true },
      ],
-    currentCollectionIndex: 0,
+    lastReportedBinTime: 0,
     deviceId: DEVICE_ID,
     fetchedOnDate: yesterday,
     currentBinType: "DOMESTIC" }
 
 tomorrowAttributes = { collections:
-       [ { date: today + 86400000,
+       [ { date: today.addDays(1).toISOString(),
            roundTypes: ['RECYCLE'],
            slippedCollection: false }
        ],
-      currentCollectionIndex: 0,
+      lastReportedBinTime: 0,
       fetchedOnDate: yesterday,
       deviceId: DEVICE_ID,
       currentBinType: null }
@@ -76,7 +76,7 @@ describe("Bin Collections Skill", function() {
                 hasAttributes: {
                     missedQuestion: false,
                     currentBinType: "DOMESTIC",
-                    currentCollectionIndex: 0,
+                    lastReportedBinTime: 16779225600000,
                 },
             },
         ])
@@ -95,7 +95,7 @@ describe("Bin Collections Skill", function() {
                 hasAttributes: {
                     missedQuestion: true,
                     currentBinType: "DOMESTIC",
-                    currentCollectionIndex: 0,
+                    lastReportedBinTime: new SpeakableDate(todayAttributes.collections[0].date).getTime()
                 },
             },
             {
@@ -108,7 +108,7 @@ describe("Bin Collections Skill", function() {
                 hasAttributes: {
                     missedQuestion: false,
                     currentBinType: "DOMESTIC",
-                    currentCollectionIndex: 1,
+                    lastReportedBinTime: new SpeakableDate(todayAttributes.collections[1].date).getTime()
                 },
             },
         ])
@@ -139,7 +139,41 @@ describe("Bin Collections Skill", function() {
                 hasAttributes: {
                     missedQuestion: false,
                     currentBinType: "RECYCLE",
-                    currentCollectionIndex: 0,
+                    lastReportedBinTime: new SpeakableDate(datedAttributes.collections[1].date).getTime()
+                },
+            },
+        ])
+    })
+    describe("NextColourBinIntent (today)", function() {
+        todayAttributes.missedQuestion = false
+        todayAttributes.lastReportedBinTime = 0
+        alexaTest.test([
+            {
+                request: alexaTest.getIntentRequest(
+                    "NextColourBinIntent",
+                    { 'binType': 'DOMESTIC' }
+                ),
+                says: `Your next black landfill collection is today.${messages.DID_YOU_MISS_IT}`,
+                repromptsNothing: true,
+                shouldEndSession: false,
+                withSessionAttributes: todayAttributes,
+                hasAttributes: {
+                    missedQuestion: true,
+                    currentBinType: "DOMESTIC",
+                    lastReportedBinTime: new SpeakableDate(todayAttributes.collections[0].date).getTime()
+                },
+            },
+            {
+                request: alexaTest.getIntentRequest("AMAZON.YesIntent"),
+                saysLike: "OK then.  The next black landfill collection will be on",
+                hasCardTitle: "Next landfill collection",
+                hasCardTextLike: "The next black landfill collection will be",
+                repromptsNothing: true,
+                shouldEndSession: true,
+                hasAttributes: {
+                    missedQuestion: false,
+                    currentBinType: "DOMESTIC",
+                    lastReportedBinTime: new SpeakableDate(todayAttributes.collections[1].date).getTime()
                 },
             }
         ])
@@ -184,12 +218,12 @@ describe("Bin Collections Skill", function() {
                 shouldEndSession: true,
                 withSessionAttributes: { deviceId: DEVICE_ID,
                     collections:
-                   [ { date: Date.now()+300,
+                   [ { date: today.addDays(1).toISOString(),
                        roundTypes: ['RECYCLE'],
                        slippedCollection: false }
                    ],
                   fetchedOnDate: yesterday,
-                  currentCollectionIndex: 0,
+                  lastReportedBinTime: 0,
                   currentBinType: null }
             },
         ])
