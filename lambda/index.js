@@ -217,8 +217,13 @@ const HelpIntentHandler = {
     },
     handle(handlerInput) {
         return handlerInput.responseBuilder
-            .speak(messages.HELP)
-            .reprompt(messages.HELP)
+            .speak(messages.HELP + " " + messages.HELP_REPROMPT)
+            .reprompt(messages.HELP_REPROMPT)
+            .withSimpleCard(
+                messages.HELPCARD_TITLE, [
+                    messages.HELP, messages.HELPCARD_BODY
+                ].join("\n")
+            )
             .getResponse();
     }
 };
