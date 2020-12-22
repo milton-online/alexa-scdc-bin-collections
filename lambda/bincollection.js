@@ -17,26 +17,25 @@ const SpeakableDate = require("./speakabledate.js")
 const { messages } = require("./messages.js")
 
 const binTypes = {
-        'RECYCLE': {
-           'colour': 'blue',
-           'name': 'recycling',
-           'smallUrl': 'https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png',
-           'largeUrl': 'https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png'
-
-        } ,
-        'DOMESTIC': {
-            'colour': 'black',
-            'name': 'landfill',
-            'smallUrl': 'https://www.scambs.gov.uk/media/1122/black_bin.png',
-            'largeUrl': 'https://www.scambs.gov.uk/media/1122/black_bin.png'
-        },
-        'ORGANIC': {
-            'colour': 'green',
-            'name': 'compostable',
-            'smallUrl': 'https://www.scambs.gov.uk/media/1118/green_bin.png',
-            'largeUrl': 'https://www.scambs.gov.uk/media/1118/green_bin.png'
-        }
+    'RECYCLE': {
+        'colour': 'blue',
+        'name': 'recycling',
+        'smallUrl': 'https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png',
+        'largeUrl': 'https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png'
+    },
+    'DOMESTIC': {
+        'colour': 'black',
+        'name': 'landfill',
+        'smallUrl': 'https://www.scambs.gov.uk/media/1122/black_bin.png',
+        'largeUrl': 'https://www.scambs.gov.uk/media/1122/black_bin.png'
+    },
+    'ORGANIC': {
+        'colour': 'green',
+        'name': 'compostable',
+        'smallUrl': 'https://www.scambs.gov.uk/media/1118/green_bin.png',
+        'largeUrl': 'https://www.scambs.gov.uk/media/1118/green_bin.png'
     }
+}
 
 module.exports = class BinCollection {
 

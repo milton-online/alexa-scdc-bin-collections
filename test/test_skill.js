@@ -29,40 +29,57 @@ alexaTest.initialize(
 const today = new SpeakableDate().setToMidnight()
 const yesterday = Date.now() - 86400000
 
-datedAttributes = { collections:
-   [ { date: '2501-09-18T00:00:00Z',
-       roundTypes: ['DOMESTIC'],
-       slippedCollection: false },
-     { date: '2501-09-24T00:00:00Z',
-       roundTypes: ['RECYCLE','ORGANIC'],
-       slippedCollection: true } ],
-  lastReportedBinTime: 0,
-  fetchedOnDate: yesterday,
-  deviceId: DEVICE_ID,
-  currentBinType: null }
+datedAttributes = {
+    collections: [
+        {
+            date: '2501-09-18T00:00:00Z',
+            roundTypes: ['DOMESTIC'],
+            slippedCollection: false
+        },
+        {
+            date: '2501-09-24T00:00:00Z',
+            roundTypes: ['RECYCLE','ORGANIC'],
+            slippedCollection: true
+        }
+    ],
+    lastReportedBinTime: 0,
+    fetchedOnDate: yesterday,
+    deviceId: DEVICE_ID,
+    currentBinType: null
+}
 
-todayAttributes = { collections:
-     [ { date: today.toISOString(),
-         roundTypes: ['DOMESTIC'],
-         slippedCollection: false },
-       { date: today.addDays(7).toISOString(),
-         roundTypes: ['RECYCLE', 'DOMESTIC'],
-         slippedCollection: true },
-     ],
+todayAttributes = {
+    collections: [
+        {
+            date: today.toISOString(),
+            roundTypes: ['DOMESTIC'],
+            slippedCollection: false
+        },
+        {
+            date: today.addDays(7).toISOString(),
+            roundTypes: ['RECYCLE', 'DOMESTIC'],
+            slippedCollection: true
+        },
+    ],
     lastReportedBinTime: 0,
     deviceId: DEVICE_ID,
     fetchedOnDate: yesterday,
-    currentBinType: "DOMESTIC" }
+    currentBinType: "DOMESTIC"
+}
 
-tomorrowAttributes = { collections:
-       [ { date: today.addDays(1).toISOString(),
-           roundTypes: ['RECYCLE'],
-           slippedCollection: false }
-       ],
-      lastReportedBinTime: 0,
-      fetchedOnDate: yesterday,
-      deviceId: DEVICE_ID,
-      currentBinType: null }
+tomorrowAttributes = {
+    collections: [
+        {
+            date: today.addDays(1).toISOString(),
+            roundTypes: ['RECYCLE'],
+            slippedCollection: false
+        }
+    ],
+    lastReportedBinTime: 0,
+    fetchedOnDate: yesterday,
+    deviceId: DEVICE_ID,
+    currentBinType: null
+}
 
 describe("Bin Collections Skill", function() {
     describe("LaunchRequest", function() {

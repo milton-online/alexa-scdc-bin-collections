@@ -19,16 +19,19 @@ const { messages } = require("../lambda/messages.js")
 
 "use strict"
 
-const testAddress = { addressLine1: '241 The Made Up Street',
-  addressLine2: null,
-  addressLine3: null,
-  city: 'Some town',
-  stateOrRegion: null,
-  districtOrCounty: null,
-  countryCode: 'GB',
-  postalCode: 'CB24 6ZD' }
+const testAddress = {
+    addressLine1: '241 The Made Up Street',
+    addressLine2: null,
+    addressLine3: null,
+    city: 'Some town',
+    stateOrRegion: null,
+    districtOrCounty: null,
+    countryCode: 'GB',
+    postalCode: 'CB24 6ZD'
+}
 
-const testPostcodeSearchResults = [{ id: '100090161613',
+const testPostcodeSearchResults = [{
+    id: '100090161613',
     houseNumber: '241',
     street: 'The Made Up Street',
     town: 'Sometown',

@@ -117,24 +117,24 @@ async function getCollectionsFromLocationList(locationList) {
 }
 
 function callDirectiveService(handlerInput, message) {
-  const requestEnvelope = handlerInput.requestEnvelope;
-  const directiveServiceClient = handlerInput.serviceClientFactory.getDirectiveServiceClient();
+    const requestEnvelope = handlerInput.requestEnvelope;
+    const directiveServiceClient = handlerInput.serviceClientFactory.getDirectiveServiceClient();
 
-  const requestId = requestEnvelope.request.requestId;
-  const endpoint = requestEnvelope.context.System.apiEndpoint;
-  const token = Alexa.getApiAccessToken(requestEnvelope);
+    const requestId = requestEnvelope.request.requestId;
+    const endpoint = requestEnvelope.context.System.apiEndpoint;
+    const token = Alexa.getApiAccessToken(requestEnvelope);
 
-  const directive = {
-    header: {
-      requestId,
-    },
-    directive: {
-      type: 'VoicePlayer.Speak',
-      speech: message
-    },
-  };
+    const directive = {
+        header: {
+            requestId,
+        },
+        directive: {
+            type: 'VoicePlayer.Speak',
+            speech: message
+        },
+    };
 
-  return directiveServiceClient.enqueue(directive, endpoint, token);
+    return directiveServiceClient.enqueue(directive, endpoint, token);
 }
 
 exports.getFreshSessionData = function (handlerInput) {
