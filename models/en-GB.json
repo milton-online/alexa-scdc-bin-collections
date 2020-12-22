@@ -36,6 +36,8 @@
             }
           ],
           "samples": [
+            "about the {binType} bin",
+            "next {binType} bin",
             "when is the next {binType} bin collection",
             "what about {binType}",
             "When should I put my {binType} bin out",
@@ -58,6 +60,8 @@
           "name": "NextBinCollectionIntent",
           "slots": [],
           "samples": [
+            "the next collection",
+            "the next bin",
             "what type of bin is it",
             "which bin is being collected",
             "which bin colour is it this week"
@@ -77,6 +81,8 @@
           "name": "WhichBinTodayIntent",
           "slots": [],
           "samples": [
+            "today's collection",
+            "today's bin",
             "which bin is it today",
             "what colour bin is it today",
             "which bin is collected today"
