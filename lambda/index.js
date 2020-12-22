@@ -219,11 +219,7 @@ const HelpIntentHandler = {
         return handlerInput.responseBuilder
             .speak(messages.HELP + " " + messages.HELP_REPROMPT)
             .reprompt(messages.HELP_REPROMPT)
-            .withSimpleCard(
-                messages.HELPCARD_TITLE, [
-                    messages.HELP, messages.HELPCARD_BODY
-                ].join("\n")
-            )
+            .withSimpleCard(messages.HELPCARD_TITLE, messages.HELP)
             .getResponse();
     }
 };
