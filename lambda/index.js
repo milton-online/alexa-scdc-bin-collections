@@ -325,7 +325,7 @@ const LoadBinCollectionsInterceptor = {
     async process(handlerInput) {
         const {requestEnvelope, attributesManager} = handlerInput
         // In normal operation there wouldn't be session attributes here, but during testing there are
-        const attributes = attributesManager.getSessionAttributes()
+        let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
           attributesManager.setSessionAttributes(attributes)
