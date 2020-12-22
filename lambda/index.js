@@ -255,9 +255,7 @@ const SessionEndedRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        attributes = handlerInput.attributesManager.getSessionAttributes()
-        attributes.lastReportedBinTime = 0
-        handlerInput.attributesManager.setSessionAttributes(attributes)
+        // Any cleanup logic goes here.
         return handlerInput.responseBuilder.getResponse();
     }
 };
@@ -326,11 +324,16 @@ const LoadBinCollectionsInterceptor = {
         let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
-          attributesManager.setSessionAttributes(attributes)
         }
 
         // Check data is not stale (more than a week old, for a different
         // device, or where the first collection is in the past)
+
+        if (Alexa.isNewSession(requestEnvelope)) {
+            attributes.lastReportedBinTime = 0
+        }
+        
+        attributesManager.setSessionAttributes(attributes)
 
         if (attributes.collections) {
             console.log("Found collections")
