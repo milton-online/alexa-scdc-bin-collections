@@ -37,9 +37,9 @@ const LaunchRequestHandler = {
         let { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
-        let attributes = attributesManager.getSessionAttributes();
+        const attributes = attributesManager.getSessionAttributes();
 
-        let collection = getNextCollection(attributes)
+        const collection = getNextCollection(attributes)
         attributes.currentBinType = collection.roundTypes[0];
         attributes.lastIntent = requestEnvelope.request.intent;
         attributes.lastReportedBinTime = collection.date.getTime();
@@ -96,10 +96,10 @@ const NextColourBinIntentHandler = {
 
         const binType = resolveToCanonicalSlotValue(requestEnvelope.request.intent.slots.binType);
 
-        let attributes = attributesManager.getSessionAttributes();
+        const attributes = attributesManager.getSessionAttributes();
 
-        attributes.currentBinType = binType;
         const collection = getNextCollectionOfType(attributes, binType);
+        attributes.currentBinType = binType;
         attributes.lastReportedBinTime = collection.date.getTime();
         attributes.lastIntent = requestEnvelope.request.intent;
 
@@ -112,7 +112,7 @@ const NextColourBinIntentHandler = {
 
         attributesManager.setSessionAttributes(attributes);
 
-        let speakOutput = [
+        const speakOutput = [
             'Your next',
             BinCollection.getColourForBinType(binType),
             BinCollection.getNameForBinType(binType),
@@ -135,7 +135,7 @@ const MissedBinCollectionIntentHandler = {
         const { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
-        let attributes = attributesManager.getSessionAttributes();
+        const attributes = attributesManager.getSessionAttributes();
 
         const collection = getNextCollectionOfType(attributes, attributes.currentBinType);
 
@@ -152,7 +152,7 @@ const MissedBinCollectionIntentHandler = {
 
         const binName = BinCollection.getNameForBinType(attributes.currentBinType)
 
-        let speakOutput = [
+        const speakOutput = [
             'The next',
             BinCollection.getColourForBinType(attributes.currentBinType),
             binName,
@@ -179,8 +179,8 @@ const WhichBinTodayIntentHandler = {
         let { requestEnvelope, serviceClientFactory,
                 responseBuilder, attributesManager } = handlerInput;
 
-        let attributes = attributesManager.getSessionAttributes();
-        let collection = new BinCollection(attributes.collections[0])
+        const attributes = attributesManager.getSessionAttributes();
+        const collection = getNextCollection(attributes);
         attributes.currentBinType = collection.roundTypes[0];
         attributes.lastReportedBinTime = collection.date.getTime()
         attributes.lastIntent = requestEnvelope.request.intent;
@@ -301,7 +301,7 @@ const PersistenceSavingInterceptor = {
     process(handlerInput) {
         const {attributesManager} = handlerInput
         return new Promise((resolve, reject) => {
-            let attributes = attributesManager.getSessionAttributes()
+            const attributes = attributesManager.getSessionAttributes()
             if (attributes.areDirty) {
                 console.log("Saving attributes")
                 attributesManager.savePersistentAttributes()
@@ -324,14 +324,14 @@ const LoadBinCollectionsInterceptor = {
     async process(handlerInput) {
         const {requestEnvelope, attributesManager} = handlerInput
         // In normal operation there wouldn't be session attributes here, but during testing there are
-        let attributes = attributesManager.getSessionAttributes()
+        const attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
           attributesManager.setSessionAttributes(attributes)
         }
 
-        // Check data is not stale (more than a week old, for a different device,
-        // or where the first collection is in the past)
+        // Check data is not stale (more than a week old, for a different
+        // device, or where the first collection is in the past)
 
         if (attributes.collections) {
             console.log("Found collections")
@@ -343,8 +343,8 @@ const LoadBinCollectionsInterceptor = {
             const midnightToday = new SpeakableDate().setToMidnight().getTime();
             attributes.midnightToday = midnightToday;
 
-            console.log(`oldDev: ${attributes.deviceId}`)
-            console.log(`newDev: ${requestEnvelope.context.System.device.deviceId}`)
+            //console.log(`oldDev: ${attributes.deviceId}`)
+            //console.log(`newDev: ${requestEnvelope.context.System.device.deviceId}`)
 
             if (attributes.deviceId === requestEnvelope.context.System.device.deviceId) {
                 console.log("Same device as before")
@@ -370,7 +370,7 @@ const LoadBinCollectionsInterceptor = {
 async function getFreshAttributes(handlerInput) {
     console.info("Fetching new persistent data")
     const attributesManager = handlerInput.attributesManager
-    let attributes = await getFreshSessionData(handlerInput)
+    const attributes = await getFreshSessionData(handlerInput)
 
     attributesManager.setSessionAttributes(attributes)
     attributesManager.setPersistentAttributes(attributes)

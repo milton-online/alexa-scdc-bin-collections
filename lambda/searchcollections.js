@@ -18,7 +18,7 @@ const SpeakableDate = require("./speakabledate.js")
 
 exports.getNextCollectionOfType = function (sessionData, binType) {
   let r = sessionData.collections.find(function(item) {
-    let collectionDate = new SpeakableDate(item.date).getTime()
+    const collectionDate = new SpeakableDate(item.date).getTime()
     return item.roundTypes.indexOf(binType) !== -1 &&
            collectionDate >= sessionData.midnightToday &&
            collectionDate > sessionData.lastReportedBinTime
@@ -28,7 +28,7 @@ exports.getNextCollectionOfType = function (sessionData, binType) {
 
 exports.getNextCollection = function(sessionData) {
   let r = sessionData.collections.find(function(item) {
-    let collectionDate = new SpeakableDate(item.date).getTime()
+    const collectionDate = new SpeakableDate(item.date).getTime()
     return collectionDate >= sessionData.midnightToday &&
            collectionDate > sessionData.lastReportedBinTime
   })

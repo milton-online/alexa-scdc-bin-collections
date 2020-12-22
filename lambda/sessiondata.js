@@ -97,8 +97,8 @@ async function getLocationList(handlerInput) {
 
 async function getCollectionsFromLocationList(locationList) {
 
-    // We only have enough time for four tests, if the first does not work
-    // We will try four entries evenly spaced throughout the list.
+    // We only have enough time for four tests. If the first does not work
+    // we will try four entries evenly spaced throughout the list.
 
     const step = ~~(locationList.length/4)
 
@@ -117,7 +117,6 @@ async function getCollectionsFromLocationList(locationList) {
 }
 
 function callDirectiveService(handlerInput, message) {
-  // Call Alexa Directive Service.
   const requestEnvelope = handlerInput.requestEnvelope;
   const directiveServiceClient = handlerInput.serviceClientFactory.getDirectiveServiceClient();
 
@@ -125,7 +124,6 @@ function callDirectiveService(handlerInput, message) {
   const endpoint = requestEnvelope.context.System.apiEndpoint;
   const token = requestEnvelope.context.System.apiAccessToken;
 
-  // build the progressive response directive
   const directive = {
     header: {
       requestId,
@@ -136,7 +134,6 @@ function callDirectiveService(handlerInput, message) {
     },
   };
 
-  // send directive
   return directiveServiceClient.enqueue(directive, endpoint, token);
 }
 

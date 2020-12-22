@@ -96,7 +96,7 @@ module.exports = class BinCollection {
     getColoursSpeech() {
         let speakOutput;
 
-        let colours = this.roundTypes.map(k => binTypes[k].colour)
+        const colours = this.roundTypes.map(k => binTypes[k].colour)
 
         if (colours.length === 1) {
             speakOutput = `${colours[0]}`
