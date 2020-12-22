@@ -39,6 +39,7 @@ const LaunchRequestHandler = {
 
         const attributes = attributesManager.getSessionAttributes();
 
+        attributes.lastReportedBinTime = 0
         const collection = getNextCollection(attributes)
         attributes.currentBinType = collection.roundTypes[0];
         attributes.lastReportedBinTime = collection.date.getTime();
@@ -96,6 +97,7 @@ const NextColourBinIntentHandler = {
 
         const attributes = attributesManager.getSessionAttributes();
 
+        attributes.lastReportedBinTime = 0
         const collection = getNextCollectionOfType(attributes, binType);
         attributes.currentBinType = binType;
         attributes.lastReportedBinTime = collection.date.getTime();
@@ -177,6 +179,7 @@ const WhichBinTodayIntentHandler = {
                 responseBuilder, attributesManager } = handlerInput;
 
         const attributes = attributesManager.getSessionAttributes();
+        attributes.lastReportedBinTime = 0
         const collection = getNextCollection(attributes);
         attributes.currentBinType = collection.roundTypes[0];
         attributes.lastReportedBinTime = collection.date.getTime()
@@ -324,16 +327,11 @@ const LoadBinCollectionsInterceptor = {
         let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
+          attributesManager.setSessionAttributes(attributes)
         }
 
         // Check data is not stale (more than a week old, for a different
         // device, or where the first collection is in the past)
-
-        if (Alexa.isNewSession(requestEnvelope)) {
-            attributes.lastReportedBinTime = 0
-        }
-        
-        attributesManager.setSessionAttributes(attributes)
 
         if (attributes.collections) {
             console.log("Found collections")
