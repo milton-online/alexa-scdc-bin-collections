@@ -41,7 +41,6 @@ const LaunchRequestHandler = {
 
         const collection = getNextCollection(attributes)
         attributes.currentBinType = collection.roundTypes[0];
-        attributes.lastIntent = requestEnvelope.request.intent;
         attributes.lastReportedBinTime = collection.date.getTime();
 
         let speakOutput = "Your next collection is the "
@@ -146,7 +145,6 @@ const MissedBinCollectionIntentHandler = {
         }
 
         attributes.lastReportedBinTime = collection.date.getTime();
-        attributes.lastIntent = null;
         attributes.missedQuestion = false;
         attributesManager.setSessionAttributes(attributes);
 
@@ -183,7 +181,6 @@ const WhichBinTodayIntentHandler = {
         const collection = getNextCollection(attributes);
         attributes.currentBinType = collection.roundTypes[0];
         attributes.lastReportedBinTime = collection.date.getTime()
-        attributes.lastIntent = requestEnvelope.request.intent;
         attributes.missedQuestion = false
 
         let speakOutput;
@@ -343,10 +340,12 @@ const LoadBinCollectionsInterceptor = {
             const midnightToday = new SpeakableDate().setToMidnight().getTime();
             attributes.midnightToday = midnightToday;
 
-            //console.log(`oldDev: ${attributes.deviceId}`)
-            //console.log(`newDev: ${requestEnvelope.context.System.device.deviceId}`)
+            const deviceId = Alexa.getDeviceId(requestEnvelope)
 
-            if (attributes.deviceId === requestEnvelope.context.System.device.deviceId) {
+            //console.log(`oldDev: ${attributes.deviceId}`)
+            //console.log(`newDev: ${deviceId}`)
+
+            if (attributes.deviceId === deviceId) {
                 console.log("Same device as before")
                 const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
                 if (firstCollectionDate >= midnightToday) {

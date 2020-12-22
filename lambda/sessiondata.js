@@ -34,7 +34,7 @@ function getConsentToken(requestEnvelope) {
 async function getAddressFromDevice(handlerInput) {
     try {
         const { requestEnvelope, serviceClientFactory } = handlerInput
-        const { deviceId } = requestEnvelope.context.System.device;
+        const deviceId = Alexa.getDeviceId(requestEnvelope)
         const deviceAddressServiceClient = serviceClientFactory.getDeviceAddressServiceClient();
         const address = await deviceAddressServiceClient.getFullAddress(deviceId);
 
@@ -122,7 +122,7 @@ function callDirectiveService(handlerInput, message) {
 
   const requestId = requestEnvelope.request.requestId;
   const endpoint = requestEnvelope.context.System.apiEndpoint;
-  const token = requestEnvelope.context.System.apiAccessToken;
+  const token = Alexa.getApiAccessToken(requestEnvelope);
 
   const directive = {
     header: {
@@ -145,7 +145,7 @@ exports.getFreshSessionData = function (handlerInput) {
         .catch(err => console.log(err))
 
     const consentToken = getConsentToken(requestEnvelope)
-    const deviceId = requestEnvelope.context.System.device.deviceId
+    const deviceId = Alexa.getDeviceId(requestEnvelope)
 
     return new Promise((resolve, reject) => {
         getLocationList(handlerInput)
