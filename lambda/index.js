@@ -13,8 +13,9 @@
    limitations under the License.
 */
 
-const Alexa = require('ask-sdk-core');
-const persistenceAdapter = require('ask-sdk-s3-persistence-adapter')
+const AWS = require('aws-sdk')
+const Alexa = require('ask-sdk-core')
+const ddbAdapter = require('ask-sdk-dynamodb-persistence-adapter')
 const BinCollection = require("./bincollection.js")
 const DataError = require("./dataerror.js")
 const { messages } = require("./messages.js")
@@ -429,7 +430,11 @@ const GetFreshDataIntentHandler = {
 
 exports.handler = Alexa.SkillBuilders.custom()
     .withPersistenceAdapter(
-        new persistenceAdapter.S3PersistenceAdapter({bucketName:process.env.S3_PERSISTENCE_BUCKET})
+        new ddbAdapter.DynamoDbPersistenceAdapter({
+            tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
+            createTable: false,
+            dynamoDBClient: new AWS.DynamoDB({apiVersion: 'latest', region: process.env.DYNAMODB_PERSISTENCE_REGION})
+        })
     )
     .withApiClient(new Alexa.DefaultApiClient())
     .addRequestHandlers(

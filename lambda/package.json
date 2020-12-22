@@ -12,7 +12,7 @@
     "ask-sdk-core": "^2.6.0",
     "ask-sdk-model": "^1.18.0",
     "aws-sdk": "^2.751.0",
-    "ask-sdk-s3-persistence-adapter": "^2.0.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.9.0",
     "node-fetch": "^2.6.1",
     "abort-controller": "^3.0.0"
   }
