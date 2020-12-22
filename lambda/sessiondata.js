@@ -13,6 +13,7 @@
    limitations under the License.
 */
 
+const Alexa = require('ask-sdk-core')
 const { getJSON } = require("./getJSON.js")
 const DataError = require("./dataerror.js")
 const { messages } = require("./messages.js")
