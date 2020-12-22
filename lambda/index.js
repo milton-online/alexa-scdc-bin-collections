@@ -255,7 +255,9 @@ const SessionEndedRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        // Any cleanup logic goes here.
+        attributes = handlerInput.attributesManager.getSessionAttributes()
+        attributes.lastReportedBinTime = 0
+        handlerInput.attributesManager.setSessionAttributes(attributes)
         return handlerInput.responseBuilder.getResponse();
     }
 };
