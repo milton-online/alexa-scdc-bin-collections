@@ -57,7 +57,8 @@ const LaunchRequestHandler = {
             attributes.missedQuestion = false;
         }
 
-        attributes.areDirty = (attributes.missedQuestion !== oldQuestionState)
+        attributes.areDirty = attributes.areDirty ||
+                              (attributes.missedQuestion !== oldQuestionState)
 
         attributesManager.setSessionAttributes(attributes);
 
@@ -370,7 +371,6 @@ async function getFreshAttributes(handlerInput) {
     console.info("Fetching new persistent data")
     const attributesManager = handlerInput.attributesManager
     let attributes = await getFreshSessionData(handlerInput)
-    attributes.deviceId = handlerInput.requestEnvelope.context.System.device.deviceId
 
     attributesManager.setSessionAttributes(attributes)
     attributesManager.setPersistentAttributes(attributes)
