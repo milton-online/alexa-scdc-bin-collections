@@ -18,6 +18,7 @@ const { getJSON } = require("./getJSON.js")
 const DataError = require("./dataerror.js")
 const { messages } = require("./messages.js")
 const SpeakableDate = require("./speakabledate.js")
+const { getAddressFromDevice } = require("./device.js")
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
 const numberOfCollections = 12
@@ -30,19 +31,6 @@ function getConsentToken(requestEnvelope) {
     }
 
     return consentToken
-}
-
-async function getAddressFromDevice(handlerInput) {
-    try {
-        const { requestEnvelope, serviceClientFactory } = handlerInput
-        const deviceId = Alexa.getDeviceId(requestEnvelope)
-        const deviceAddressServiceClient = serviceClientFactory.getDeviceAddressServiceClient();
-        const address = await deviceAddressServiceClient.getFullAddress(deviceId);
-
-        return address
-    } catch (e) {
-        throw new DataError('No address from device', messages.NOTIFY_MISSING_PERMISSIONS)
-    }
 }
 
 function getPostcodeFromAddress(address) {
