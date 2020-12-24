@@ -106,7 +106,7 @@ module.exports = class BinCollection {
         if (colours.length !== 1) {
             speakOutput += 's'
         }
-        // console.log("getColoursSpeech:", colours, speakOutput)
+
         return speakOutput
     }
 

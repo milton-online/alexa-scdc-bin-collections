@@ -39,8 +39,6 @@ async function getAddressFromDevice(handlerInput) {
         const deviceAddressServiceClient = serviceClientFactory.getDeviceAddressServiceClient();
         const address = await deviceAddressServiceClient.getFullAddress(deviceId);
 
-        // console.log('Device:', deviceId); console.log('Address:', address)
-
         return address
     } catch (e) {
         throw new DataError('No address from device', messages.NOTIFY_MISSING_PERMISSIONS)
