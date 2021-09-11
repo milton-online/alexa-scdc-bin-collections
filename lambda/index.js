@@ -1,4 +1,4 @@
-/* Copyright 2020 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020-2021 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -328,6 +328,7 @@ const LoadBinCollectionsInterceptor = {
         let attributes = attributesManager.getSessionAttributes()
         if (!attributes.deviceId) {
           attributes = await attributesManager.getPersistentAttributes() || {};
+          attributes.missedQuestion = false
           attributesManager.setSessionAttributes(attributes)
         }
 
@@ -336,10 +337,6 @@ const LoadBinCollectionsInterceptor = {
 
         if (attributes.collections) {
             console.log("Found collections")
-            if (attributes.missedQuestion === true) {
-                console.log("Not refreshing:  missedQuestion is true")
-                return
-            }
 
             const midnightToday = new SpeakableDate().setToMidnight().getTime();
             attributes.midnightToday = midnightToday;
