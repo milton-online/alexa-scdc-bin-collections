@@ -19,7 +19,7 @@ const ddbAdapter = require('ask-sdk-dynamodb-persistence-adapter')
 const BinCollection = require("./bincollection.js")
 const DataError = require("./dataerror.js")
 const { messages } = require("./messages.js")
-const { getFreshSessionData } = require("./sessiondata.js")
+const { getFreshSessionData, attributesAreStale } = require("./sessiondata.js")
 const { getJSON } = require("./getJSON.js")
 const SpeakableDate = require("./speakabledate.js")
 const { getNextCollection, getNextCollectionOfType } = require("./searchcollections.js")
@@ -332,38 +332,11 @@ const LoadBinCollectionsInterceptor = {
           attributesManager.setSessionAttributes(attributes)
         }
 
-        // Check data is not stale (more than a week old, for a different
-        // device, or where the first collection is in the past)
+        const deviceId = Alexa.getDeviceId(requestEnvelope)
 
-        if (attributes.collections) {
-            console.log("Found collections")
-
-            const midnightToday = new SpeakableDate().setToMidnight().getTime();
-            attributes.midnightToday = midnightToday;
-
-            const deviceId = Alexa.getDeviceId(requestEnvelope)
-
-            //console.log(`oldDev: ${attributes.deviceId}`)
-            //console.log(`newDev: ${deviceId}`)
-
-            if (attributes.deviceId === deviceId) {
-                console.log("Same device as before")
-                const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
-                if (firstCollectionDate >= midnightToday) {
-
-                    console.log(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`)
-                    const aWeekAgo = midnightToday - 7*86400000
-
-                    if (attributes.fetchedOnDate > aWeekAgo) {
-                        console.log("Not refreshing:  data is less than a week old")
-                        return
-                    }
-                }
-            }
+        if (attributesAreStale(attributes, deviceId)) {
+            await getFreshAttributes(handlerInput);
         }
-
-        await getFreshAttributes(handlerInput);
-
     }
 }
 

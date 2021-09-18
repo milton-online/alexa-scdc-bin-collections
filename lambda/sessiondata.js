@@ -124,6 +124,36 @@ function callDirectiveService(handlerInput, message) {
     return directiveServiceClient.enqueue(directive, endpoint, token);
 }
 
+exports.attributesAreStale = function (attributes, deviceId) {
+    // Check data is not stale (more than a week old, for a different
+    // device, or where the first collection is in the past)
+    if (attributes.collections) {
+        console.log("Found collections")
+
+        const midnightToday = new SpeakableDate().setToMidnight().getTime();
+        attributes.midnightToday = midnightToday;
+
+        //console.log(`oldDev: ${attributes.deviceId}`)
+        //console.log(`newDev: ${deviceId}`)
+
+        if (attributes.deviceId === deviceId) {
+            console.log("Same device as before")
+            const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
+            if (firstCollectionDate >= midnightToday) {
+
+                console.log(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`)
+                const aWeekAgo = midnightToday - 7*86400000
+
+                if (attributes.fetchedOnDate > aWeekAgo) {
+                    console.log("Not refreshing:  data is less than a week old")
+                    return false
+                }
+            }
+        }
+    }
+    return true
+}
+
 exports.getFreshSessionData = function (handlerInput) {
 
     const { requestEnvelope } = handlerInput;

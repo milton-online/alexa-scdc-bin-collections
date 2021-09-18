@@ -14,10 +14,18 @@
 */
 
 const should = require('should')
-const { Internal } = require("../lambda/sessiondata.js")
+const { Internal, attributesAreStale } = require("../lambda/sessiondata.js")
 const { messages } = require("../lambda/messages.js")
+const SpeakableDate = require ("../lambda/speakabledate.js")
 
 "use strict"
+
+const today = new SpeakableDate().setToMidnight()
+const tomorrow = new SpeakableDate().addDays(1)
+const yesterday = Date.now() - 86400000
+const amonthago = Date.now() - 86400000*30
+const DEVICE_ID = "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+const OTHER_DEVICE = "amzn1.ask.device.1111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
 const testAddress = {
     addressLine1: '241 The Made Up Street',
@@ -37,6 +45,26 @@ const testPostcodeSearchResults = [{
     town: 'Sometown',
     postCode: 'CB246ZD'
 }]
+
+const testAttributes = {
+    collections: [
+        {
+            date: today.toISOString(),
+            roundTypes: ['DOMESTIC'],
+            slippedCollection: false
+        },
+        {
+            date: today.addDays(7).toISOString(),
+            roundTypes: ['RECYCLE', 'DOMESTIC'],
+            slippedCollection: true
+        },
+    ],
+    lastReportedBinTime: 0,
+    missedQuestion: false,
+    deviceId: DEVICE_ID,
+    fetchedOnDate: yesterday,
+    currentBinType: "DOMESTIC"
+}
 
 describe('sessiondata', function() {
     let results
@@ -63,6 +91,36 @@ describe('sessiondata', function() {
         it.skip("getCollectionsFromLocationList()", async function() {
             let r = await Internal().getCollectionsFromLocationList(locationList)
             r.collections.length.should.be.greaterThan(0)
+        })
+    })
+    describe("attributesAreStale()", function() {
+        it("Data fetched yesterday, collection today", function() {
+            attributesAreStale(testAttributes,
+                               DEVICE_ID).should.be.true
+        })
+        testAttributes.collections[0].date = today.addDays(-7).toISOString()
+        it ("data fetched yesterday, collection in the past", function() {
+            attributesAreStale(testAttributes,
+                               DEVICE_ID).should.be.true
+        })
+        testAttributes.collections[0].date = tomorrow.toISOString()
+        it("data fetched yesterday, collection tomorrow", function() {
+            attributesAreStale(testAttributes,
+                               DEVICE_ID).should.be.false
+        })
+        it("Data fresh but for different device", function() {
+            attributesAreStale(testAttributes,
+                               OTHER_DEVICE).should.be.true
+        })
+        testAttributes.fetchedOnDate = amonthago
+        it("Data more than a week old", function() {
+            attributesAreStale(testAttributes,
+                               DEVICE_ID).should.be.true
+        })
+        testAttributes.missedQuestion = true
+        it("Old data with missed question flag set", function() {
+            attributesAreStale(testAttributes,
+                               DEVICE_ID).should.be.true
         })
     })
 })
