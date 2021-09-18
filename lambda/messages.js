@@ -31,7 +31,7 @@ exports.messages = {
     DID_YOU_MISS_IT: "  Did you miss it? Do you want to know about the next one?",
     SLIPPED_COLLECTION: "  This collection is not on your usual day.",
     GOT_FRESH_DATA: "  I'm up to date with the council.  What would you like to know about upcoming collections?",
-    CONTACTING_SCDC:  "Please wait while I ask the council for the latest information.",
+    CONTACTING_SCDC:  "Please wait while I look that up.",
     BYE_THEN: "Bye then!",
     NO_QUESTION: "I didn't ask you a question."
 };
