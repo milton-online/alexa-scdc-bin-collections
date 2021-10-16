@@ -9,11 +9,16 @@
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "ask-sdk-core": "^2.6.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.9.0",
     "ask-sdk-model": "^1.18.0",
     "aws-sdk": "^2.751.0",
-    "ask-sdk-dynamodb-persistence-adapter": "^2.9.0",
-    "node-fetch": "^2.6.1",
-    "abort-controller": "^3.0.0"
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "alexa-skill-test-framework": "^1.2.4",
+    "mocha": "^3.2.0",
+    "should": "^13.2.3"
   }
 }
