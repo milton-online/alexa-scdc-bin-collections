@@ -51,9 +51,9 @@
           "slots": [],
           "samples": [
             "what about the one after",
-            "they've already been",
+            "they\u0027ve already been",
             "I missed that one",
-            "I've missed it"
+            "I\u0027ve missed it"
           ]
         },
         {
@@ -81,8 +81,8 @@
           "name": "WhichBinTodayIntent",
           "slots": [],
           "samples": [
-            "today's collection",
-            "today's bin",
+            "today\u0027s collection",
+            "today\u0027s bin",
             "which bin is it today",
             "what colour bin is it today",
             "which bin is collected today"
@@ -197,12 +197,11 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "What sort of bin. You can ask for the colour of the bin, whether it's for recycling, compost or landfill, or you can ask by material you put in the bin, such as glass."
+            "value": "What sort of bin. You can ask for the colour of the bin, whether it\u0027s for recycling, compost or landfill, or you can ask by material you put in the bin, such as glass."
           }
         ]
       }
     ]
   },
-  "version": "6"
+  "version": "1"
 }
-

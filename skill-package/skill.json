@@ -1,0 +1,62 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-GB": {
+          "summary": "Tells you when your next bin collection is, and what type",
+          "examplePhrases": [
+            "Alexa, launch bin collections",
+            "Alexa, ask bin collections when is the next glass collection?",
+            "Alexa, ask bin collections which bin is it today?"
+          ],
+          "keywords": [
+            "bins",
+            "rubbish",
+            "recycling"
+          ],
+          "name": "South Cambridgeshire Bin Collection Information",
+          "description": "This skill uses the address configured in your Alexa device to look up your upcoming waste collections on South Cambridgeshire District Council\u0027s website.  You need to be resident in South Cambridgeshire for this to be useful.\n\nThe skill is a community project, and is not a product of, or supported by, South Cambridgeshire District Council.\n\nPlease report bugs and enhancement requests at:\nhttps://github.com/milton-online/alexa-scdc-bin-collections/issues",
+          "smallIconUri": "file://assets/images/en-GB_smallIconUri.png",
+          "updatesDescription": "Fixed a bug which occasionally could cause the skill to return a collection in the past.",
+          "largeIconUri": "file://assets/images/en-GB_largeIconUri.png"
+        }
+      },
+      "automaticDistribution": {
+        "isActive": false
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "You will need a device with a configured address and post code within South Cambridgeshire.  Check that the selected address returns appropriate bin collection times at the web site https://www.scambs.gov.uk/bins/find-your-household-bin-collection-day/ which uses the same back-end service as this skill.",
+      "category": "HOME_SERVICES",
+      "distributionMode": "PUBLIC",
+      "distributionCountries": [
+        "GB"
+      ]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:643132677536:function:a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0:Release_1"
+        },
+        "interfaces": []
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::devices:all:address:full:read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "en-GB": {
+          "privacyPolicyUrl": "https://www.thecutts.org/bin-collections/privacy.shtml"
+        }
+      },
+      "containsAds": false,
+      "isExportCompliant": true,
+      "isChildDirected": false,
+      "usesPersonalInfo": true
+    }
+  }
+}
