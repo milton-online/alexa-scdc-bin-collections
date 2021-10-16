@@ -17,7 +17,7 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "alexa-skill-test-framework": "https://github.com/milton-online/alexa-skill-test-framework.git",
+    "alexa-skill-test-framework": "milton-online/alexa-skill-test-framework#master",
     "ask-sdk-local-debug": "^1.1.0",
     "mocha": "^9.1.3",
     "should": "^13.2.3"
