@@ -10,13 +10,9 @@ If you just want to enable the skill on your device, please visit [this Alexa Qu
 
 ## Running the test suite
 
-The test suite requires the following npm modules:
+To run the test suite, navigate to the root directory of the checkout and run:
 
-* Should.js
-* mocha
-* alexa-skill-test-framework
-
-To run the test suite, simply type `mocha` in the root directory.
+`NODE_PATH=lambda/node_modules mocha`
 
 # Author
 
