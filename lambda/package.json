@@ -4,7 +4,7 @@
   "description": "alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "cd .. && NODE_PATH=lambda/node_modules mocha"
   },
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",

@@ -10,9 +10,9 @@ If you just want to enable the skill on your device, please visit [this Alexa Qu
 
 ## Running the test suite
 
-To run the test suite, navigate to the root directory of the checkout and run:
+To run the test suite, navigate to the lambda directory of the checkout and run:
 
-`NODE_PATH=lambda/node_modules mocha`
+`npm test`
 
 # Author
 
