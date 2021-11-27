@@ -14,45 +14,46 @@
 */
 
 module.exports = class SpeakableDate extends Date {
+  addDays(days) {
+    let result = new SpeakableDate(this);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
 
-    addDays(days) {
-        let result = new SpeakableDate(this);
-        result.setDate(result.getDate() + days);
-        return result;
-    }
+  setToMidnight() {
+    this.setHours(0);
+    this.setMinutes(0);
+    this.setSeconds(0);
+    this.setMilliseconds(0);
+    return this;
+  }
 
-    setToMidnight() {
-        this.setHours(0)
-        this.setMinutes(0)
-        this.setSeconds(0)
-        this.setMilliseconds(0)
-        return this;
-    }
+  isSameDateAs(somedate) {
+    return (
+      this.getDate() === somedate.getDate() &&
+      this.getMonth() === somedate.getMonth() &&
+      this.getFullYear() === somedate.getFullYear()
+    );
+  }
 
-    isSameDateAs(somedate) {
-        return this.getDate() === somedate.getDate() &&
-               this.getMonth() === somedate.getMonth() &&
-               this.getFullYear() === somedate.getFullYear()
-    }
+  isToday() {
+    const today = new Date();
+    return this.isSameDateAs(today);
+  }
 
-    isToday() {
-        const today = new Date()
-        return this.isSameDateAs(today)
-    }
+  isTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return this.isSameDateAs(tomorrow);
+  }
 
-    isTomorrow() {
-        const tomorrow = new Date()
-        tomorrow.setDate(tomorrow.getDate()+1)
-        return this.isSameDateAs(tomorrow)
+  getDateSpeech() {
+    if (this.isToday()) {
+      return "today.";
+    } else if (this.isTomorrow()) {
+      return "tomorrow.";
+    } else {
+      return `on ${this.toDateString().slice(0, -4)}.`;
     }
-
-    getDateSpeech() {
-        if (this.isToday()) {
-            return 'today.'
-        } else if (this.isTomorrow()) {
-            return 'tomorrow.'
-        } else {
-            return `on ${this.toDateString().slice(0,-4)}.`
-        }
-    }
-}
+  }
+};

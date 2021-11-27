@@ -13,35 +13,36 @@
    limitations under the License.
 */
 
-const DataError = require("./dataerror.js")
+const DataError = require("./dataerror.js");
 const fetch = require("node-fetch");
-const AbortController = require("abort-controller")
-const { messages } = require("./messages.js")
+const AbortController = require("abort-controller");
+const { messages } = require("./messages.js");
 
 exports.getJSON = function (url, timeout = 5000) {
+  return new Promise(function (resolve, reject) {
+    const controller = new AbortController();
+    const timeoutobj = setTimeout(() => {
+      controller.abort();
+    }, timeout);
 
-    return new Promise(function(resolve, reject) {
-        const controller = new AbortController();
-        const timeoutobj = setTimeout(() => {
-            controller.abort();
-        }, timeout);
-
-        fetch(url, {signal: controller.signal })
-            .then((res) => {
-                if (res.ok) {
-                    return res.json()
-                } else {
-                    reject(new DataError('HTTP error ' + res.status, messages.WEB_ERROR))
-                }
-            })
-            .finally(() => clearTimeout(timeoutobj))
-            .then(json => resolve(json))
-            .catch((err) => {
-                if (err.name === 'AbortError') {
-                    reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT))
-                } else {
-                    reject(new DataError(`Other error: ${err.stack}`, messages.WEB_ERROR))
-                }
-            })
-    })
-}
+    fetch(url, { signal: controller.signal })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          reject(new DataError("HTTP error " + res.status, messages.WEB_ERROR));
+        }
+      })
+      .finally(() => clearTimeout(timeoutobj))
+      .then((json) => resolve(json))
+      .catch((err) => {
+        if (err.name === "AbortError") {
+          reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT));
+        } else {
+          reject(
+            new DataError(`Other error: ${err.stack}`, messages.WEB_ERROR)
+          );
+        }
+      });
+  });
+};
