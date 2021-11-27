@@ -16,12 +16,11 @@
 const AWS = require("aws-sdk");
 const Alexa = require("ask-sdk-core");
 const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
+const process = require("process");
 const BinCollection = require("./bincollection.js");
 const DataError = require("./dataerror.js");
 const { messages } = require("./messages.js");
 const { getFreshSessionData, attributesAreStale } = require("./sessiondata.js");
-const { getJSON } = require("./getJSON.js");
-const SpeakableDate = require("./speakabledate.js");
 const {
   getNextCollection,
   getNextCollectionOfType,
@@ -41,12 +40,7 @@ const LaunchRequestHandler = {
     );
   },
   handle(handlerInput) {
-    let {
-      requestEnvelope,
-      serviceClientFactory,
-      responseBuilder,
-      attributesManager,
-    } = handlerInput;
+    let { responseBuilder, attributesManager } = handlerInput;
 
     const attributes = attributesManager.getSessionAttributes();
 
@@ -111,12 +105,7 @@ const NextColourBinIntentHandler = {
     );
   },
   handle(handlerInput) {
-    let {
-      requestEnvelope,
-      serviceClientFactory,
-      responseBuilder,
-      attributesManager,
-    } = handlerInput;
+    let { requestEnvelope, responseBuilder, attributesManager } = handlerInput;
 
     const binType = resolveToCanonicalSlotValue(
       requestEnvelope.request.intent.slots.binType
@@ -160,12 +149,7 @@ const MissedBinCollectionIntentHandler = {
     );
   },
   handle(handlerInput) {
-    const {
-      requestEnvelope,
-      serviceClientFactory,
-      responseBuilder,
-      attributesManager,
-    } = handlerInput;
+    const { attributesManager } = handlerInput;
 
     const attributes = attributesManager.getSessionAttributes();
 
@@ -213,12 +197,7 @@ const WhichBinTodayIntentHandler = {
     );
   },
   handle(handlerInput) {
-    let {
-      requestEnvelope,
-      serviceClientFactory,
-      responseBuilder,
-      attributesManager,
-    } = handlerInput;
+    let { responseBuilder, attributesManager } = handlerInput;
 
     const attributes = attributesManager.getSessionAttributes();
     attributes.lastReportedBinTime = 0;

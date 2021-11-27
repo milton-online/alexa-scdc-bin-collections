@@ -173,7 +173,7 @@ exports.getFreshSessionData = function (handlerInput) {
     console.error(err)
   );
 
-  const consentToken = getConsentToken(requestEnvelope);
+  getConsentToken(requestEnvelope);
   const deviceId = Alexa.getDeviceId(requestEnvelope);
 
   return new Promise((resolve, reject) => {
