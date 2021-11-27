@@ -14,7 +14,7 @@
 */
 
 const should = require('should')
-const messages = require("../lambda/messages.js")
+const { messages } = require("../lambda/messages.js")
 const { getJSON } = require("../lambda/getJSON.js")
 const TestServer = require ('./utils/server.js')
 
