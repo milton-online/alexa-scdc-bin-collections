@@ -92,7 +92,7 @@ async function getCollectionsFromLocationList(locationList) {
     for (let l = 0; l < locationList.length; l += step) {
         let locationId = locationList[l]
         let url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`
-        console.log(url)
+        console.info(url)
         let r = await getJSON(url)
 
         if (r.collections.length >= 1) {
@@ -128,24 +128,24 @@ exports.attributesAreStale = function (attributes, deviceId) {
     // Check data is not stale (more than a week old, for a different
     // device, or where the first collection is in the past)
     if (attributes.collections) {
-        console.log("Found collections")
+        console.debug("Found collections")
 
         const midnightToday = new SpeakableDate().setToMidnight().getTime();
         attributes.midnightToday = midnightToday;
 
-        //console.log(`oldDev: ${attributes.deviceId}`)
-        //console.log(`newDev: ${deviceId}`)
+        //console.debug(`oldDev: ${attributes.deviceId}`)
+        //console.debug(`newDev: ${deviceId}`)
 
         if (attributes.deviceId === deviceId) {
-            console.log("Same device as before")
+            console.debug("Same device as before")
             const firstCollectionDate = new Date(attributes.collections[0].date).getTime()
             if (firstCollectionDate >= midnightToday) {
 
-                console.log(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`)
+                console.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`)
                 const aWeekAgo = midnightToday - 7*86400000
 
                 if (attributes.fetchedOnDate > aWeekAgo) {
-                    console.log("Not refreshing:  data is less than a week old")
+                    console.debug("Not refreshing:  data is less than a week old")
                     return false
                 }
             }
@@ -159,7 +159,7 @@ exports.getFreshSessionData = function (handlerInput) {
     const { requestEnvelope } = handlerInput;
 
     callDirectiveService(handlerInput, messages.CONTACTING_SCDC)
-        .catch(err => console.log(err))
+        .catch(err => console.error(err))
 
     const consentToken = getConsentToken(requestEnvelope)
     const deviceId = Alexa.getDeviceId(requestEnvelope)

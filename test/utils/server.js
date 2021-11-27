@@ -26,7 +26,7 @@ module.exports = class TestServer {
 		// make it shorter here as we want to close server quickly at the end of tests
 		this.server.keepAliveTimeout = 1000;
 		this.server.on('error', err => {
-			console.log(err.stack);
+			console.error(err.stack);
 		});
 		this.server.on('connection', socket => {
 			socket.setTimeout(1500);
