@@ -13,8 +13,7 @@
    limitations under the License.
 */
 
-const should = require("should");
-const { messages } = require("../lambda/messages.js");
+require("should");
 const { getJSON } = require("../lambda/getJSON.js");
 const TestServer = require("./utils/server.js");
 

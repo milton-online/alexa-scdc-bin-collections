@@ -30,7 +30,7 @@ alexaTest.initialize(
 const today = new SpeakableDate().setToMidnight();
 const yesterday = Date.now() - 86400000;
 
-datedAttributes = {
+const datedAttributes = {
   collections: [
     {
       date: "2501-09-18T00:00:00Z",
@@ -49,7 +49,7 @@ datedAttributes = {
   currentBinType: null,
 };
 
-todayAttributes = {
+const todayAttributes = {
   collections: [
     {
       date: today.toISOString(),
@@ -68,7 +68,7 @@ todayAttributes = {
   currentBinType: "DOMESTIC",
 };
 
-tomorrowAttributes = {
+const tomorrowAttributes = {
   collections: [
     {
       date: today.addDays(1).toISOString(),

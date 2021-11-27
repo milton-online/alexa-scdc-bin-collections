@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-const should = require("should");
+require("should");
 const BinCollection = require("../lambda/bincollection.js");
 const { messages } = require("../lambda/messages.js");
 
@@ -64,7 +64,7 @@ describe("BinCollection", function () {
     it("two bins", function () {
       multipleExample.getColoursSpeech().should.equal("green and blue bins");
     });
-    tripleExample = new BinCollection({
+    const tripleExample = new BinCollection({
       roundTypes: ["ORGANIC", "RECYCLE", "DOMESTIC"],
     });
     it("three bins", function () {

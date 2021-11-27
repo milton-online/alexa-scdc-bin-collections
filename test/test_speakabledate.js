@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-const should = require("should");
+require("should");
 const SpeakableDate = require("../lambda/speakabledate.js");
 const jan31_a = new SpeakableDate("2020-01-31T00:00:00Z");
 const jan31_b = new SpeakableDate("2020-01-31T00:00:00Z");
