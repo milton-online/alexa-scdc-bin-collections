@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-require("should");
+const should = require("should");
 const { Internal, attributesAreStale } = require("../lambda/sessiondata.js");
 const SpeakableDate = require("../lambda/speakabledate.js");
 

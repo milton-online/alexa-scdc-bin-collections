@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-require("should");
+const should = require("should");
 const BinCollection = require("../lambda/bincollection.js");
 const { messages } = require("../lambda/messages.js");
 

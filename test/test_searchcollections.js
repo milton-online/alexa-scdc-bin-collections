@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-require("should");
+const should = require("should");
 const {
   getNextCollection,
   getNextCollectionOfType,
