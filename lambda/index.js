@@ -342,7 +342,7 @@ const PersistenceSavingInterceptor = {
     return new Promise((resolve, reject) => {
       const attributes = attributesManager.getSessionAttributes();
       if (attributes.areDirty) {
-        console.debug("Saving attributes");
+        // console.debug("Saving attributes");
         attributesManager
           .savePersistentAttributes()
           .then(() => {
@@ -380,7 +380,7 @@ const LoadBinCollectionsInterceptor = {
 };
 
 async function getFreshAttributes(handlerInput) {
-  console.info("Fetching new persistent data");
+  // console.info("Fetching new persistent data");
   const attributesManager = handlerInput.attributesManager;
   const attributes = await getFreshSessionData(handlerInput);
 
