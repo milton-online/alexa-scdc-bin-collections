@@ -2,3 +2,4 @@ lambda/node_modules
 .ask/
 hooks/
 ask-resources.json
+*~
