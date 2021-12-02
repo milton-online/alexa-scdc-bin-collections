@@ -1,7 +1,7 @@
 {
   "name": "bin-collections",
-  "version": "0.0.1",
-  "description": "alexa skill for querying south cambs bin collections",
+  "version": "0.1.0",
+  "description": "Alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
     "test": "cd .. && NODE_PATH=lambda/node_modules mocha"
