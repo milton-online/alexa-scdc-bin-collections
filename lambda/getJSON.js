@@ -20,7 +20,7 @@ const log = require("loglevel");
 const { messages } = require("./messages.js");
 
 exports.getJSON_fromURL = function (url, timeout = 5000) {
-  log.debug(url);
+  log.debug(`getJSON_fromURL: ${url}`);
   return new Promise(function (resolve, reject) {
     const controller = new AbortController();
     const timeoutobj = setTimeout(() => {
