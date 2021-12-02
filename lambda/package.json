@@ -15,7 +15,8 @@
     "ask-sdk-model": "^1.36.1",
     "aws-sdk": "^2.1009.0",
     "loglevel": "^1.8.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "util": "^0.12.4"
   },
   "devDependencies": {
     "alexa-skill-test-framework": "milton-online/alexa-skill-test-framework#master",
