@@ -413,8 +413,8 @@ async function getFreshAttributes(handlerInput) {
   if (attributes.logLevel) {
     log.setLevel(attributes.logLevel);
   } else {
-    attributes.logLevel === "silent";
-    log.setLevel("silent");
+    attributes.logLevel = "error";
+    log.setLevel("error");
   }
 
   attributesManager.setSessionAttributes(attributes);
