@@ -42,16 +42,7 @@ function getPostcodeFromAddress(address) {
     throw new DataError("No postcode", messages.NO_POSTCODE);
   }
 
-  if (
-    address.addressLine1 === null &&
-    address.addressLine2 === null &&
-    address.addressLine3 === null &&
-    address.city === null &&
-    address.stateOrRegion === null &&
-    address.districtOrCounty === null &&
-    address.countryCode === "US" &&
-    address.postalCode === "20146"
-  ) {
+  if (address.countryCode === "US" && address.postalCode === "20146") {
     // This is a testing address for Amazon hosted skills, and causes failures during live deployment
     // Special case returning a real Cambridge postcode for this case
     return "CB30JG";
