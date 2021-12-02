@@ -45,6 +45,6 @@ exports.messages = {
   BYE_THEN: "Bye then!",
   NO_QUESTION: "I didn't ask you a question.",
   LOGGING_CARD:
-    "Logging level is set to %s.  To switch looging off, tell bin collections to set logging to off",
-  LOGGING: "bin collections skill logging for your account is set to %s",
+    "Bin Collections logging level is set to %s.  To switch logging off, tell bin collections to set logging to off",
+  LOGGING: "Bin Collections skill logging for your account is set to %s",
 };
