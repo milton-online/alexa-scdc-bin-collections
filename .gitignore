@@ -3,3 +3,4 @@ lambda/node_modules
 hooks/
 ask-resources.json
 *~
+.DS_Store
