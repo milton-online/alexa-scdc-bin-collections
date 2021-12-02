@@ -51,9 +51,9 @@
           "slots": [],
           "samples": [
             "what about the one after",
-            "they\u0027ve already been",
+            "they've already been",
             "I missed that one",
-            "I\u0027ve missed it"
+            "I've missed it"
           ]
         },
         {
@@ -81,8 +81,8 @@
           "name": "WhichBinTodayIntent",
           "slots": [],
           "samples": [
-            "today\u0027s collection",
-            "today\u0027s bin",
+            "today's collection",
+            "today's bin",
             "which bin is it today",
             "what colour bin is it today",
             "which bin is collected today"
@@ -93,6 +93,30 @@
           "slots": [],
           "samples": [
             "who put the bins out"
+          ]
+        },
+        {
+          "name": "SetLogLevelIntent",
+          "slots": [
+            {
+              "name": "logLevel",
+              "type": "logLevel",
+              "samples": [
+                "warning",
+                "info",
+                "warn",
+                "error",
+                "debug",
+                "off",
+                "on",
+                "silent"
+              ]
+            }
+          ],
+          "samples": [
+            "set debugging {logLevel}",
+            "turn logging {logLevel}",
+            "set logging to {logLevel}"
           ]
         }
       ],
@@ -148,6 +172,51 @@
             }
           ],
           "name": "binType"
+        },
+        {
+          "values": [
+            {
+              "id": "trace",
+              "name": {
+                "value": "trace"
+              }
+            },
+            {
+              "id": "warn",
+              "name": {
+                "value": "warn",
+                "synonyms": [
+                  "warning"
+                ]
+              }
+            },
+            {
+              "id": "debug",
+              "name": {
+                "value": "debug",
+                "synonyms": [
+                  "on"
+                ]
+              }
+            },
+            {
+              "id": "silent",
+              "name": {
+                "value": "silent",
+                "synonyms": [
+                  "error",
+                  "off"
+                ]
+              }
+            },
+            {
+              "id": "info",
+              "name": {
+                "value": "info"
+              }
+            }
+          ],
+          "name": "logLevel"
         }
       ]
     },
@@ -174,6 +243,22 @@
               ]
             }
           ]
+        },
+        {
+          "name": "SetLogLevelIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "logLevel",
+              "type": "logLevel",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1603030742482.810439073260"
+              }
+            }
+          ]
         }
       ],
       "delegationStrategy": "ALWAYS"
@@ -197,11 +282,20 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "What sort of bin. You can ask for the colour of the bin, whether it\u0027s for recycling, compost or landfill, or you can ask by material you put in the bin, such as glass."
+            "value": "What sort of bin. You can ask for the colour of the bin, whether it's for recycling, compost or landfill, or you can ask by material you put in the bin, such as glass."
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.1603030742482.810439073260",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Logging can be set at various levels to assist the developer in fixing problems with the skill.  Logs cannot be read by anyone other than the developer, and the level can be set from silent, which logs errors only, to debug, which logs more detail to assist the developer with problem solving.  Silent is recommended unless the developer has asked you to set a higher level to solve a problem.Choices, in increasing order, are silent, warning, info and debug.    Which do you want?"
           }
         ]
       }
     ]
   },
-  "version": "1"
+  "version": "3"
 }

@@ -17,6 +17,8 @@ const AWS = require("aws-sdk");
 const Alexa = require("ask-sdk-core");
 const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
 const process = require("process");
+const log = require("loglevel");
+const util = require("util");
 const BinCollection = require("./bincollection.js");
 const DataError = require("./dataerror.js");
 const { messages } = require("./messages.js");
@@ -95,6 +97,35 @@ function resolveToCanonicalSlotValue(slot) {
     return slot.value;
   }
 }
+
+const SetLogLevelIntentHandler = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "SetLogLevelIntent"
+    );
+  },
+  handle(handlerInput) {
+    let { requestEnvelope, responseBuilder, attributesManager } = handlerInput;
+
+    const logLevel = resolveToCanonicalSlotValue(
+      requestEnvelope.request.intent.slots.logLevel
+    );
+
+    const attributes = attributesManager.getSessionAttributes();
+    attributes.logLevel = logLevel;
+    log.setLevel(logLevel);
+    attributesManager.setSessionAttributes(attributes);
+
+    return responseBuilder
+      .speak(util.format(messages.LOGGING, logLevel))
+      .withSimpleCard(
+        "Bin Collections Log Level",
+        util.format(messages.LOGGING_CARD, logLevel)
+      )
+      .getResponse();
+  },
+};
 
 const NextColourBinIntentHandler = {
   canHandle(handlerInput) {
@@ -308,12 +339,7 @@ const IntentReflectorHandler = {
     const intentName = Alexa.getIntentName(handlerInput.requestEnvelope);
     const speakOutput = `You just triggered ${intentName}`;
 
-    return (
-      handlerInput.responseBuilder
-        .speak(speakOutput)
-        //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
-        .getResponse()
-    );
+    return handlerInput.responseBuilder.speak(speakOutput).getResponse();
   },
 };
 
@@ -322,6 +348,7 @@ const ErrorHandler = {
     return true;
   },
   handle(handlerInput, e) {
+    // Errors which reach here we always want logged, so use console rather than log
     console.error(`~~~~~ Error handled: ${e.stack}`);
     let r = handlerInput.responseBuilder;
     if (e instanceof DataError) {
@@ -342,7 +369,7 @@ const PersistenceSavingInterceptor = {
     return new Promise((resolve, reject) => {
       const attributes = attributesManager.getSessionAttributes();
       if (attributes.areDirty) {
-        // console.debug("Saving attributes");
+        log.debug("Saving attributes");
         attributesManager
           .savePersistentAttributes()
           .then(() => {
@@ -380,9 +407,15 @@ const LoadBinCollectionsInterceptor = {
 };
 
 async function getFreshAttributes(handlerInput) {
-  // console.info("Fetching new persistent data");
+  log.info("Fetching new persistent data");
   const attributesManager = handlerInput.attributesManager;
   const attributes = await getFreshSessionData(handlerInput);
+  if (attributes.logLevel) {
+    log.setLevel(attributes.logLevel);
+  } else {
+    attributes.logLevel === "silent";
+    log.setLevel("silent");
+  }
 
   attributesManager.setSessionAttributes(attributes);
   attributesManager.setPersistentAttributes(attributes);
@@ -462,6 +495,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     MissedBinCollectionIntentHandler,
     WhichBinTodayIntentHandler,
     GetFreshDataIntentHandler,
+    SetLogLevelIntentHandler,
     WhoPutTheBinsOutIntentHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,

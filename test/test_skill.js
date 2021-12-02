@@ -14,6 +14,8 @@
 */
 
 const alexaTest = require("alexa-skill-test-framework");
+const log = require("loglevel");
+const util = require("util");
 const { messages } = require("../lambda/messages.js");
 const SpeakableDate = require("../lambda/speakabledate.js");
 
@@ -47,6 +49,7 @@ const datedAttributes = {
   fetchedOnDate: yesterday,
   deviceId: DEVICE_ID,
   currentBinType: null,
+  logLevel: "silent",
 };
 
 const todayAttributes = {
@@ -66,6 +69,7 @@ const todayAttributes = {
   deviceId: DEVICE_ID,
   fetchedOnDate: yesterday,
   currentBinType: "DOMESTIC",
+  logLevel: "silent",
 };
 
 const tomorrowAttributes = {
@@ -80,7 +84,10 @@ const tomorrowAttributes = {
   fetchedOnDate: yesterday,
   deviceId: DEVICE_ID,
   currentBinType: null,
+  logLevel: "silent",
 };
+
+log.disableAll();
 
 describe("Bin Collections Skill", function () {
   describe("LaunchRequest", function () {
@@ -252,5 +259,31 @@ describe("Bin Collections Skill", function () {
         },
       },
     ]);
+  });
+  describe("SetLogLevelIntent", function () {
+    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (
+      testLevel,
+      levelNumber
+    ) {
+      alexaTest.test([
+        {
+          request: alexaTest.getIntentRequest("SetLogLevelIntent", {
+            logLevel: testLevel,
+          }),
+          says: util.format(messages.LOGGING, testLevel),
+          hasCardTitle: "Bin Collections Log Level",
+          hasCardContent: util.format(messages.LOGGING_CARD, testLevel),
+          repromptsNothing: true,
+          shouldEndSession: true,
+          withSessionAttributes: tomorrowAttributes,
+          hasAttributes: {
+            logLevel: testLevel,
+          },
+        },
+      ]);
+      it(`logging level check: ${testLevel}`, function () {
+        log.getLevel().should.equal(levelNumber);
+      });
+    });
   });
 });

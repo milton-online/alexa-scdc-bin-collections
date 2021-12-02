@@ -14,6 +14,7 @@
 */
 
 const Alexa = require("ask-sdk-core");
+const log = require("loglevel");
 const { getJSON } = require("./getJSON.js");
 const DataError = require("./dataerror.js");
 const { messages } = require("./messages.js");
@@ -71,7 +72,6 @@ function getPostcodeSearchFromSCDCWeb(postcode) {
     getJSON(`${apiUrl}/address/search/?postCode=${postcode}`)
       .then((postcodeSearchResults) => {
         if (postcodeSearchResults.length < 1) {
-          // console.error(`${apiUrl}/address/search/?postCode=${postcode}`);
           reject(
             new DataError(
               "SCDC returned no locations for postcode starting " +
@@ -102,7 +102,6 @@ async function getCollectionsFromLocationList(locationList) {
   for (let l = 0; l < locationList.length; l += step) {
     let locationId = locationList[l];
     let url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
-    // console.info(url);
     let r = await getJSON(url);
 
     if (r.collections.length >= 1) {
@@ -139,25 +138,25 @@ exports.attributesAreStale = function (attributes, deviceId) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
   if (attributes.collections) {
-    // console.debug("Found collections");
+    log.debug("Found collections");
 
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
 
-    //console.debug(`oldDev: ${attributes.deviceId}`)
-    //console.debug(`newDev: ${deviceId}`)
+    log.debug(`oldDev: ${attributes.deviceId}`);
+    log.debug(`newDev: ${deviceId}`);
 
     if (attributes.deviceId === deviceId) {
-      // console.debug("Same device as before");
+      log.debug("Same device as before");
       const firstCollectionDate = new Date(
         attributes.collections[0].date
       ).getTime();
       if (firstCollectionDate >= midnightToday) {
-        // console.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`);
+        log.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`);
         const aWeekAgo = midnightToday - 7 * 86400000;
 
         if (attributes.fetchedOnDate > aWeekAgo) {
-          // console.debug("Not refreshing:  data is less than a week old");
+          log.debug("Not refreshing:  data is less than a week old");
           return false;
         }
       }
@@ -170,7 +169,7 @@ exports.getFreshSessionData = function (handlerInput) {
   const { requestEnvelope } = handlerInput;
 
   callDirectiveService(handlerInput, messages.CONTACTING_SCDC).catch((err) =>
-    console.error(err)
+    log.error(err)
   );
 
   getConsentToken(requestEnvelope);
