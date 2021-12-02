@@ -14,10 +14,10 @@
 */
 
 const should = require("should");
-const { getJSON } = require("../lambda/getJSON.js");
+const { getJSON_fromURL } = require("../lambda/getJSON.js");
 const TestServer = require("./utils/server.js");
 
-describe("getJSON", function () {
+describe("getJSON_fromURL", function () {
   const local = new TestServer();
   let base;
 
@@ -31,19 +31,19 @@ describe("getJSON", function () {
   });
 
   it("should fetch name", function () {
-    const r = getJSON(`${base}json`);
+    const r = getJSON_fromURL(`${base}json`);
     return r.should.eventually.have.property("name");
   });
 
   it("error/404 should throw DataError", function () {
-    getJSON(`${base}error/404`).should.be.rejectedWith({
+    getJSON_fromURL(`${base}error/404`).should.be.rejectedWith({
       name: "DataError",
       message: "HTTP error 404",
     });
   });
 
   it("slow should throw Timeout", function () {
-    getJSON(`${base}slow`, 100).should.be.rejectedWith({
+    getJSON_fromURL(`${base}slow`, 100).should.be.rejectedWith({
       name: "DataError",
       message: `Timeout: ${base}slow`,
     });

@@ -15,7 +15,7 @@
 
 const Alexa = require("ask-sdk-core");
 const log = require("loglevel");
-const { getJSON } = require("./getJSON.js");
+const { getJSON_fromURL } = require("./getJSON.js");
 const DataError = require("./dataerror.js");
 const { messages } = require("./messages.js");
 const SpeakableDate = require("./speakabledate.js");
@@ -69,7 +69,7 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 
 function getPostcodeSearchFromSCDCWeb(postcode) {
   return new Promise((resolve, reject) => {
-    getJSON(`${apiUrl}/address/search/?postCode=${postcode}`)
+    getJSON_fromURL(`${apiUrl}/address/search/?postCode=${postcode}`)
       .then((postcodeSearchResults) => {
         if (postcodeSearchResults.length < 1) {
           reject(
@@ -102,7 +102,7 @@ async function getCollectionsFromLocationList(locationList) {
   for (let l = 0; l < locationList.length; l += step) {
     let locationId = locationList[l];
     let url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
-    let r = await getJSON(url);
+    let r = await getJSON_fromURL(url);
 
     if (r.collections.length >= 1) {
       return { collections: r.collections };

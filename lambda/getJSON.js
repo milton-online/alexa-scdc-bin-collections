@@ -19,7 +19,7 @@ const AbortController = require("abort-controller");
 const log = require("loglevel");
 const { messages } = require("./messages.js");
 
-exports.getJSON = function (url, timeout = 5000) {
+exports.getJSON_fromURL = function (url, timeout = 5000) {
   log.debug(url);
   return new Promise(function (resolve, reject) {
     const controller = new AbortController();
