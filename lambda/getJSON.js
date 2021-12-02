@@ -32,7 +32,12 @@ exports.getJSON = function (url, timeout = 5000) {
         if (res.ok) {
           return res.json();
         } else {
-          reject(new DataError("HTTP error " + res.status, messages.WEB_ERROR));
+          reject(
+            new DataError(
+              `HTTP error (${res.status}) :${url}: `,
+              messages.WEB_ERROR
+            )
+          );
         }
       })
       .finally(() => clearTimeout(timeoutobj))
@@ -42,7 +47,10 @@ exports.getJSON = function (url, timeout = 5000) {
           reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT));
         } else {
           reject(
-            new DataError(`Other error: ${err.stack}`, messages.WEB_ERROR)
+            new DataError(
+              `Other error: ${url}: ${err.stack}`,
+              messages.WEB_ERROR
+            )
           );
         }
       });
