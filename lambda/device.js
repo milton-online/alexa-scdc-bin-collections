@@ -25,8 +25,6 @@ exports.getAddressFromDevice = async function (handlerInput) {
       serviceClientFactory.getDeviceAddressServiceClient();
     const address = await deviceAddressServiceClient.getFullAddress(deviceId);
 
-    console.debug(`getAddressFromDevice: ${JSON.stringify(address)}`);
-
     return address;
   } catch (e) {
     throw new DataError(
