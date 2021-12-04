@@ -15,7 +15,7 @@
 
 const Alexa = require("ask-sdk-core");
 const DataError = require("./dataerror.js");
-const { messages } = require("./messages.js");
+const messages = require("./messages.js");
 
 exports.getAddressFromDevice = async function (handlerInput) {
   try {

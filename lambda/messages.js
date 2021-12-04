@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-exports.messages = {
+module.exports = {
   NO_ADDRESS:
     "It looks like you don't have an address set on this device. You can set your address in the Alexa app.",
   NO_DATA_RETURNED:

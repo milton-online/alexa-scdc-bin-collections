@@ -22,7 +22,7 @@ const util = require("util");
 const BinCollection = require("./bincollection.js");
 const DataError = require("./dataerror.js");
 const interceptors = require("./interceptors.js");
-const { messages } = require("./messages.js");
+const messages = require("./messages.js");
 const {
   getNextCollection,
   getNextCollectionOfType,

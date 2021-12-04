@@ -17,10 +17,10 @@ const DataError = require("./dataerror.js");
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
 const log = require("loglevel");
-const { messages } = require("./messages.js");
+const messages = require("./messages.js");
 
-exports.getJSON_fromURL = function (url, timeout = 5000) {
-  log.debug(`getJSON_fromURL: ${url}`);
+exports.getJSON = function (url, timeout = 5000) {
+  log.debug(`getJSON: ${url}`);
   return new Promise(function (resolve, reject) {
     const controller = new AbortController();
     const timeoutobj = setTimeout(() => {

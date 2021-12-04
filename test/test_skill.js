@@ -16,7 +16,7 @@
 const alexaTest = require("alexa-skill-test-framework");
 const log = require("loglevel");
 const util = require("util");
-const { messages } = require("../lambda/messages.js");
+const messages = require("../lambda/messages.js");
 const SpeakableDate = require("../lambda/speakabledate.js");
 
 const DEVICE_ID =

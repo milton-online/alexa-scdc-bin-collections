@@ -14,7 +14,7 @@
 */
 
 const SpeakableDate = require("./speakabledate.js");
-const { messages } = require("./messages.js");
+const messages = require("./messages.js");
 
 const binTypes = {
   RECYCLE: {
