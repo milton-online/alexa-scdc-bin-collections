@@ -18,61 +18,62 @@ const log = require("loglevel");
 const { getFreshSessionData, attributesAreStale } = require("./sessiondata.js");
 
 async function getFreshAttributes(handlerInput) {
-  log.info("Fetching new persistent data");
-  const attributesManager = handlerInput.attributesManager;
-  const attributes = await getFreshSessionData(handlerInput);
-  if (attributes.logLevel) {
-    log.setLevel(attributes.logLevel);
-  } else {
-    attributes.logLevel = "error";
-    log.setLevel("error");
-  }
+    log.info("Fetching new persistent data");
+    const attributesManager = handlerInput.attributesManager;
+    const attributes = await getFreshSessionData(handlerInput);
+    if (attributes.logLevel) {
+        log.setLevel(attributes.logLevel);
+    } else {
+        attributes.logLevel = "error";
+        log.setLevel("error");
+    }
 
-  attributesManager.setSessionAttributes(attributes);
-  attributesManager.setPersistentAttributes(attributes);
+    attributesManager.setSessionAttributes(attributes);
+    attributesManager.setPersistentAttributes(attributes);
 }
 
 module.exports = {
-  getFreshAttributes: getFreshAttributes,
-  PersistenceSavingInterceptor: {
-    process(handlerInput) {
-      const { attributesManager } = handlerInput;
-      return new Promise((resolve, reject) => {
-        const attributes = attributesManager.getSessionAttributes();
-        if (attributes.areDirty) {
-          log.debug("Saving attributes");
-          attributesManager
-            .savePersistentAttributes()
-            .then(() => {
-              attributes.areDirty = false;
-              attributesManager.setSessionAttributes(attributes);
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
+    getFreshAttributes: getFreshAttributes,
+    PersistenceSavingInterceptor: {
+        process(handlerInput) {
+            const { attributesManager } = handlerInput;
+            return new Promise((resolve, reject) => {
+                const attributes = attributesManager.getSessionAttributes();
+                if (attributes.areDirty) {
+                    log.debug("Saving attributes");
+                    attributesManager
+                        .savePersistentAttributes()
+                        .then(() => {
+                            attributes.areDirty = false;
+                            attributesManager.setSessionAttributes(attributes);
+                            resolve();
+                        })
+                        .catch((error) => {
+                            reject(error);
+                        });
+                } else {
+                    resolve();
+                }
             });
-        } else {
-          resolve();
-        }
-      });
+        },
     },
-  },
-  LoadBinCollectionsInterceptor: {
-    async process(handlerInput) {
-      const { requestEnvelope, attributesManager } = handlerInput;
-      // In normal operation there wouldn't be session attributes here, but during testing there are
-      let attributes = attributesManager.getSessionAttributes();
-      if (!attributes.deviceId) {
-        attributes = (await attributesManager.getPersistentAttributes()) || {};
-        attributes.missedQuestion = false;
-        attributesManager.setSessionAttributes(attributes);
-      }
+    LoadBinCollectionsInterceptor: {
+        async process(handlerInput) {
+            const { requestEnvelope, attributesManager } = handlerInput;
+            // In normal operation there wouldn't be session attributes here, but during testing there are
+            let attributes = attributesManager.getSessionAttributes();
+            if (!attributes.deviceId) {
+                attributes =
+                    (await attributesManager.getPersistentAttributes()) || {};
+                attributes.missedQuestion = false;
+                attributesManager.setSessionAttributes(attributes);
+            }
 
-      const deviceId = Alexa.getDeviceId(requestEnvelope);
+            const deviceId = Alexa.getDeviceId(requestEnvelope);
 
-      if (attributesAreStale(attributes, deviceId)) {
-        await getFreshAttributes(handlerInput);
-      }
+            if (attributesAreStale(attributes, deviceId)) {
+                await getFreshAttributes(handlerInput);
+            }
+        },
     },
-  },
 };

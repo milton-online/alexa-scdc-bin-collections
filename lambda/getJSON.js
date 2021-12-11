@@ -20,39 +20,41 @@ const log = require("loglevel");
 const messages = require("./messages.js");
 
 exports.getJSON = function (url, timeout = 5000) {
-  log.debug(`getJSON: ${url}`);
-  return new Promise(function (resolve, reject) {
-    const controller = new AbortController();
-    const timeoutobj = setTimeout(() => {
-      controller.abort();
-    }, timeout);
+    log.debug(`getJSON: ${url}`);
+    return new Promise(function (resolve, reject) {
+        const controller = new AbortController();
+        const timeoutobj = setTimeout(() => {
+            controller.abort();
+        }, timeout);
 
-    fetch(url, { signal: controller.signal })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          reject(
-            new DataError(
-              `HTTP error (${res.status}) :${url}: `,
-              messages.WEB_ERROR
-            )
-          );
-        }
-      })
-      .finally(() => clearTimeout(timeoutobj))
-      .then((json) => resolve(json))
-      .catch((err) => {
-        if (err.name === "AbortError") {
-          reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT));
-        } else {
-          reject(
-            new DataError(
-              `Other error: ${url}: ${err.stack}`,
-              messages.WEB_ERROR
-            )
-          );
-        }
-      });
-  });
+        fetch(url, { signal: controller.signal })
+            .then((res) => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    reject(
+                        new DataError(
+                            `HTTP error (${res.status}) :${url}: `,
+                            messages.WEB_ERROR
+                        )
+                    );
+                }
+            })
+            .finally(() => clearTimeout(timeoutobj))
+            .then((json) => resolve(json))
+            .catch((err) => {
+                if (err.name === "AbortError") {
+                    reject(
+                        new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT)
+                    );
+                } else {
+                    reject(
+                        new DataError(
+                            `Other error: ${url}: ${err.stack}`,
+                            messages.WEB_ERROR
+                        )
+                    );
+                }
+            });
+    });
 };

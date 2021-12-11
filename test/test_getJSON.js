@@ -18,34 +18,34 @@ const { getJSON } = require("../lambda/getJSON.js");
 const TestServer = require("./utils/server.js");
 
 describe("getJSON", function () {
-  const local = new TestServer();
-  let base;
+    const local = new TestServer();
+    let base;
 
-  before(async () => {
-    await local.start();
-    base = `http://${local.hostname}:${local.port}/`;
-  });
-
-  after(async () => {
-    return local.stop();
-  });
-
-  it("should fetch name", function () {
-    const r = getJSON(`${base}json`);
-    return r.should.eventually.have.property("name");
-  });
-
-  it("error/404 should throw DataError", function () {
-    getJSON(`${base}error/404`).should.be.rejectedWith({
-      name: "DataError",
-      message: "HTTP error 404",
+    before(async () => {
+        await local.start();
+        base = `http://${local.hostname}:${local.port}/`;
     });
-  });
 
-  it("slow should throw Timeout", function () {
-    getJSON(`${base}slow`, 100).should.be.rejectedWith({
-      name: "DataError",
-      message: `Timeout: ${base}slow`,
+    after(async () => {
+        return local.stop();
     });
-  });
+
+    it("should fetch name", function () {
+        const r = getJSON(`${base}json`);
+        return r.should.eventually.have.property("name");
+    });
+
+    it("error/404 should throw DataError", function () {
+        getJSON(`${base}error/404`).should.be.rejectedWith({
+            name: "DataError",
+            message: "HTTP error 404",
+        });
+    });
+
+    it("slow should throw Timeout", function () {
+        getJSON(`${base}slow`, 100).should.be.rejectedWith({
+            name: "DataError",
+            message: `Timeout: ${base}slow`,
+        });
+    });
 });

@@ -17,97 +17,104 @@ const SpeakableDate = require("./speakabledate.js");
 const messages = require("./messages.js");
 
 const binTypes = {
-  RECYCLE: {
-    colour: "blue",
-    name: "recycling",
-    smallUrl: "https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png",
-    largeUrl: "https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png",
-  },
-  DOMESTIC: {
-    colour: "black",
-    name: "landfill",
-    smallUrl: "https://www.scambs.gov.uk/media/1122/black_bin.png",
-    largeUrl: "https://www.scambs.gov.uk/media/1122/black_bin.png",
-  },
-  ORGANIC: {
-    colour: "green",
-    name: "compostable",
-    smallUrl: "https://www.scambs.gov.uk/media/1118/green_bin.png",
-    largeUrl: "https://www.scambs.gov.uk/media/1118/green_bin.png",
-  },
+    RECYCLE: {
+        colour: "blue",
+        name: "recycling",
+        smallUrl: "https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png",
+        largeUrl: "https://www.scambs.gov.uk/media/1123/blue_bin_clipart.png",
+    },
+    DOMESTIC: {
+        colour: "black",
+        name: "landfill",
+        smallUrl: "https://www.scambs.gov.uk/media/1122/black_bin.png",
+        largeUrl: "https://www.scambs.gov.uk/media/1122/black_bin.png",
+    },
+    ORGANIC: {
+        colour: "green",
+        name: "compostable",
+        smallUrl: "https://www.scambs.gov.uk/media/1118/green_bin.png",
+        largeUrl: "https://www.scambs.gov.uk/media/1118/green_bin.png",
+    },
 };
 
 module.exports = class BinCollection {
-  static getColourForBinType(binType) {
-    return binTypes[binType].colour;
-  }
-
-  static getNameForBinType(binType) {
-    return binTypes[binType].name;
-  }
-
-  constructor(jsondata) {
-    this.slippedCollection = false;
-    // { date: '2020-01-19T00:00:00Z', roundTypes: [ 'ORGANIC' ], slippedCollection: true }
-    Object.assign(this, jsondata);
-    this.date = new SpeakableDate(this.date);
-  }
-
-  getDateSpeech() {
-    let speech = this.date.getDateSpeech();
-    if (this.slippedCollection) {
-      speech += messages.SLIPPED_COLLECTION;
-    }
-    if (this.isTomorrow()) {
-      speech += "  Better get ";
-      speech +=
-        this.roundTypes.length > 1 ? "those bins out!" : "that bin out!";
-    } else if (this.isToday()) {
-      speech += messages.DID_YOU_MISS_IT;
-    }
-    return speech;
-  }
-
-  isToday() {
-    return this.date.isToday();
-  }
-
-  isTomorrow() {
-    return this.date.isTomorrow();
-  }
-
-  getSmallImageUrl() {
-    return binTypes[this.roundTypes[0]].smallUrl;
-  }
-
-  getLargeImageUrl() {
-    return binTypes[this.roundTypes[0]].largeUrl;
-  }
-
-  getName() {
-    return binTypes[this.roundTypes[0]].name;
-  }
-
-  getColour() {
-    return binTypes[this.roundTypes[0]].colour;
-  }
-
-  getColoursSpeech() {
-    let speakOutput;
-
-    const colours = this.roundTypes.map((k) => binTypes[k].colour);
-
-    if (colours.length === 1) {
-      speakOutput = `${colours[0]}`;
-    } else {
-      speakOutput =
-        colours.slice(0, -1).join(", ") + ` and ${colours[colours.length - 1]}`;
-    }
-    speakOutput += " bin";
-    if (colours.length !== 1) {
-      speakOutput += "s";
+    static getBinType(binType) {
+        return binTypes[binType];
     }
 
-    return speakOutput;
-  }
+    static getColourForBinType(binType) {
+        return binTypes[binType].colour;
+    }
+
+    static getNameForBinType(binType) {
+        return binTypes[binType].name;
+    }
+
+    constructor(jsondata) {
+        this.slippedCollection = false;
+        // { date: '2020-01-19T00:00:00Z', roundTypes: [ 'ORGANIC' ], slippedCollection: true }
+        Object.assign(this, jsondata);
+        this.date = new SpeakableDate(this.date);
+    }
+
+    getDateSpeech() {
+        let speech = this.date.getDateSpeech();
+        if (this.slippedCollection) {
+            speech += messages.SLIPPED_COLLECTION;
+        }
+        if (this.isTomorrow()) {
+            speech += "  Better get ";
+            speech +=
+                this.roundTypes.length > 1
+                    ? "those bins out!"
+                    : "that bin out!";
+        } else if (this.isToday()) {
+            speech += messages.DID_YOU_MISS_IT;
+        }
+        return speech;
+    }
+
+    isToday() {
+        return this.date.isToday();
+    }
+
+    isTomorrow() {
+        return this.date.isTomorrow();
+    }
+
+    getSmallImageUrl() {
+        return binTypes[this.roundTypes[0]].smallUrl;
+    }
+
+    getLargeImageUrl() {
+        return binTypes[this.roundTypes[0]].largeUrl;
+    }
+
+    getName() {
+        return binTypes[this.roundTypes[0]].name;
+    }
+
+    getColour() {
+        return binTypes[this.roundTypes[0]].colour;
+    }
+
+    getColoursSpeech() {
+        let speakOutput;
+
+        const colours = this.roundTypes.map((k) => binTypes[k].colour);
+
+        if (colours.length === 1) {
+            speakOutput = `${colours[0]}`;
+        } else {
+            speakOutput = `${colours.slice(0, -1).join(", ")} and ${
+                colours[colours.length - 1]
+            }`;
+        }
+        speakOutput += " bin";
+        if (colours.length !== 1) {
+            speakOutput += "s";
+        }
+
+        return speakOutput;
+    }
 };

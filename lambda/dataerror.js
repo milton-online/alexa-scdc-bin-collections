@@ -14,9 +14,9 @@
 */
 
 module.exports = class DataError extends Error {
-  constructor(message, speech) {
-    super(message);
-    this.name = "DataError";
-    this.speech = speech;
-  }
+    constructor(message, speech) {
+        super(message);
+        this.name = "DataError";
+        this.speech = speech;
+    }
 };
