@@ -438,6 +438,7 @@ const GetFreshDataIntentHandler = {
 };
 
 exports.handler = Alexa.SkillBuilders.custom()
+    .withSkillId("amzn1.ask.skill.a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0")
     .withPersistenceAdapter(
         new ddbAdapter.DynamoDbPersistenceAdapter({
             tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
