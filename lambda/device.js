@@ -18,20 +18,18 @@ const DataError = require("./dataerror.js");
 const messages = require("./messages.js");
 
 exports.getAddressFromDevice = async function (handlerInput) {
-    try {
-        const { requestEnvelope, serviceClientFactory } = handlerInput;
-        const deviceId = Alexa.getDeviceId(requestEnvelope);
-        const deviceAddressServiceClient =
-            serviceClientFactory.getDeviceAddressServiceClient();
-        const address = await deviceAddressServiceClient.getFullAddress(
-            deviceId
-        );
+  try {
+    const { requestEnvelope, serviceClientFactory } = handlerInput;
+    const deviceId = Alexa.getDeviceId(requestEnvelope);
+    const deviceAddressServiceClient =
+      serviceClientFactory.getDeviceAddressServiceClient();
+    const address = await deviceAddressServiceClient.getFullAddress(deviceId);
 
-        return address;
-    } catch (e) {
-        throw new DataError(
-            "No address from device",
-            messages.NOTIFY_MISSING_PERMISSIONS
-        );
-    }
+    return address;
+  } catch (e) {
+    throw new DataError(
+      "No address from device",
+      messages.NOTIFY_MISSING_PERMISSIONS
+    );
+  }
 };

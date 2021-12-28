@@ -17,24 +17,24 @@ const BinCollection = require("./bincollection.js");
 const SpeakableDate = require("./speakabledate.js");
 
 exports.getNextCollectionOfType = function (sessionData, binType) {
-    let r = sessionData.collections.find(function (item) {
-        const collectionDate = new SpeakableDate(item.date).getTime();
-        return (
-            item.roundTypes.indexOf(binType) !== -1 &&
-            collectionDate >= sessionData.midnightToday &&
-            collectionDate > sessionData.lastReportedBinTime
-        );
-    });
-    return r ? new BinCollection(r) : r;
+  let r = sessionData.collections.find(function (item) {
+    const collectionDate = new SpeakableDate(item.date).getTime();
+    return (
+      item.roundTypes.indexOf(binType) !== -1 &&
+      collectionDate >= sessionData.midnightToday &&
+      collectionDate > sessionData.lastReportedBinTime
+    );
+  });
+  return r ? new BinCollection(r) : r;
 };
 
 exports.getNextCollection = function (sessionData) {
-    let r = sessionData.collections.find(function (item) {
-        const collectionDate = new SpeakableDate(item.date).getTime();
-        return (
-            collectionDate >= sessionData.midnightToday &&
-            collectionDate > sessionData.lastReportedBinTime
-        );
-    });
-    return r ? new BinCollection(r) : r;
+  let r = sessionData.collections.find(function (item) {
+    const collectionDate = new SpeakableDate(item.date).getTime();
+    return (
+      collectionDate >= sessionData.midnightToday &&
+      collectionDate > sessionData.lastReportedBinTime
+    );
+  });
+  return r ? new BinCollection(r) : r;
 };
