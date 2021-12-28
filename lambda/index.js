@@ -80,8 +80,11 @@ const LaunchRequestHandler = {
 };
 
 function resolveToCanonicalSlotValue(slot) {
+  const resolutions = slot.resolutions;
   const hasResolutionDataOnSlot =
-    (slot.resolutions?.resolutionsPerAuthority.length ?? 0) > 0;
+    resolutions &&
+    resolutions.resolutionsPerAuthority &&
+    resolutions.resolutionsPerAuthority.length > 0;
   const resolution = hasResolutionDataOnSlot
     ? slot.resolutions.resolutionsPerAuthority[0]
     : null;
