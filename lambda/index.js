@@ -51,9 +51,7 @@ const LaunchRequestHandler = {
     attributes.currentBinType = collection.roundTypes[0];
     attributes.lastReportedBinTime = collection.date.getTime();
 
-    let speakOutput = "Your next collection is the ";
-    speakOutput += collection.getColoursSpeech();
-    speakOutput += ", " + collection.getDateSpeech();
+    const speakOutput = `Your next collection is the ${collection.getColoursSpeech()}, ${collection.getDateSpeech()}`;
 
     const oldQuestionState = attributes.missedQuestion;
 
@@ -197,24 +195,20 @@ const MissedBinCollectionIntentHandler = {
     attributes.missedQuestion = false;
     attributesManager.setSessionAttributes(attributes);
 
-    const binName = BinCollection.getNameForBinType(attributes.currentBinType);
+    const binType = BinCollection.getBinType(attributes.currentBinType);
 
-    const speakOutput = [
-      "The next",
-      BinCollection.getColourForBinType(attributes.currentBinType),
-      binName,
-      "collection will be",
-      collection.getDateSpeech(),
-    ].join(" ");
+    const speakOutput =
+      `The next ${binType.colour} ${binType.name} collection ` +
+      `will be ${collection.getDateSpeech()}`;
 
     return handlerInput.responseBuilder
       .withStandardCard(
-        `Next ${binName} collection`,
+        `Next ${binType.name} collection`,
         speakOutput,
         collection.getSmallImageUrl(),
         collection.getLargeImageUrl()
       )
-      .speak("OK then.  " + speakOutput)
+      .speak(`OK then.  ${speakOutput}`)
       .getResponse();
   },
 };
@@ -280,7 +274,7 @@ const HelpIntentHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak(messages.HELP + " " + messages.HELP_REPROMPT)
+      .speak(`${messages.HELP} ${messages.HELP_REPROMPT}`)
       .reprompt(messages.HELP_REPROMPT)
       .withSimpleCard(messages.HELPCARD_TITLE, messages.HELP)
       .getResponse();

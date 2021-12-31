@@ -38,6 +38,10 @@ const binTypes = {
 };
 
 module.exports = class BinCollection {
+  static getBinType(binType) {
+    return binTypes[binType];
+  }
+
   static getColourForBinType(binType) {
     return binTypes[binType].colour;
   }
@@ -100,8 +104,9 @@ module.exports = class BinCollection {
     if (colours.length === 1) {
       speakOutput = `${colours[0]}`;
     } else {
-      speakOutput =
-        colours.slice(0, -1).join(", ") + ` and ${colours[colours.length - 1]}`;
+      speakOutput = `${colours.slice(0, -1).join(", ")} and ${
+        colours[colours.length - 1]
+      }`;
     }
     speakOutput += " bin";
     if (colours.length !== 1) {
