@@ -1,4 +1,4 @@
-/* Copyright 2020 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,25 +16,26 @@
 const BinCollection = require("./bincollection.js");
 const SpeakableDate = require("./speakabledate.js");
 
-exports.getNextCollectionOfType = function (sessionData, binType) {
+function getNextCollection(sessionData, testfunc = () => true) {
   let r = sessionData.collections.find(function (item) {
     const collectionDate = new SpeakableDate(item.date).getTime();
     return (
-      item.roundTypes.indexOf(binType) !== -1 &&
       collectionDate >= sessionData.midnightToday &&
-      collectionDate > sessionData.lastReportedBinTime
+      collectionDate > sessionData.lastReportedBinTime &&
+      testfunc(item)
     );
   });
   return r ? new BinCollection(r) : r;
-};
+}
 
-exports.getNextCollection = function (sessionData) {
-  let r = sessionData.collections.find(function (item) {
-    const collectionDate = new SpeakableDate(item.date).getTime();
-    return (
-      collectionDate >= sessionData.midnightToday &&
-      collectionDate > sessionData.lastReportedBinTime
-    );
-  });
-  return r ? new BinCollection(r) : r;
+function getNextCollectionOfType(sessionData, binType) {
+  return getNextCollection(
+    sessionData,
+    (item) => item.roundTypes.indexOf(binType) !== -1
+  );
+}
+
+module.exports = {
+  getNextCollectionOfType: getNextCollectionOfType,
+  getNextCollection: getNextCollection,
 };
