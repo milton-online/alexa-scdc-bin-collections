@@ -92,16 +92,29 @@ function getPostcodeSearchFromSCDCWeb(postcode) {
   });
 }
 
-async function getLocationList(handlerInput) {
+async function getPostCodeFromDevice(handlerInput) {
   const address = await getAddressFromDevice(handlerInput);
   let postcode = getPostcodeFromAddress(address);
   // Special test case during live deployment test
   if (postcode === "IN_TEST") {
     postcode = "CB246ZD";
-    address.addressLine1 = "241 No Such Street";
+    address.addressLine1 = "999 No Such Street";
   }
-  const postcodeSearchResults = await getPostcodeSearchFromSCDCWeb(postcode);
-  return getLocationListFromSearchResults(postcodeSearchResults, address);
+  return {
+    address: address,
+    postcode: postcode,
+  };
+}
+
+async function getLocationList(handlerInput) {
+  const addrObj = getPostCodeFromDevice(handlerInput);
+  const postcodeSearchResults = await getPostcodeSearchFromSCDCWeb(
+    addrObj.postcode
+  );
+  return getLocationListFromSearchResults(
+    postcodeSearchResults,
+    addrObj.address
+  );
 }
 
 async function getCollectionsFromLocationList(locationList) {
@@ -145,7 +158,7 @@ function callDirectiveService(handlerInput, message) {
   return directiveServiceClient.enqueue(directive, endpoint, token);
 }
 
-exports.attributesAreStale = function (attributes, deviceId) {
+function attributesAreStale(attributes, deviceId) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
   if (attributes.collections) {
@@ -174,9 +187,9 @@ exports.attributesAreStale = function (attributes, deviceId) {
     }
   }
   return true;
-};
+}
 
-exports.getFreshSessionData = function (handlerInput) {
+function getFreshSessionData(handlerInput) {
   const { requestEnvelope } = handlerInput;
 
   callDirectiveService(handlerInput, messages.CONTACTING_SCDC).catch((err) =>
@@ -203,15 +216,17 @@ exports.getFreshSessionData = function (handlerInput) {
       })
       .catch((e) => reject(e));
   });
-};
+}
 
-/* for testing */
-exports.Internal = function () {
-  return {
+/* end test only */
+
+module.exports = {
+  Internal: {
     getPostcodeSearchFromSCDCWeb,
     getPostcodeFromAddress,
     getLocationListFromSearchResults,
     getCollectionsFromLocationList,
-  };
+  },
+  attributesAreStale: attributesAreStale,
+  getFreshSessionData: getFreshSessionData,
 };
-/* end test only */
