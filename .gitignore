@@ -1,6 +1,7 @@
 lambda/node_modules
 .ask/
 hooks/
+docker/
 ask-resources.json
 *~
 .DS_Store
