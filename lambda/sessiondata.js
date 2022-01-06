@@ -13,43 +13,15 @@
    limitations under the License.
 */
 
-const Alexa = require("ask-sdk-core");
 const log = require("loglevel");
 const { getJSON } = require("./getJSON.js");
 const DataError = require("./dataerror.js");
 const messages = require("./messages.js");
 const SpeakableDate = require("./speakabledate.js");
-const { getAddressFromDevice } = require("./device.js");
+const AlexaDevice = require("./alexadevice.js");
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
 const numberOfCollections = 12;
-
-function getConsentToken(requestEnvelope) {
-  const consentToken = requestEnvelope.context.System.apiAccessToken;
-
-  if (!consentToken) {
-    throw new DataError(
-      "No consent token",
-      messages.NOTIFY_MISSING_PERMISSIONS
-    );
-  }
-
-  return consentToken;
-}
-
-function getPostcodeFromAddress(address) {
-  if (address.postalCode === null) {
-    throw new DataError("No postcode", messages.NO_POSTCODE);
-  }
-
-  if (address.countryCode === "US" && address.postalCode === "20146") {
-    // This is a testing address for Amazon hosted skills, and causes failures during live deployment
-    // Return a special result to avoid the test failure
-    return "IN_TEST";
-  }
-  // get rid of the space in the postcode
-  return address.postalCode.slice(0, -4) + address.postalCode.slice(-3);
-}
 
 function getLocationListFromSearchResults(postcodeSearchResults, address) {
   let matched_address = null;
@@ -74,6 +46,7 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 }
 
 function getPostcodeSearchFromSCDCWeb(postcode) {
+  log.debug(`getPostcodeSearchFromSCDCWeb(postcode=${postcode})`);
   return new Promise((resolve, reject) => {
     getJSON(`${apiUrl}/address/search/?postCode=${postcode}`)
       .then((postcodeSearchResults) => {
@@ -92,28 +65,13 @@ function getPostcodeSearchFromSCDCWeb(postcode) {
   });
 }
 
-async function getPostCodeFromDevice(handlerInput) {
-  const address = await getAddressFromDevice(handlerInput);
-  let postcode = getPostcodeFromAddress(address);
-  // Special test case during live deployment test
-  if (postcode === "IN_TEST") {
-    postcode = "CB246ZD";
-    address.addressLine1 = "999 No Such Street";
-  }
-  return {
-    address: address,
-    postcode: postcode,
-  };
-}
-
-async function getLocationList(handlerInput) {
-  const addrObj = getPostCodeFromDevice(handlerInput);
+async function getLocationList(alexaDevice) {
   const postcodeSearchResults = await getPostcodeSearchFromSCDCWeb(
-    addrObj.postcode
+    alexaDevice.postalcode
   );
   return getLocationListFromSearchResults(
     postcodeSearchResults,
-    addrObj.address
+    alexaDevice.address
   );
 }
 
@@ -136,42 +94,26 @@ async function getCollectionsFromLocationList(locationList) {
   throw new DataError("No data", messages.NO_DATA_RETURNED);
 }
 
-function callDirectiveService(handlerInput, message) {
-  const requestEnvelope = handlerInput.requestEnvelope;
-  const directiveServiceClient =
-    handlerInput.serviceClientFactory.getDirectiveServiceClient();
-
-  const requestId = requestEnvelope.request.requestId;
-  const endpoint = requestEnvelope.context.System.apiEndpoint;
-  const token = Alexa.getApiAccessToken(requestEnvelope);
-
-  const directive = {
-    header: {
-      requestId,
-    },
-    directive: {
-      type: "VoicePlayer.Speak",
-      speech: message,
-    },
-  };
-
-  return directiveServiceClient.enqueue(directive, endpoint, token);
-}
-
-function attributesAreStale(attributes, deviceId) {
+function attributesAreStale(attributes, thisDevice) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
+
   if (attributes.collections) {
     log.debug("Found collections");
 
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
 
-    log.debug(`oldDev: ${attributes.deviceId}`);
-    log.debug(`newDev: ${deviceId}`);
+    log.debug(`oldAddr: ${attributes.alexaDevice.postalcode}`);
+    log.debug(`newAddr: ${thisDevice.postalcode}`);
+    log.debug(`oldHouse: ${attributes.alexaDevice.house}`);
+    log.debug(`newHouse: ${thisDevice.house}`);
 
-    if (attributes.deviceId === deviceId) {
-      log.debug("Same device as before");
+    if (
+      attributes.alexaDevice.postalcode === thisDevice.postalcode &&
+      attributes.alexaDevice.house === thisDevice.house
+    ) {
+      log.debug("Same address as before");
       const firstCollectionDate = new Date(
         attributes.collections[0].date
       ).getTime();
@@ -189,18 +131,21 @@ function attributesAreStale(attributes, deviceId) {
   return true;
 }
 
-function getFreshSessionData(handlerInput) {
+function getFreshSessionData(handlerInput, alexaDevice) {
+  log.debug(`getFreshSessionData(): ${alexaDevice.postalcode}`);
   const { requestEnvelope } = handlerInput;
 
-  callDirectiveService(handlerInput, messages.CONTACTING_SCDC).catch((err) =>
-    log.error(err)
-  );
+  if (process.env.MOCK_DEVICE !== "true") {
+    AlexaDevice.callDirectiveService(
+      handlerInput,
+      messages.CONTACTING_SCDC
+    ).catch((err) => log.error(err));
 
-  getConsentToken(requestEnvelope);
-  const deviceId = Alexa.getDeviceId(requestEnvelope);
+    AlexaDevice.getConsentToken(requestEnvelope);
+  }
 
   return new Promise((resolve, reject) => {
-    getLocationList(handlerInput)
+    getLocationList(alexaDevice)
       .then((locationList) => getCollectionsFromLocationList(locationList))
       .then((data) => {
         Object.assign(data, {
@@ -209,8 +154,9 @@ function getFreshSessionData(handlerInput) {
           midnightToday: new SpeakableDate().setToMidnight().getTime(),
           lastReportedBinTime: 0,
           currentBinType: null,
-          deviceId: deviceId,
           fetchedOnDate: Date.now(),
+          deviceId: alexaDevice.deviceId,
+          alexaDevice: alexaDevice,
         });
         resolve(data);
       })
@@ -218,12 +164,9 @@ function getFreshSessionData(handlerInput) {
   });
 }
 
-/* end test only */
-
 module.exports = {
   Internal: {
     getPostcodeSearchFromSCDCWeb,
-    getPostcodeFromAddress,
     getLocationListFromSearchResults,
     getCollectionsFromLocationList,
   },

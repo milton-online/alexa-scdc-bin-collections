@@ -16,6 +16,7 @@
 const should = require("should");
 const { Internal, attributesAreStale } = require("../lambda/sessiondata.js");
 const SpeakableDate = require("../lambda/speakabledate.js");
+const MockAlexaDevice = require("./mockalexadevice.js");
 
 ("use strict");
 
@@ -29,7 +30,7 @@ const OTHER_DEVICE =
   "amzn1.ask.device.1111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
 const testAddress = {
-  addressLine1: "241 The Made Up Street",
+  addressLine1: "241 No Such Street",
   addressLine2: null,
   addressLine3: null,
   city: "Some town",
@@ -39,11 +40,15 @@ const testAddress = {
   postalCode: "CB24 6ZD",
 };
 
+const mockalexadevice = new MockAlexaDevice(DEVICE_ID, testAddress);
+mockalexadevice.getPostcodeFromAddress();
+const mockOtherDevice = new MockAlexaDevice(OTHER_DEVICE, testAddress);
+
 const testPostcodeSearchResults = [
   {
     id: "100090161613",
     houseNumber: "241",
-    street: "The Made Up Street",
+    street: "No Such Street",
     town: "Sometown",
     postCode: "CB246ZD",
   },
@@ -66,6 +71,7 @@ const testAttributes = {
   missedQuestion: false,
   deviceId: DEVICE_ID,
   fetchedOnDate: yesterday,
+  alexaDevice: mockalexadevice,
   currentBinType: "DOMESTIC",
 };
 
@@ -80,16 +86,16 @@ describe("sessiondata", function () {
       results[0].should.have.property("id");
     });
   });
-  describe("getPostcodeFromAddress()", function () {
+  describe("alexaDevice.getPostcodeFromAddress()", function () {
     it("withspace", function () {
-      Internal.getPostcodeFromAddress(testAddress).should.equal("CB246ZD");
+      mockalexadevice.postalcode.should.equal("CB246ZD");
     });
   });
   describe("Fetching collections", function () {
     it("getLocationListFromSearchResults()", function () {
       locationList = Internal.getLocationListFromSearchResults(
         testPostcodeSearchResults,
-        testAddress
+        mockalexadevice.address
       );
       locationList[0].should.equal("100090161613");
     });
@@ -100,26 +106,32 @@ describe("sessiondata", function () {
   });
   describe("attributesAreStale()", function () {
     it("Data fetched yesterday, collection today", function () {
-      attributesAreStale(testAttributes, DEVICE_ID).should.be.true;
+      attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
     testAttributes.collections[0].date = today.addDays(-7).toISOString();
     it("data fetched yesterday, collection in the past", function () {
-      attributesAreStale(testAttributes, DEVICE_ID).should.be.true;
+      attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
     testAttributes.collections[0].date = tomorrow.toISOString();
     it("data fetched yesterday, collection tomorrow", function () {
-      attributesAreStale(testAttributes, DEVICE_ID).should.be.false;
+      attributesAreStale(testAttributes, mockalexadevice).should.be.false;
     });
-    it("Data fresh but for different device", function () {
-      attributesAreStale(testAttributes, OTHER_DEVICE).should.be.true;
+    it("Data fresh but for different device, same address", function () {
+      attributesAreStale(testAttributes, mockOtherDevice).should.be.false;
+    });
+    it("Data fresh but from device with different postcode", function () {
+      mockOtherDevice.address.postalCode = "CB24 6ZX";
+      mockOtherDevice.getPostcodeFromAddress();
+      mockOtherDevice.postalcode.should.equal("CB246ZX");
+      attributesAreStale(testAttributes, mockOtherDevice).should.be.true;
     });
     testAttributes.fetchedOnDate = amonthago;
     it("Data more than a week old", function () {
-      attributesAreStale(testAttributes, DEVICE_ID).should.be.true;
+      attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
     testAttributes.missedQuestion = true;
     it("Old data with missed question flag set", function () {
-      attributesAreStale(testAttributes, DEVICE_ID).should.be.true;
+      attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
   });
 });

@@ -13,21 +13,22 @@
    limitations under the License.
 */
 
-const Alexa = require("ask-sdk-core");
 const log = require("loglevel");
+const AlexaDevice = require("./alexadevice.js");
 const { getFreshSessionData, attributesAreStale } = require("./sessiondata.js");
 
-async function getFreshAttributes(handlerInput) {
-  log.info("Fetching new persistent data");
+async function getFreshAttributes(handlerInput, alexaDevice) {
+  log.info(`Fetching new persistent data for ${alexaDevice.postalcode}`);
   const attributesManager = handlerInput.attributesManager;
-  const attributes = await getFreshSessionData(handlerInput);
-  if (attributes.logLevel) {
-    log.setLevel(attributes.logLevel);
-  } else {
-    attributes.logLevel = "error";
-    log.setLevel("error");
+  const attributes = await getFreshSessionData(handlerInput, alexaDevice);
+  if (process.env.NODE_ENV !== "development") {
+    if (attributes.logLevel) {
+      log.setLevel(attributes.logLevel);
+    } else {
+      attributes.logLevel = "error";
+      log.setLevel("error");
+    }
   }
-
   attributesManager.setSessionAttributes(attributes);
   attributesManager.setPersistentAttributes(attributes);
 }
@@ -41,16 +42,22 @@ module.exports = {
         const attributes = attributesManager.getSessionAttributes();
         if (attributes.areDirty) {
           log.debug("Saving attributes");
-          attributesManager
-            .savePersistentAttributes()
-            .then(() => {
-              attributes.areDirty = false;
-              attributesManager.setSessionAttributes(attributes);
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
-            });
+          if (process.env.MOCK_DEVICE === "true") {
+            attributes.areDirty = false;
+            attributesManager.setSessionAttributes(attributes);
+            resolve();
+          } else {
+            attributesManager
+              .savePersistentAttributes()
+              .then(() => {
+                attributes.areDirty = false;
+                attributesManager.setSessionAttributes(attributes);
+                resolve();
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          }
         } else {
           resolve();
         }
@@ -59,7 +66,7 @@ module.exports = {
   },
   LoadBinCollectionsInterceptor: {
     async process(handlerInput) {
-      const { requestEnvelope, attributesManager } = handlerInput;
+      const { attributesManager } = handlerInput;
       // In normal operation there wouldn't be session attributes here, but during testing there are
       let attributes = attributesManager.getSessionAttributes();
       if (!attributes.deviceId) {
@@ -68,10 +75,12 @@ module.exports = {
         attributesManager.setSessionAttributes(attributes);
       }
 
-      const deviceId = Alexa.getDeviceId(requestEnvelope);
+      const thisDevice = new AlexaDevice();
+      await thisDevice.getAddressFromDevice(handlerInput);
+      thisDevice.getPostcodeFromAddress();
 
-      if (attributesAreStale(attributes, deviceId)) {
-        await getFreshAttributes(handlerInput);
+      if (attributesAreStale(attributes, thisDevice)) {
+        await getFreshAttributes(handlerInput, thisDevice);
       }
     },
   },
