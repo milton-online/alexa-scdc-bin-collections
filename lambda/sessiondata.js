@@ -109,6 +109,14 @@ function attributesAreStale(attributes, thisDevice) {
     log.debug(`oldHouse: ${attributes.alexaDevice.house}`);
     log.debug(`newHouse: ${thisDevice.house}`);
 
+    if (attributes.alexaDevice === undefined) {
+      if (attributes.alexaDevice === thisDevice.deviceId) {
+        attributes.alexaDevice === thisDevice;
+      } else {
+        return true;
+      }
+    }
+
     if (
       attributes.alexaDevice.postalcode === thisDevice.postalcode &&
       attributes.alexaDevice.house === thisDevice.house
