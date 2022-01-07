@@ -98,16 +98,15 @@ function attributesAreStale(attributes, thisDevice) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
 
+  log.error("attributesAreStale()");
+  log.error(`attributes: ${JSON.stringify(attributes, null, 2)}`);
+  log.error(`thisDevice: ${JSON.stringify(thisDevice, null, 2)}`);
+
   if (attributes.collections) {
     log.debug("Found collections");
 
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
-
-    log.debug(`oldAddr: ${attributes.alexaDevice.postalcode}`);
-    log.debug(`newAddr: ${thisDevice.postalcode}`);
-    log.debug(`oldHouse: ${attributes.alexaDevice.house}`);
-    log.debug(`newHouse: ${thisDevice.house}`);
 
     if (attributes.alexaDevice === undefined) {
       if (attributes.alexaDevice === thisDevice.deviceId) {
@@ -117,10 +116,7 @@ function attributesAreStale(attributes, thisDevice) {
       }
     }
 
-    if (
-      attributes.alexaDevice.postalcode === thisDevice.postalcode &&
-      attributes.alexaDevice.house === thisDevice.house
-    ) {
+    if (thisDevice.isSameLocationAsDevice(attributes.alexaDevice)) {
       log.debug("Same address as before");
       const firstCollectionDate = new Date(
         attributes.collections[0].date

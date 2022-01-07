@@ -55,6 +55,13 @@ module.exports = class AlexaDevice {
     return directiveServiceClient.enqueue(directive, endpoint, token);
   }
 
+  isSameLocationAsDevice(otherDevice) {
+    return (
+      otherDevice.house === this.house &&
+      otherDevice.postalcode === this.postalcode
+    );
+  }
+
   getPostcodeFromAddress() {
     if (this.address.postalCode === null) {
       throw new DataError("No postcode", messages.NO_POSTCODE);
