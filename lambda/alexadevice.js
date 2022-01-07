@@ -57,8 +57,8 @@ module.exports = class AlexaDevice {
 
   isSameLocationAsDevice(otherDevice) {
     return (
-      otherDevice.house === this.house &&
-      otherDevice.postalcode === this.postalcode
+      otherDevice.house.toUpperCase() === this.house.toUpperCase() &&
+      otherDevice.postalcode.toUpperCase() === this.postalcode.toUpperCase()
     );
   }
 

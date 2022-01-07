@@ -43,6 +43,7 @@ const testAddress = {
 const mockalexadevice = new MockAlexaDevice(DEVICE_ID, testAddress);
 mockalexadevice.getPostcodeFromAddress();
 const mockOtherDevice = new MockAlexaDevice(OTHER_DEVICE, testAddress);
+mockOtherDevice.getPostcodeFromAddress();
 
 const testPostcodeSearchResults = [
   {
@@ -84,6 +85,11 @@ describe("sessiondata", function () {
       results = await Internal.getPostcodeSearchFromSCDCWeb("CB246ZD");
       results.length.should.be.greaterThan(0);
       results[0].should.have.property("id");
+    });
+  });
+  describe("mockalexadevice.isSameLocationAsDevice()", function () {
+    it("otherdevice and mockdevice are same address", function () {
+      mockalexadevice.isSameLocationAsDevice(mockOtherDevice).should.be.true;
     });
   });
   describe("alexaDevice.getPostcodeFromAddress()", function () {
