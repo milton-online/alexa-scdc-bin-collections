@@ -1,4 +1,4 @@
-/* Copyright 2020 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -98,9 +98,9 @@ function attributesAreStale(attributes, thisDevice) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
 
-  log.error("attributesAreStale()");
-  log.error(`attributes: ${JSON.stringify(attributes, null, 2)}`);
-  log.error(`thisDevice: ${JSON.stringify(thisDevice, null, 2)}`);
+  log.debug("attributesAreStale()");
+  log.debug(`attributes: ${JSON.stringify(attributes, null, 2)}`);
+  log.debug(`thisDevice: ${JSON.stringify(thisDevice, null, 2)}`);
 
   if (attributes.collections) {
     log.debug("Found collections");
@@ -139,6 +139,7 @@ function getFreshSessionData(handlerInput, alexaDevice) {
   log.debug(`getFreshSessionData(): ${alexaDevice.postalcode}`);
   const { requestEnvelope } = handlerInput;
 
+  // Device access doesn't work under mocha test framework
   if (process.env.MOCK_DEVICE !== "true") {
     AlexaDevice.callDirectiveService(
       handlerInput,

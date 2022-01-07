@@ -1,4 +1,4 @@
-/* Copyright 2020-2021 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -57,8 +57,10 @@ module.exports = class AlexaDevice {
 
   isSameLocationAsDevice(otherDevice) {
     return (
-      otherDevice.house.toUpperCase() === this.house.toUpperCase() &&
-      otherDevice.postalcode.toUpperCase() === this.postalcode.toUpperCase()
+      otherDevice.address.addressLine1.toUpperCase() ===
+        this.address.addressLine1.toUpperCase() &&
+      otherDevice.address.postalCode.toUpperCase() ===
+        this.address.postalCode.toUpperCase()
     );
   }
 
@@ -74,7 +76,6 @@ module.exports = class AlexaDevice {
       // This is a testing address for Amazon hosted skills, and causes failures during live deployment
       // Return a special result to avoid the test failure
       this.postalcode = "CB246ZD";
-      this.house = "241 No Such Street";
     } else {
       // get rid of the space in the postcode
       this.postalcode =
@@ -90,7 +91,6 @@ module.exports = class AlexaDevice {
         addressLine1: "241 No Such Street",
         postalCode: "CB24 6ZD",
       };
-      this.house = this.address.addressLine1;
       return this;
     }
     try {
@@ -101,7 +101,6 @@ module.exports = class AlexaDevice {
       this.address = await deviceAddressServiceClient.getFullAddress(
         this.deviceId
       );
-      this.house = this.address.addressLine1;
     } catch (e) {
       throw new DataError(
         "No address from device",

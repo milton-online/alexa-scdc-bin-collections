@@ -1,4 +1,4 @@
-/* Copyright 2020-2021 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -421,47 +421,35 @@ function getLocalDynamoDBClient(options) {
   return new AWS.DynamoDB();
 }
 
-function getPersistenceAdapter(tableName, createTable, dynamoDBClient) {
-  let options = {
-    tableName: tableName,
-    createTable: createTable,
-    partitionKeyGenerator: (requestEnvelope) => {
-      const userId = Alexa.getUserId(requestEnvelope);
-      return userId.substr(userId.lastIndexOf(".") + 1);
-    },
-  };
-  //if a DynamoDB client is specified, this adapter will use it. e.g. the one that will connect to our local instance
-  if (dynamoDBClient) {
-    options.dynamoDBClient = dynamoDBClient;
-  }
-
-  return new ddbAdapter.DynamoDbPersistenceAdapter(options);
-}
-
-let persistenceAdapter;
 if (process.env.NODE_ENV === "development") {
   log.setLevel("debug");
 }
-if (process.env.DYNAMODB_LOCAL === "true") {
-  const dynamoDBClient = getLocalDynamoDBClient({ port: 8000 });
-  persistenceAdapter = getPersistenceAdapter(
-    "test-bins-table",
-    true,
-    dynamoDBClient
-  );
-} else {
-  persistenceAdapter = new ddbAdapter.DynamoDbPersistenceAdapter({
-    tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
-    createTable: false,
-    dynamoDBClient: new AWS.DynamoDB({
-      apiVersion: "latest",
-      region: process.env.DYNAMODB_PERSISTENCE_REGION,
-    }),
-  });
+
+function getPersistenceAdapter() {
+  if (process.env.DYNAMODB_LOCAL === "true") {
+    return new ddbAdapter.DynamoDbPersistenceAdapter({
+      tableName: "test-bins-table",
+      createTable: true,
+      dynamoDBClient: getLocalDynamoDBClient({ port: 8000 }),
+      partitionKeyGenerator: (requestEnvelope) => {
+        const userId = Alexa.getUserId(requestEnvelope);
+        return userId.substring(userId.lastIndexOf(".") + 1);
+      },
+    });
+  } else {
+    return new ddbAdapter.DynamoDbPersistenceAdapter({
+      tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
+      createTable: false,
+      dynamoDBClient: new AWS.DynamoDB({
+        apiVersion: "latest",
+        region: process.env.DYNAMODB_PERSISTENCE_REGION,
+      }),
+    });
+  }
 }
 
 exports.handler = Alexa.SkillBuilders.custom()
-  .withPersistenceAdapter(persistenceAdapter)
+  .withPersistenceAdapter(getPersistenceAdapter())
   .withApiClient(new Alexa.DefaultApiClient())
   .addRequestHandlers(
     LaunchRequestHandler,
