@@ -43,6 +43,7 @@ module.exports = {
     "  I'm up to date with the council.  What would you like to know about upcoming collections?",
   CONTACTING_SCDC: "Please wait while I look that up.",
   BYE_THEN: "Bye then!",
+  GOODBYE: "Goodbye",
   NO_QUESTION: "I didn't ask you a question.",
   LOGGING_CARD:
     "Bin Collections logging level is set to %s.  To switch logging off, tell bin collections to set logging to off",

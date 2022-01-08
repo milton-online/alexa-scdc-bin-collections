@@ -13,13 +13,14 @@
    limitations under the License.
 */
 
-const DataError = require("./dataerror.js");
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
 const log = require("loglevel");
-const messages = require("./messages.js");
 
-exports.getJSON = function (url, timeout = 5000) {
+const DataError = require("./errors/dataerror");
+const messages = require("./messages");
+
+function getJSON(url, timeout = 5000) {
   log.debug(`getJSON: ${url}`);
   return new Promise(function (resolve, reject) {
     const controller = new AbortController();
@@ -55,4 +56,6 @@ exports.getJSON = function (url, timeout = 5000) {
         }
       });
   });
-};
+}
+
+module.exports = getJSON;

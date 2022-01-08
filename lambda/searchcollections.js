@@ -13,8 +13,8 @@
    limitations under the License.
 */
 
-const BinCollection = require("./bincollection.js");
-const SpeakableDate = require("./speakabledate.js");
+const BinCollection = require("./bincollection");
+const SpeakableDate = require("./speakabledate");
 
 function getNextCollection(sessionData, testfunc = () => true) {
   let r = sessionData.collections.find(function (item) {
@@ -36,6 +36,6 @@ function getNextCollectionOfType(sessionData, binType) {
 }
 
 module.exports = {
-  getNextCollectionOfType: getNextCollectionOfType,
-  getNextCollection: getNextCollection,
+  getNextCollectionOfType,
+  getNextCollection,
 };

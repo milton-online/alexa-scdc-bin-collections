@@ -14,11 +14,11 @@
 */
 
 const log = require("loglevel");
-const { getJSON } = require("./getJSON.js");
-const DataError = require("./dataerror.js");
-const messages = require("./messages.js");
-const SpeakableDate = require("./speakabledate.js");
-const AlexaDevice = require("./alexadevice.js");
+const getJSON = require("./getJSON");
+const DataError = require("./errors/dataerror");
+const messages = require("./messages");
+const SpeakableDate = require("./speakabledate");
+const AlexaDevice = require("./alexadevice");
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
 const numberOfCollections = 12;
@@ -92,6 +92,22 @@ async function getCollectionsFromLocationList(locationList) {
   }
 
   throw new DataError("No data", messages.NO_DATA_RETURNED);
+}
+
+async function getFreshAttributes(handlerInput, alexaDevice) {
+  log.info(`Fetching new persistent data for ${alexaDevice.postalcode}`);
+  const attributesManager = handlerInput.attributesManager;
+  const attributes = await getFreshSessionData(handlerInput, alexaDevice);
+  if (process.env.NODE_ENV !== "development") {
+    if (attributes.logLevel) {
+      log.setLevel(attributes.logLevel);
+    } else {
+      attributes.logLevel = "error";
+      log.setLevel("error");
+    }
+  }
+  attributesManager.setSessionAttributes(attributes);
+  attributesManager.setPersistentAttributes(attributes);
 }
 
 function attributesAreStale(attributes, thisDevice) {
@@ -175,6 +191,7 @@ module.exports = {
     getLocationListFromSearchResults,
     getCollectionsFromLocationList,
   },
-  attributesAreStale: attributesAreStale,
-  getFreshSessionData: getFreshSessionData,
+  getFreshAttributes,
+  attributesAreStale,
+  getFreshSessionData,
 };

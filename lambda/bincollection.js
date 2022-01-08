@@ -13,8 +13,8 @@
    limitations under the License.
 */
 
-const SpeakableDate = require("./speakabledate.js");
-const messages = require("./messages.js");
+const SpeakableDate = require("./speakabledate");
+const messages = require("./messages");
 
 const binTypes = {
   RECYCLE: {

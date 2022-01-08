@@ -14,9 +14,9 @@
 */
 
 const should = require("should");
-const { Internal, attributesAreStale } = require("../lambda/sessiondata.js");
-const SpeakableDate = require("../lambda/speakabledate.js");
-const MockAlexaDevice = require("./mockalexadevice.js");
+const { Internal, attributesAreStale } = require("../lambda/sessiondata");
+const SpeakableDate = require("../lambda/speakabledate");
+const MockAlexaDevice = require("./mockalexadevice");
 
 ("use strict");
 

@@ -16,9 +16,9 @@
 const alexaTest = require("alexa-skill-test-framework");
 const log = require("loglevel");
 const util = require("util");
-const messages = require("../lambda/messages.js");
-const SpeakableDate = require("../lambda/speakabledate.js");
-const MockAlexaDevice = require("./mockalexadevice.js");
+const messages = require("../lambda/messages");
+const SpeakableDate = require("../lambda/speakabledate");
+const MockAlexaDevice = require("./mockalexadevice");
 
 const DEVICE_ID =
   "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -38,7 +38,7 @@ const mockAlexaDevice = new MockAlexaDevice(DEVICE_ID, testAddress);
 mockAlexaDevice.getPostcodeFromAddress();
 
 alexaTest.initialize(
-  require("../lambda/index.js"),
+  require("../lambda/index"),
   "amzn1.ask.skill.a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0",
   "amzn1.ask.account.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
   DEVICE_ID
