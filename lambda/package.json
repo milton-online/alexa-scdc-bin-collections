@@ -1,6 +1,6 @@
 {
   "name": "bin-collections",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
