@@ -76,7 +76,7 @@ const todayAttributes = {
       slippedCollection: false,
     },
     {
-      date: today.addDays(7).toISOString(),
+      date: today.clone().addDays(7).toISOString(),
       roundTypes: ["RECYCLE", "DOMESTIC"],
       slippedCollection: true,
     },
@@ -92,7 +92,7 @@ const todayAttributes = {
 const tomorrowAttributes = {
   collections: [
     {
-      date: today.addDays(1).toISOString(),
+      date: today.clone().addDays(1).toISOString(),
       roundTypes: ["RECYCLE"],
       slippedCollection: false,
     },

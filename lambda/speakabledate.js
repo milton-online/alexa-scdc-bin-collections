@@ -14,10 +14,13 @@
 */
 
 module.exports = class SpeakableDate extends Date {
+  clone() {
+    return new SpeakableDate(this);
+  }
+
   addDays(days) {
-    let result = new SpeakableDate(this);
-    result.setDate(result.getDate() + days);
-    return result;
+    this.setDate(this.getDate() + days);
+    return this;
   }
 
   setToMidnight() {

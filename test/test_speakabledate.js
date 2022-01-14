@@ -32,6 +32,12 @@ describe("SpeakableDate", function () {
       jan31_a.isSameDateAs(feb1).should.equal(false);
     });
   });
+  describe("clone()", function () {
+    it("clone == jan31_a", function () {
+      const clone = jan31_a.clone();
+      clone.isSameDateAs(jan31_a).should.equal(true);
+    });
+  });
   describe("setToMidnight()", function () {
     it("correctly sets midnight", function () {
       feb1.getTime().should.equal(feb1midday.setToMidnight().getTime());

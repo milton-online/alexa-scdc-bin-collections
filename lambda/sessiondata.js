@@ -155,7 +155,8 @@ function getFreshSessionData(handlerInput, alexaDevice) {
   log.debug(`getFreshSessionData(): ${alexaDevice.postalcode}`);
   const { requestEnvelope } = handlerInput;
 
-  // Device access doesn't work under mocha test framework
+  // Device access doesn't work under mocha test framework, but
+  // otherwise send user a "please wait" message
   if (process.env.MOCK_DEVICE !== "true") {
     AlexaDevice.callDirectiveService(
       handlerInput,

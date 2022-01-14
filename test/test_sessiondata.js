@@ -63,7 +63,7 @@ const testAttributes = {
       slippedCollection: false,
     },
     {
-      date: today.addDays(7).toISOString(),
+      date: today.clone().addDays(7).toISOString(),
       roundTypes: ["RECYCLE", "DOMESTIC"],
       slippedCollection: true,
     },
@@ -114,7 +114,10 @@ describe("sessiondata", function () {
     it("Data fetched yesterday, collection today", function () {
       attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
-    testAttributes.collections[0].date = today.addDays(-7).toISOString();
+    testAttributes.collections[0].date = today
+      .clone()
+      .addDays(-7)
+      .toISOString();
     it("data fetched yesterday, collection in the past", function () {
       attributesAreStale(testAttributes, mockalexadevice).should.be.true;
     });
