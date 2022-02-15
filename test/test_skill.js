@@ -44,6 +44,8 @@ alexaTest.initialize(
   DEVICE_ID
 );
 
+alexaTest.setLocale('en-GB');
+
 const today = new SpeakableDate().setToMidnight();
 const yesterday = Date.now() - 86400000;
 
