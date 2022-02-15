@@ -36,7 +36,7 @@ module.exports = {
   WEB_ERROR: "I got an error code from the council web site, please try later",
   WEB_TIMEOUT:
     "The council website took too long to respond.  Please try later.",
-  WHOWHOWHO: "Who, Who Who Who",
+  WHOWHOWHO: "Who, Who, Who Who",
   DID_YOU_MISS_IT: "  Did you miss it? Do you want to know about the next one?",
   SLIPPED_COLLECTION: "  This collection is not on your usual day.",
   GOT_FRESH_DATA:
