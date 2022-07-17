@@ -41,7 +41,7 @@ module.exports = {
   SLIPPED_COLLECTION: "  This collection is not on your usual day.",
   GOT_FRESH_DATA:
     "  I'm up to date with the council.  What would you like to know about upcoming collections?",
-  CONTACTING_SCDC: "Please wait while I look that up.",
+  CONTACTING_SCDC: "Just a moment...",
   BYE_THEN: "Bye then!",
   GOODBYE: "Goodbye",
   NO_QUESTION: "I didn't ask you a question.",
