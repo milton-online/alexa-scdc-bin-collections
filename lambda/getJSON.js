@@ -1,4 +1,4 @@
-/* Copyright 2020 Tim Cutts <tim@thecutts.org>
+/* Copyright 2020,2022 Tim Cutts <tim@thecutts.org>
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
    limitations under the License.
 */
 
-const fetch = require("node-fetch");
-const AbortController = require("abort-controller");
+const axios = require("axios").default;
 const log = require("loglevel");
 
 const DataError = require("./errors/dataerror");
@@ -23,36 +22,21 @@ const messages = require("./messages");
 function getJSON(url, timeout = 5000) {
   log.debug(`getJSON: ${url}`);
   return new Promise(function (resolve, reject) {
-    const controller = new AbortController();
-    const timeoutobj = setTimeout(() => {
-      controller.abort();
-    }, timeout);
-
-    fetch(url, { signal: controller.signal })
+    axios(url, { timeout })
       .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          reject(
-            new DataError(
-              `HTTP error (${res.status}) :${url}: `,
-              messages.WEB_ERROR
-            )
-          );
-        }
+        resolve(res.data);
       })
-      .finally(() => clearTimeout(timeoutobj))
-      .then((json) => resolve(json))
       .catch((err) => {
-        if (err.name === "AbortError") {
-          reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT));
-        } else {
+        log.error(`Error: ${err.code} ${err.message}`);
+        if (err.response) {
           reject(
             new DataError(
-              `Other error: ${url}: ${err.stack}`,
+              `Error: ${url}: ${err.response.status}`,
               messages.WEB_ERROR
             )
           );
+        } else {
+          reject(new DataError(`Timeout: ${url}`, messages.WEB_TIMEOUT));
         }
       });
   });
