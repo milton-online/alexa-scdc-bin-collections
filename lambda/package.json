@@ -11,7 +11,7 @@
   "dependencies": {
     "ask-sdk-core": "^2.12.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
-    "ask-sdk-model": "^1.64.0",
+    "ask-sdk-model": "^1.65.0",
     "aws-sdk": "^2.1359.0",
     "axios": "^0.27.2",
     "loglevel": "^1.8.1",
