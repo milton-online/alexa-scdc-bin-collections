@@ -1,6 +1,6 @@
 {
   "name": "bin-collections",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,10 @@
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",
   "dependencies": {
-    "ask-sdk-core": "^2.12.0",
+    "ask-sdk-core": "^2.14.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "ask-sdk-model": "^1.64.0",
-    "aws-sdk": "^2.1359.0",
+    "aws-sdk": "^2.1377.0",
     "axios": "^0.27.2",
     "loglevel": "^1.8.1",
     "moment": "^2.29.4",
