@@ -21,7 +21,7 @@ const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 
 const midnightToday = new SpeakableDate().setToMidnight().getTime();
-const newCalendarDate = new SpeakableDate("2023-09-15T00:00:00Z");
+const newCalendarDate = new SpeakableDate("2023-09-15T00:00:00Z").getTime();
 let apiUrl;
 if (midnightToday <= newCalendarDate) {
   apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
