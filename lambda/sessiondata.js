@@ -20,14 +20,8 @@ const messages = require("./messages");
 const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 
-const midnightToday = new SpeakableDate().setToMidnight().getTime();
-const newCalendarDate = new SpeakableDate("2023-09-15T00:00:00Z").getTime();
-let apiUrl;
-if (midnightToday <= newCalendarDate) {
-  apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
-} else {
-  apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar/uat";
-}
+const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
+
 const numberOfCollections = 12;
 
 function getLocationListFromSearchResults(postcodeSearchResults, address) {
@@ -82,15 +76,7 @@ async function getLocationList(alexaDevice) {
   );
 }
 
-async function getCollectionsFromLocationList(locationList, fetchdate) {
-  // API URL changes for dates after 15/9/2023
-
-  if (fetchdate && fetchdate > newCalendarDate) {
-    apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar/uat";
-  } else {
-    apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
-  }
-
+async function getCollectionsFromLocationList(locationList) {
   // We only have enough time for four tests. If the first does not work
   // we will try four entries evenly spaced throughout the list.
 
