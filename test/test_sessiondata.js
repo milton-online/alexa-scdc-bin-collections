@@ -14,7 +14,9 @@
 */
 
 const should = require("should");
+const process = require("process");
 const { Internal, attributesAreStale } = require("../lambda/sessiondata");
+const BinCollection = require("../lambda/bincollection");
 const SpeakableDate = require("../lambda/speakabledate");
 const MockAlexaDevice = require("./mockalexadevice");
 
@@ -105,10 +107,18 @@ describe("sessiondata", function () {
       );
       locationList[0].should.equal("100090161613");
     });
-    it.skip("getCollectionsFromLocationList()", async function () {
-      let r = await Internal.getCollectionsFromLocationList(locationList);
-      r.collections.length.should.be.greaterThan(0);
-    });
+    // Debugging comms with the SCDC API only makes sense during interactive
+    // coding, and shouldn't be attempted in other contexts
+    if (process.env.DEBUG_SCDC === "1") {
+      it("getCollectionsFromLocationList()", async function () {
+        let r = await Internal.getCollectionsFromLocationList(locationList);
+        r.collections.length.should.be.greaterThan(0);
+        //const bc = new BinCollection(r.collections[0]);
+        //if (!bc.slippedCollection) {
+        //  bc.date.getDay().should.equal(5); // Friday
+        //}
+      });
+    }
   });
   describe("attributesAreStale()", function () {
     it("Data fetched yesterday, collection today", function () {
