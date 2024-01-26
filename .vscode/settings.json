@@ -2,5 +2,11 @@
     "githubPullRequests.remotes": [
         "origin",
         "github"
-    ]
+    ],
+    "terminal.integrated.env.linux": {
+        "DEBUG_SCDC": "1"
+    },
+    "terminal.integrated.env.osx": {
+        "DEBUG_SCDC": "1"
+    }
 }

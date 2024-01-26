@@ -21,6 +21,7 @@ const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
+
 const numberOfCollections = 12;
 
 function getLocationListFromSearchResults(postcodeSearchResults, address) {

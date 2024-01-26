@@ -13,7 +13,7 @@
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "ask-sdk-model": "^1.65.0",
     "aws-sdk": "^2.1378.0",
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "loglevel": "^1.8.1",
     "moment": "^2.29.4",
     "util": "^0.12.5"
@@ -21,7 +21,7 @@
   "devDependencies": {
     "alexa-skill-test-framework": "milton-online/alexa-skill-test-framework#master",
     "ask-sdk-local-debug": "^1.1.0",
-    "eslint": "^8.3.0",
+    "eslint": "^8.45.0",
     "mocha": "^9.1.3",
     "should": "^13.2.3"
   }

@@ -38,7 +38,7 @@ module.exports = {
     "The council website took too long to respond.  Please try later.",
   WHOWHOWHO: "Who, Who, Who Who",
   DID_YOU_MISS_IT:
-    '  Did you miss it? Do you want to know about the <emphasis level="strong">next</emphasis> one?',
+    '  Did you miss it? Do you want to know about the next <amazon:emotion intensity="low" name="disappointed">one</amazon:emotion>?',
   SLIPPED_COLLECTION: "  This collection is not on your usual day.",
   GOT_FRESH_DATA:
     "  I'm up to date with the council.  What would you like to know about upcoming collections?",
