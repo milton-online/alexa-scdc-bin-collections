@@ -1,6 +1,6 @@
 {
   "name": "bin-collections",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "ask-sdk-model": "^1.67.0",
     "aws-sdk": "^2.1378.0",
-    "axios": "^1.6.0",
+    "axios": "^1.6.4",
     "loglevel": "^1.8.1",
     "moment": "^2.29.4",
     "util": "^0.12.5"
