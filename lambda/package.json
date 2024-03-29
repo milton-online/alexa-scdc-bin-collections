@@ -14,7 +14,7 @@
     "ask-sdk-model": "^1.67.0",
     "aws-sdk": "^2.1531.0",
     "axios": "^1.6.4",
-    "follow-redirects": "^1.15.4",
+    "follow-redirects": "^1.15.6",
     "loglevel": "^1.8.1",
     "moment": "^2.29.4",
     "util": "^0.12.5"
