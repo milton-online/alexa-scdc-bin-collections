@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2020-2024 Tim Cutts <tim@thecutts.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Description
 
 This project contains an Alexa Skill which contacts an Azure web service run by
