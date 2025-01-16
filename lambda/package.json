@@ -13,7 +13,7 @@
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "ask-sdk-model": "^1.86.0",
     "aws-sdk": "^2.1692.0",
-    "axios": "^1.7.8",
+    "axios": "^1.7.9",
     "follow-redirects": "^1.15.9",
     "loglevel": "^1.9.2",
     "moment": "^2.30.1",
