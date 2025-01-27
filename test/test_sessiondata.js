@@ -1,5 +1,5 @@
-// Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -14,8 +14,10 @@ const MockAlexaDevice = require("./mockalexadevice");
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);
-const yesterday = Date.now() - 86400000;
-const amonthago = Date.now() - 86400000 * 30;
+const MILLISCONDS_PER_DAY = 86400000;
+const yesterday = Date.now() - MILLISCONDS_PER_DAY;
+const sixdaysago = Date.now() - MILLISCONDS_PER_DAY * 6;
+const amonthago = Date.now() - MILLISCONDS_PER_DAY * 30;
 const DEVICE_ID =
   "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 const OTHER_DEVICE =
@@ -137,6 +139,10 @@ describe("sessiondata", function () {
     testAttributes.fetchedOnDate = amonthago;
     it("Data more than a week old", function () {
       attributesAreStale(testAttributes, mockalexadevice).should.be.true;
+    });
+    testAttributes.fetchedOnDate = sixdaysago;
+    it("Data six days old", function () {
+      attributesAreStale(testAttributes, mockalexadevice).should.be.false;
     });
     testAttributes.missedQuestion = true;
     it("Old data with missed question flag set", function () {

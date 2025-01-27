@@ -11,6 +11,8 @@ const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 
 const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
+const CACHE_DAYS = 7;
+const MILLISECONDS_PER_DAY = 86400000;
 
 const numberOfCollections = 12;
 
@@ -26,7 +28,7 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
   }
 
   // Return the complete list of locations in this postCode
-  let locationList = postcodeSearchResults.map((address) => address.id);
+  let locationList = postcodeSearchResults.map(({ id }) => id);
 
   // put the matched address at the front of the list if we found one
   if (matched_address) {
@@ -115,7 +117,7 @@ function attributesAreStale(attributes, thisDevice) {
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
 
-    if (attributes.alexaDevice === undefined) {
+    if (!attributes.alexaDevice === undefined) {
       if (attributes.alexaDevice === thisDevice.deviceId) {
         attributes.alexaDevice === thisDevice;
       } else {
@@ -130,7 +132,7 @@ function attributesAreStale(attributes, thisDevice) {
       ).getTime();
       if (firstCollectionDate >= midnightToday) {
         log.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`);
-        const aWeekAgo = midnightToday - 7 * 86400000;
+        const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
 
         if (attributes.fetchedOnDate > aWeekAgo) {
           log.debug("Not refreshing:  data is less than a week old");
