@@ -47,6 +47,13 @@ describe("SpeakableDate", function () {
       tomorrow.isToday().should.equal(false);
     });
   });
+  describe("isThisAfternoon()", function () {
+    it("12:03 is the afternoon", function () {
+      this_afternoon = new SpeakableDate();
+      this_afternoon.setHours(12, 3);
+      this_afternoon.isThisAfternoon().should.equal(true);
+    });
+  });
   describe("getDateSpeech()", function () {
     it("tomorrow", function () {
       tomorrow.getDateSpeech().should.equal("tomorrow.");

@@ -58,7 +58,7 @@ module.exports = class BinCollection {
       speech += "  Better get ";
       speech +=
         this.roundTypes.length > 1 ? "those bins out!" : "that bin out!";
-    } else if (this.isToday()) {
+    } else if (this.isThisAfternoon()) {
       speech += messages.DID_YOU_MISS_IT;
     }
     return speech;
@@ -66,6 +66,10 @@ module.exports = class BinCollection {
 
   isToday() {
     return this.date.isToday();
+  }
+
+  isThisAfternoon() {
+    return this.date.isThisAfternoon();
   }
 
   isTomorrow() {

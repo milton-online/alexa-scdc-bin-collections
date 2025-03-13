@@ -29,7 +29,7 @@ const LaunchRequestHandler = {
 
     const oldQuestionState = attributes.missedQuestion;
 
-    if (collection.isToday()) {
+    if (collection.isThisAfternoon()) {
       responseBuilder = responseBuilder.withShouldEndSession(false);
       attributes.missedQuestion = true;
     } else {

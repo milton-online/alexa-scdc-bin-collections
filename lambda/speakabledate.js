@@ -34,6 +34,10 @@ module.exports = class SpeakableDate extends Date {
     return this.isSameDateAs(today);
   }
 
+  isThisAfternoon() {
+    return this.getHours() >= 12 && this.isToday();
+  }
+
   isTomorrow() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
