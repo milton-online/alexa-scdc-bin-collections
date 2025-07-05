@@ -1,4 +1,4 @@
-// Copyright 2020,2022 Tim Cutts <tim@thecutts.org>
+// Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
 // SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -9,10 +9,21 @@ const log = require("loglevel");
 const DataError = require("./errors/dataerror");
 const messages = require("./messages");
 
-function getJSON(url, timeout = 5000) {
+// Reuse HTTP agent for connection pooling
+const httpAgent = axios.create({
+  timeout: 3000,
+  maxRedirects: 2,
+  headers: {
+    Accept: "application/json",
+    "User-Agent": "BinCollectionSkill/1.0",
+  },
+});
+
+function getJSON(url) {
   log.debug(`getJSON: ${url}`);
   return new Promise(function (resolve, reject) {
-    axios(url, { timeout })
+    httpAgent
+      .get(url)
       .then((res) => {
         resolve(res.data);
       })

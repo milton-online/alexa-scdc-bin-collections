@@ -1,4 +1,4 @@
-// Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
 // SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -69,19 +69,26 @@ async function getLocationList(alexaDevice) {
 }
 
 async function getCollectionsFromLocationList(locationList) {
-  // We only have enough time for four tests. If the first does not work
-  // we will try four entries evenly spaced throughout the list.
+  // Try parallel requests for better performance
+  const maxConcurrent = Math.min(3, locationList.length);
+  const step = Math.max(1, ~~(locationList.length / maxConcurrent));
 
-  const step = ~~(locationList.length / 4);
+  const promises = [];
+  for (let i = 0; i < maxConcurrent && i * step < locationList.length; i++) {
+    const locationId = locationList[i * step];
+    const url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
+    promises.push(
+      getJSON(url)
+        .then((r) => ({ locationId, collections: r.collections }))
+        .catch(() => ({ locationId, collections: [] }))
+    );
+  }
 
-  for (let l = 0; l < locationList.length; l += step) {
-    let locationId = locationList[l];
-    let url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
-    let r = await getJSON(url);
+  const results = await Promise.all(promises);
+  const validResult = results.find((r) => r.collections.length >= 1);
 
-    if (r.collections.length >= 1) {
-      return { collections: r.collections };
-    }
+  if (validResult) {
+    return { collections: validResult.collections };
   }
 
   throw new DataError("No data", messages.NO_DATA_RETURNED);

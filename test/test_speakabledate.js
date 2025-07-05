@@ -1,5 +1,5 @@
-// Copyright 2020 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,6 +10,9 @@ const jan31_b = new SpeakableDate("2020-01-31T00:00:00Z");
 const feb1 = new SpeakableDate("2020-02-01T00:00:00Z");
 const feb1midday = new SpeakableDate("2020-02-01T12:03:45Z");
 const today = new SpeakableDate();
+today.setHours(6);
+const this_afternoon = new SpeakableDate();
+this_afternoon.setHours(12, 3);
 const tomorrow = new SpeakableDate();
 tomorrow.setTime(today.getTime() + 86400000);
 
@@ -49,8 +52,6 @@ describe("SpeakableDate", function () {
   });
   describe("isThisAfternoon()", function () {
     it("12:03 is the afternoon", function () {
-      this_afternoon = new SpeakableDate();
-      this_afternoon.setHours(12, 3);
       this_afternoon.isThisAfternoon().should.equal(true);
     });
   });

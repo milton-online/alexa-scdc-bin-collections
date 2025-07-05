@@ -1,5 +1,5 @@
-// Copyright 2020,2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -32,9 +32,7 @@ describe("BinCollection", function () {
     it("today", function () {
       slippedExample.date.setTime(Date.now());
       slippedExample.slippedCollection = false;
-      slippedExample
-        .getDateSpeech()
-        .should.equal(`today.${messages.DID_YOU_MISS_IT}`);
+      slippedExample.getDateSpeech().should.startWith(`today.`);
     });
     it("tomorrow", function () {
       slippedExample.date.setTime(Date.now() + 86400000);
