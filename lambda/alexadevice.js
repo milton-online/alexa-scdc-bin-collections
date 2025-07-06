@@ -76,13 +76,6 @@ module.exports = class AlexaDevice {
   }
 
   async getAddressFromDevice(handlerInput) {
-    if (process.env.MOCK_DEVICE === "true") {
-      this.address = {
-        addressLine1: "241 No Such Street",
-        postalCode: "CB24 6ZD",
-      };
-      return this;
-    }
     try {
       const { requestEnvelope, serviceClientFactory } = handlerInput;
       this.deviceId = Alexa.getDeviceId(requestEnvelope);

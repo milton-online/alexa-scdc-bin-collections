@@ -8,7 +8,8 @@ const process = require("process");
 const { Internal, attributesAreStale } = require("../lambda/sessiondata");
 const BinCollection = require("../lambda/bincollection");
 const SpeakableDate = require("../lambda/speakabledate");
-const MockAlexaDevice = require("./mockalexadevice");
+const sinon = require("sinon");
+const AlexaDevice = require("../lambda/alexadevice");
 
 ("use strict");
 
@@ -34,10 +35,19 @@ const testAddress = {
   postalCode: "CB24 6ZD",
 };
 
-const mockalexadevice = new MockAlexaDevice(DEVICE_ID, testAddress);
-mockalexadevice.getPostcodeFromAddress();
-const mockOtherDevice = new MockAlexaDevice(OTHER_DEVICE, testAddress);
-mockOtherDevice.getPostcodeFromAddress();
+const mockalexadevice = sinon.createStubInstance(AlexaDevice);
+mockalexadevice.deviceId = DEVICE_ID;
+mockalexadevice.address = testAddress;
+mockalexadevice.postalcode = "CB246ZD";
+mockalexadevice.getPostcodeFromAddress.returns(mockalexadevice);
+mockalexadevice.isSameLocationAsDevice.returns(true);
+
+const mockOtherDevice = sinon.createStubInstance(AlexaDevice);
+mockOtherDevice.deviceId = OTHER_DEVICE;
+mockOtherDevice.address = testAddress;
+mockOtherDevice.postalcode = "CB246ZD";
+mockOtherDevice.getPostcodeFromAddress.returns(mockOtherDevice);
+mockOtherDevice.isSameLocationAsDevice.returns(true);
 
 const testPostcodeSearchResults = [
   {
@@ -132,7 +142,7 @@ describe("sessiondata", function () {
     });
     it("Data fresh but from device with different postcode", function () {
       mockOtherDevice.address.postalCode = "CB24 6ZX";
-      mockOtherDevice.getPostcodeFromAddress();
+      mockOtherDevice.postalcode = "CB246ZX";
       mockOtherDevice.postalcode.should.equal("CB246ZX");
       attributesAreStale(testAttributes, mockOtherDevice).should.be.true;
     });

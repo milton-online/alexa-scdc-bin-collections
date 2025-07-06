@@ -8,7 +8,8 @@ const log = require("loglevel");
 const util = require("util");
 const messages = require("../lambda/messages");
 const SpeakableDate = require("../lambda/speakabledate");
-const MockAlexaDevice = require("./mockalexadevice");
+const sinon = require("sinon");
+const AlexaDevice = require("../lambda/alexadevice");
 
 const DEVICE_ID =
   "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -24,8 +25,14 @@ const testAddress = {
   postalCode: "CB24 6ZD",
 };
 
-const mockAlexaDevice = new MockAlexaDevice(DEVICE_ID, testAddress);
-mockAlexaDevice.getPostcodeFromAddress();
+// Create mock device for session attributes
+const mockAlexaDevice = {
+  deviceId: DEVICE_ID,
+  address: testAddress,
+  postalcode: "CB246ZD",
+  getPostcodeFromAddress: () => mockAlexaDevice,
+  isSameLocationAsDevice: () => true
+};
 
 alexaTest.initialize(
   require("../lambda/index"),
@@ -101,6 +108,23 @@ const tomorrowAttributes = {
 log.disableAll();
 
 describe("Bin Collections Skill", function () {
+  beforeEach(function() {
+    // Stub AlexaDevice methods on prototype
+    sinon.stub(AlexaDevice.prototype, 'getAddressFromDevice').callsFake(function() {
+      this.deviceId = DEVICE_ID;
+      this.address = testAddress;
+      return Promise.resolve(this);
+    });
+    sinon.stub(AlexaDevice.prototype, 'getPostcodeFromAddress').callsFake(function() {
+      this.postalcode = "CB246ZD";
+      return this;
+    });
+    sinon.stub(AlexaDevice.prototype, 'isSameLocationAsDevice').returns(true);
+  });
+  
+  afterEach(function() {
+    sinon.restore();
+  });
   describe("LaunchRequest", function () {
     alexaTest.test([
       {
