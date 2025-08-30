@@ -10,26 +10,28 @@ const PersistenceSavingInterceptor = {
     const { attributesManager } = handlerInput;
     return new Promise((resolve, reject) => {
       const attributes = attributesManager.getSessionAttributes();
-      if (attributes.areDirty) {
-        log.debug("Saving attributes");
-        if (process.env.MOCK_DEVICE === "true") {
-          attributes.areDirty = false;
-          attributesManager.setSessionAttributes(attributes);
-          resolve();
-        } else {
-          attributesManager
-            .savePersistentAttributes()
-            .then(() => {
-              attributes.areDirty = false;
-              attributesManager.setSessionAttributes(attributes);
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
-            });
-        }
-      } else {
+
+      if (!attributes.areDirty) {
         resolve();
+        return;
+      }
+
+      const cleanupAttributes = () => {
+        attributes.areDirty = false;
+        attributesManager.setSessionAttributes(attributes);
+        resolve();
+      };
+
+      log.debug("Saving attributes");
+      if (process.env.MOCK_DEVICE === "true") {
+        cleanupAttributes();
+      } else {
+        attributesManager
+          .savePersistentAttributes()
+          .then(cleanupAttributes())
+          .catch((error) => {
+            reject(error);
+          });
       }
     });
   },
