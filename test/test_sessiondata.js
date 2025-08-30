@@ -15,10 +15,10 @@ const AlexaDevice = require("../lambda/alexadevice");
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);
-const MILLISCONDS_PER_DAY = 86400000;
-const yesterday = Date.now() - MILLISCONDS_PER_DAY;
-const sixdaysago = Date.now() - MILLISCONDS_PER_DAY * 6;
-const amonthago = Date.now() - MILLISCONDS_PER_DAY * 30;
+const MILLISECONDS_PER_DAY = 86400000;
+const yesterday = Date.now() - MILLISECONDS_PER_DAY;
+const sixdaysago = Date.now() - MILLISECONDS_PER_DAY * 6;
+const amonthago = Date.now() - MILLISECONDS_PER_DAY * 30;
 const DEVICE_ID =
   "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 const OTHER_DEVICE =
