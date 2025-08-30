@@ -20,7 +20,7 @@ const httpAgent = axios.create({
 });
 
 function getJSON(url) {
-  log.debug(`getJSON: ${url}`);
+  log.debug(`getJSON: ${encodeURIComponent(url)}`);
   return new Promise(function (resolve, reject) {
     httpAgent
       .get(url)
