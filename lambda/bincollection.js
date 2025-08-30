@@ -76,20 +76,24 @@ module.exports = class BinCollection {
     return this.date.isTomorrow();
   }
 
-  getSmallImageUrl() {
-    return binTypes[this.roundTypes[0]].smallUrl;
-  }
-
-  getLargeImageUrl() {
-    return binTypes[this.roundTypes[0]].largeUrl;
+  _getPrimaryBinType() {
+    return binTypes[this.roundTypes[0]];
   }
 
   getName() {
-    return binTypes[this.roundTypes[0]].name;
+    return this._getPrimaryBinType().name;
   }
 
   getColour() {
-    return binTypes[this.roundTypes[0]].colour;
+    return this._getPrimaryBinType().colour;
+  }
+
+  getSmallImageUrl() {
+    return this._getPrimaryBinType().smallUrl;
+  }
+
+  getLargeImageUrl() {
+    return this._getPrimaryBinType().largeUrl;
   }
 
   getColoursSpeech() {
