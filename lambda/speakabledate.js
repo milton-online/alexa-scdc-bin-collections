@@ -50,7 +50,7 @@ module.exports = class SpeakableDate extends Date {
     } else if (this.isTomorrow()) {
       return "tomorrow.";
     } else {
-      return `on ${this.toDateString().slice(0, -4)}.`;
+      return `on ${this.toDateString().slice(0, -4)}.`; // Remove year from date string
     }
   }
 };
