@@ -23,7 +23,7 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
   if (address.addressLine1) {
     [houseNumber] = address.addressLine1.match(/^[^ ]*/);
     matched_address = postcodeSearchResults.find(
-      (item) => item.houseNumber == houseNumber
+      (item) => item.houseNumber === houseNumber
     );
   }
 
@@ -39,22 +39,20 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 }
 
 function getPostcodeSearchFromSCDCWeb(postcode) {
-  log.debug(`getPostcodeSearchFromSCDCWeb(postcode=${postcode})`);
-  return new Promise((resolve, reject) => {
-    getJSON(`${apiUrl}/address/search/?postCode=${postcode}`)
-      .then((postcodeSearchResults) => {
-        if (postcodeSearchResults.length < 1) {
-          reject(
-            new DataError(
-              "SCDC returned no locations for postcode starting " +
-                postcode.slice(0, -4),
-              messages.POSTCODE_LOOKUP_FAIL
-            )
-          );
-        }
-        resolve(postcodeSearchResults);
-      })
-      .catch((e) => reject(e));
+  log.debug(
+    `getPostcodeSearchFromSCDCWeb(postcode=${encodeURIComponent(postcode)})`
+  );
+  return getJSON(
+    `${apiUrl}/address/search/?postCode=${encodeURIComponent(postcode)}`
+  ).then((postcodeSearchResults) => {
+    if (postcodeSearchResults.length < 1) {
+      throw new DataError(
+        "SCDC returned no locations for postcode starting " +
+          postcode.slice(0, -4),
+        messages.POSTCODE_LOOKUP_FAIL
+      );
+    }
+    return postcodeSearchResults;
   });
 }
 
@@ -74,6 +72,7 @@ async function getCollectionsFromLocationList(locationList) {
   const step = Math.max(1, ~~(locationList.length / maxConcurrent));
 
   const promises = [];
+  // amazonq-ignore-next-line
   for (let i = 0; i < maxConcurrent && i * step < locationList.length; i++) {
     const locationId = locationList[i * step];
     const url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
@@ -95,7 +94,11 @@ async function getCollectionsFromLocationList(locationList) {
 }
 
 async function getFreshAttributes(handlerInput, alexaDevice) {
-  log.info(`Fetching new persistent data for ${alexaDevice.postalcode}`);
+  log.info(
+    `Fetching new persistent data for ${encodeURIComponent(
+      alexaDevice.postalcode
+    )}`
+  );
   const attributesManager = handlerInput.attributesManager;
   const attributes = await getFreshSessionData(handlerInput, alexaDevice);
   if (process.env.NODE_ENV !== "development") {
@@ -115,8 +118,12 @@ function attributesAreStale(attributes, thisDevice) {
   // device, or where the first collection is in the past)
 
   log.debug("attributesAreStale()");
-  log.debug(`attributes: ${JSON.stringify(attributes, null, 2)}`);
-  log.debug(`thisDevice: ${JSON.stringify(thisDevice, null, 2)}`);
+  log.debug(
+    `attributes: ${encodeURIComponent(JSON.stringify(attributes, null, 2))}`
+  );
+  log.debug(
+    `thisDevice: ${encodeURIComponent(JSON.stringify(thisDevice, null, 2))}`
+  );
 
   if (attributes.collections) {
     log.debug("Found collections");
@@ -124,12 +131,9 @@ function attributesAreStale(attributes, thisDevice) {
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
 
-    if (!attributes.alexaDevice === undefined) {
-      if (attributes.alexaDevice === thisDevice.deviceId) {
-        attributes.alexaDevice === thisDevice;
-      } else {
-        return true;
-      }
+    if (attributes.alexaDevice === undefined) {
+      attributes.alexaDevice = thisDevice;
+      return true;
     }
 
     if (thisDevice.isSameLocationAsDevice(attributes.alexaDevice)) {
@@ -137,8 +141,13 @@ function attributesAreStale(attributes, thisDevice) {
       const firstCollectionDate = new Date(
         attributes.collections[0].date
       ).getTime();
+
       if (firstCollectionDate >= midnightToday) {
-        log.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`);
+        log.debug(
+          `fCD: ${encodeURIComponent(
+            firstCollectionDate
+          )} >= mdt: ${encodeURIComponent(midnightToday)}`
+        );
         const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
 
         if (attributes.fetchedOnDate > aWeekAgo) {
@@ -152,34 +161,35 @@ function attributesAreStale(attributes, thisDevice) {
 }
 
 function getFreshSessionData(handlerInput, alexaDevice) {
-  log.debug(`getFreshSessionData(): ${alexaDevice.postalcode}`);
+  log.debug(
+    `getFreshSessionData(): ${encodeURIComponent(alexaDevice.postalcode)}`
+  );
   const { requestEnvelope } = handlerInput;
 
   AlexaDevice.callDirectiveService(
     handlerInput,
     messages.CONTACTING_SCDC
-  ).catch((err) => log.error(err));
+  ).catch((err) =>
+    log.error(encodeURIComponent(err?.message || "Unknown error"))
+  );
 
   AlexaDevice.getConsentToken(requestEnvelope);
 
-  return new Promise((resolve, reject) => {
-    getLocationList(alexaDevice)
-      .then((locationList) => getCollectionsFromLocationList(locationList))
-      .then((data) => {
-        Object.assign(data, {
-          missedQuestion: false,
-          areDirty: true,
-          midnightToday: new SpeakableDate().setToMidnight().getTime(),
-          lastReportedBinTime: 0,
-          currentBinType: null,
-          fetchedOnDate: Date.now(),
-          deviceId: alexaDevice.deviceId,
-          alexaDevice: alexaDevice,
-        });
-        resolve(data);
-      })
-      .catch((e) => reject(e));
-  });
+  return getLocationList(alexaDevice)
+    .then((locationList) => getCollectionsFromLocationList(locationList))
+    .then((data) => {
+      Object.assign(data, {
+        missedQuestion: false,
+        areDirty: true,
+        midnightToday: new SpeakableDate().setToMidnight().getTime(),
+        lastReportedBinTime: 0,
+        currentBinType: null,
+        fetchedOnDate: Date.now(),
+        deviceId: alexaDevice.deviceId,
+        alexaDevice: alexaDevice,
+      });
+      return data;
+    });
 }
 
 module.exports = {

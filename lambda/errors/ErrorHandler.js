@@ -14,7 +14,7 @@ const ErrorHandler = {
   },
   handle(handlerInput, e) {
     // Errors which reach here we always want logged, so use console rather than log
-    console.error(`~~~~~ Error handled: ${e.stack}`);
+    console.error(`~~~~~ Error handled: ${e.stack ? encodeURIComponent(e.stack) : 'No stack trace available'}`);
     let r = handlerInput.responseBuilder;
     if (e instanceof DataError) {
       r = r.speak(e.speech);

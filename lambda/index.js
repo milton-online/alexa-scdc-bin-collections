@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+("use strict");
+
 const Alexa = require("ask-sdk-core");
 const process = require("process");
 const log = require("loglevel");
@@ -27,8 +29,6 @@ const PersistenceSavingInterceptor = require("./interceptors/PersistenceSavingIn
 const ErrorHandler = require("./errors/ErrorHandler");
 
 const getPersistenceAdapter = require("./persistenceAdapter");
-
-("use strict");
 
 if (process.env.NODE_ENV === "development") {
   log.setLevel("debug");

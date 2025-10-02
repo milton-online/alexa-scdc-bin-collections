@@ -42,10 +42,18 @@ module.exports = class AlexaDevice {
       },
     };
 
-    return directiveServiceClient.enqueue(directive, endpoint, token);
+    try {
+      return directiveServiceClient.enqueue(directive, endpoint, token);
+    } catch (error) {
+      console.error('Failed to enqueue directive:', error.message);
+      return Promise.reject(error);
+    }
   }
 
   isSameLocationAsDevice(otherDevice) {
+    if (!otherDevice?.address?.addressLine1 || !otherDevice?.address?.postalCode) {
+      return false;
+    }
     return (
       otherDevice.address.addressLine1.toUpperCase() ===
         this.address.addressLine1.toUpperCase() &&

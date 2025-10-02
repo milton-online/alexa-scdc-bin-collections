@@ -43,13 +43,13 @@ class ProgressiveLoader {
 
   static async refreshInBackground(handlerInput, alexaDevice) {
     // Non-blocking background refresh
-    setTimeout(async () => {
+    setImmediate(async () => {
       try {
         await getFreshSessionData(handlerInput, alexaDevice);
       } catch (err) {
-        console.log("Background refresh failed:", err.message);
+        console.log("Background refresh failed:", encodeURIComponent(err.message));
       }
-    }, 100);
+    });
   }
 }
 
