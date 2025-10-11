@@ -11,6 +11,7 @@ const SpeakableDate = require("../lambda/speakabledate");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 const DataError = require("../lambda/errors/dataerror");
+const log = require("loglevel");
 
 ("use strict");
 

@@ -98,14 +98,6 @@ async function getFreshAttributes(handlerInput, alexaDevice) {
   log.info(`Fetching new persistent data for ${alexaDevice.postalcode}`);
   const attributesManager = handlerInput.attributesManager;
   const attributes = await getFreshSessionData(handlerInput, alexaDevice);
-  if (process.env.NODE_ENV !== "development") {
-    if (attributes.logLevel) {
-      log.setLevel(attributes.logLevel);
-    } else {
-      attributes.logLevel = "error";
-      log.setLevel("error");
-    }
-  }
   attributesManager.setSessionAttributes(attributes);
   attributesManager.setPersistentAttributes(attributes);
 }
@@ -114,13 +106,7 @@ function attributesAreStale(attributes, thisDevice) {
   // Check data is not stale (more than a week old, for a different
   // device, or where the first collection is in the past)
 
-  log.debug("attributesAreStale()");
-  log.debug(`attributes: ${JSON.stringify(attributes, null, 2)}`);
-  log.debug(`thisDevice: ${JSON.stringify(thisDevice, null, 2)}`);
-
   if (attributes.collections) {
-    log.debug("Found collections");
-
     const midnightToday = new SpeakableDate().setToMidnight().getTime();
     attributes.midnightToday = midnightToday;
 
@@ -133,16 +119,13 @@ function attributesAreStale(attributes, thisDevice) {
     }
 
     if (thisDevice.isSameLocationAsDevice(attributes.alexaDevice)) {
-      log.debug("Same address as before");
       const firstCollectionDate = new Date(
         attributes.collections[0].date
       ).getTime();
       if (firstCollectionDate >= midnightToday) {
-        log.debug(`fCD: ${firstCollectionDate} >= mdt: ${midnightToday}`);
         const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
 
         if (attributes.fetchedOnDate > aWeekAgo) {
-          log.debug("Not refreshing:  data is less than a week old");
           return false;
         }
       }

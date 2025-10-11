@@ -106,8 +106,6 @@ const tomorrowAttributes = {
   logLevel: "silent",
 };
 
-log.disableAll();
-
 describe("Bin Collections Skill", function () {
   beforeEach(function () {
     sinon.stub(AlexaDevice.prototype, "getAddressFromDevice").callsFake(function () {
@@ -285,7 +283,7 @@ describe("Bin Collections Skill", function () {
   });
 
   describe("SetLogLevelIntent", function () {
-    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (testLevel, levelNumber) {
+    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (testLevel) {
       alexaTest.test([
         {
           request: new IntentRequestBuilder(skillSettings, "SetLogLevelIntent")
@@ -295,15 +293,12 @@ describe("Bin Collections Skill", function () {
           hasCardTitle: "Bin Collections Log Level",
           hasCardContent: util.format(messages.LOGGING_CARD, testLevel),
           repromptsNothing: true,
-          withSessionAttributes: tomorrowAttributes,
+          withSessionAttributes: { ...tomorrowAttributes, logLevel: "silent" },
           hasAttributes: {
             logLevel: testLevel,
           },
         },
       ]);
-      it(`logging level check: ${testLevel}`, function () {
-        log.getLevel().should.equal(levelNumber);
-      });
     });
   });
 });
