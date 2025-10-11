@@ -6,6 +6,7 @@
 const should = require("should");
 const BinCollection = require("../lambda/bincollection");
 const messages = require("../lambda/messages");
+const { MILLISECONDS_PER_DAY } = require("../lambda/constants");
 
 ("use strict");
 
@@ -35,7 +36,7 @@ describe("BinCollection", function () {
       slippedExample.getDateSpeech().should.startWith(`today.`);
     });
     it("tomorrow", function () {
-      slippedExample.date.setTime(Date.now() + 86400000);
+      slippedExample.date.setTime(Date.now() + MILLISECONDS_PER_DAY);
       slippedExample.slippedCollection = false;
       slippedExample
         .getDateSpeech()

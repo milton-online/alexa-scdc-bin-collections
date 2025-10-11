@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-module.exports = class SpeakableDate extends Date {
+class SpeakableDate extends Date {
   clone() {
     return new SpeakableDate(this);
   }
@@ -49,4 +49,6 @@ module.exports = class SpeakableDate extends Date {
     }
     return `on ${this.toDateString().slice(0, -4)}.`;
   }
-};
+}
+
+module.exports = SpeakableDate;

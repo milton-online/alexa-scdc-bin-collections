@@ -9,9 +9,10 @@ const {
   getNextCollectionOfType,
 } = require("../lambda/searchcollections");
 const SpeakableDate = require("../lambda/speakabledate");
+const { MILLISECONDS_PER_DAY } = require("../lambda/constants");
 
 const today = new SpeakableDate().setToMidnight().getTime();
-const yesterday = Date.now() - 86400000;
+const yesterday = Date.now() - MILLISECONDS_PER_DAY;
 
 const datedAttributes = {
   collections: [

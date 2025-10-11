@@ -5,8 +5,7 @@
 
 const SpeakableDate = require("./speakabledate");
 const messages = require("./messages");
-
-const SCDC_MEDIA_BASE_URL = "https://www.scambs.gov.uk/media/";
+const { SCDC_MEDIA_BASE_URL } = require("./constants");
 
 const binTypes = {
   RECYCLE: {

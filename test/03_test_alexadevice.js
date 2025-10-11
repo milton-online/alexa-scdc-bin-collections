@@ -7,7 +7,10 @@ const should = require("should");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 const DataError = require("../lambda/errors/dataerror");
-const messages = require("../lambda/messages");
+const {
+  TEST_POSTCODE,
+  TEST_POSTCODE_NO_SPACE,
+} = require("../lambda/constants");
 
 ("use strict");
 
@@ -81,13 +84,13 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const otherDevice = {
         address: {
           addressLine1: "123 main st",
-          postalCode: "cb24 6zd",
+          postalCode: TEST_POSTCODE.toLowerCase(),
         },
       };
 
@@ -98,13 +101,13 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const otherDevice = {
         address: {
           addressLine1: "456 Other St",
-          postalCode: "CB24 6ZD",
+          postalCode: TEST_POSTCODE,
         },
       };
 
@@ -115,7 +118,7 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const otherDevice = {
@@ -133,7 +136,7 @@ describe("AlexaDevice", function () {
       const otherDevice = {
         address: {
           addressLine1: "123 Main St",
-          postalCode: "CB24 6ZD",
+          postalCode: TEST_POSTCODE,
         },
       };
 
@@ -144,7 +147,7 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       device.isSameLocationAsDevice({}).should.be.false();
@@ -154,12 +157,12 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const otherDevice = {
         address: {
-          postalCode: "CB24 6ZD",
+          postalCode: TEST_POSTCODE,
         },
       };
 
@@ -170,7 +173,7 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const otherDevice = {
@@ -188,11 +191,11 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         countryCode: "GB",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       device.getPostcodeFromAddress();
-      device.postalcode.should.equal("CB246ZD");
+      device.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
     });
 
     it("should handle US test address", function () {
@@ -203,7 +206,7 @@ describe("AlexaDevice", function () {
       };
 
       device.getPostcodeFromAddress();
-      device.postalcode.should.equal("CB246ZD");
+      device.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
     });
 
     it("should throw DataError when postcode is null", function () {
@@ -221,7 +224,7 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       device.address = {
         countryCode: "GB",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const result = device.getPostcodeFromAddress();
@@ -234,7 +237,7 @@ describe("AlexaDevice", function () {
       const device = new AlexaDevice();
       const mockAddress = {
         addressLine1: "123 Main St",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const handlerInput = {
@@ -275,7 +278,9 @@ describe("AlexaDevice", function () {
         },
         serviceClientFactory: {
           getDeviceAddressServiceClient: () => ({
-            getFullAddress: sinon.stub().rejects(new Error("Permission denied")),
+            getFullAddress: sinon
+              .stub()
+              .rejects(new Error("Permission denied")),
           }),
         },
       };

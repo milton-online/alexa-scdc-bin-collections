@@ -8,6 +8,14 @@ const process = require("process");
 const { Internal, attributesAreStale, getFreshSessionData, getFreshAttributes } = require("../lambda/sessiondata");
 const BinCollection = require("../lambda/bincollection");
 const SpeakableDate = require("../lambda/speakabledate");
+const {
+  MILLISECONDS_PER_DAY,
+  TEST_POSTCODE,
+  TEST_POSTCODE_NO_SPACE,
+  TEST_DEVICE_ID,
+  TEST_OTHER_DEVICE_ID,
+  TEST_ADDRESS_LINE1,
+} = require("../lambda/constants");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 const DataError = require("../lambda/errors/dataerror");
@@ -17,37 +25,34 @@ const log = require("loglevel");
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);
-const MILLISCONDS_PER_DAY = 86400000;
-const yesterday = Date.now() - MILLISCONDS_PER_DAY;
-const sixdaysago = Date.now() - MILLISCONDS_PER_DAY * 6;
-const amonthago = Date.now() - MILLISCONDS_PER_DAY * 30;
-const DEVICE_ID =
-  "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-const OTHER_DEVICE =
-  "amzn1.ask.device.1111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+const yesterday = Date.now() - MILLISECONDS_PER_DAY;
+const sixdaysago = Date.now() - MILLISECONDS_PER_DAY * 6;
+const amonthago = Date.now() - MILLISECONDS_PER_DAY * 30;
+const DEVICE_ID = TEST_DEVICE_ID;
+const OTHER_DEVICE = TEST_OTHER_DEVICE_ID;
 
 const testAddress = {
-  addressLine1: "241 No Such Street",
+  addressLine1: TEST_ADDRESS_LINE1,
   addressLine2: null,
   addressLine3: null,
   city: "Some town",
   stateOrRegion: null,
   districtOrCounty: null,
   countryCode: "GB",
-  postalCode: "CB24 6ZD",
+  postalCode: TEST_POSTCODE,
 };
 
 const mockalexadevice = sinon.createStubInstance(AlexaDevice);
 mockalexadevice.deviceId = DEVICE_ID;
 mockalexadevice.address = testAddress;
-mockalexadevice.postalcode = "CB246ZD";
+mockalexadevice.postalcode = TEST_POSTCODE_NO_SPACE;
 mockalexadevice.getPostcodeFromAddress.returns(mockalexadevice);
 mockalexadevice.isSameLocationAsDevice.returns(true);
 
 const mockOtherDevice = sinon.createStubInstance(AlexaDevice);
 mockOtherDevice.deviceId = OTHER_DEVICE;
 mockOtherDevice.address = testAddress;
-mockOtherDevice.postalcode = "CB246ZD";
+mockOtherDevice.postalcode = TEST_POSTCODE_NO_SPACE;
 mockOtherDevice.getPostcodeFromAddress.returns(mockOtherDevice);
 mockOtherDevice.isSameLocationAsDevice.returns(true);
 
@@ -57,7 +62,7 @@ const testPostcodeSearchResults = [
     houseNumber: "241",
     street: "No Such Street",
     town: "Sometown",
-    postCode: "CB246ZD",
+    postCode: TEST_POSTCODE_NO_SPACE,
   },
 ];
 
@@ -88,7 +93,7 @@ describe("sessiondata", function () {
   describe("getPostcodeSearchFromSCDCWeb()", function () {
     this.slow(5000);
     it("fetching results - might fail if SCDC web is down", async function () {
-      results = await Internal.getPostcodeSearchFromSCDCWeb("CB246ZD");
+      results = await Internal.getPostcodeSearchFromSCDCWeb(TEST_POSTCODE_NO_SPACE);
       results.length.should.be.greaterThan(0);
       results[0].should.have.property("id");
     });
@@ -122,7 +127,7 @@ describe("sessiondata", function () {
       ];
       const houseNameAddress = {
         addressLine1: "Rose Cottage",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
       const results = Internal.getLocationListFromSearchResults(
         searchResults,
@@ -140,7 +145,7 @@ describe("sessiondata", function () {
   });
   describe("alexaDevice.getPostcodeFromAddress()", function () {
     it("withspace", function () {
-      mockalexadevice.postalcode.should.equal("CB246ZD");
+      mockalexadevice.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
     });
   });
   describe("Fetching collections", function () {
@@ -251,7 +256,7 @@ describe("sessiondata", function () {
       attributesAreStale(attrs, mockalexadevice).should.be.true;
     });
     it("should return true when data is exactly 7 days old", function () {
-      const sevendaysago = Date.now() - MILLISCONDS_PER_DAY * 7;
+      const sevendaysago = Date.now() - MILLISECONDS_PER_DAY * 7;
       const attrs = {
         ...testAttributes,
         collections: [{ date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] }],
@@ -266,10 +271,10 @@ describe("sessiondata", function () {
     it("should fetch fresh session data successfully", async function () {
       const mockDevice = new AlexaDevice();
       mockDevice.deviceId = "device-123";
-      mockDevice.postalcode = "CB246ZD";
+      mockDevice.postalcode = TEST_POSTCODE_NO_SPACE;
       mockDevice.address = {
         addressLine1: "241 No Such Street",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const handlerInput = {
@@ -311,10 +316,10 @@ describe("sessiondata", function () {
     it("should set attributes correctly", async function () {
       const mockDevice = new AlexaDevice();
       mockDevice.deviceId = "device-456";
-      mockDevice.postalcode = "CB246ZD";
+      mockDevice.postalcode = TEST_POSTCODE_NO_SPACE;
       mockDevice.address = {
         addressLine1: "241 No Such Street",
-        postalCode: "CB24 6ZD",
+        postalCode: TEST_POSTCODE,
       };
 
       const handlerInput = {

@@ -9,12 +9,12 @@ const DataError = require("./errors/dataerror");
 const messages = require("./messages");
 const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
-
-const apiUrl = "https://servicelayer3c.azure-api.net/wastecalendar";
-const CACHE_DAYS = 7;
-const MILLISECONDS_PER_DAY = 86400000;
-
-const numberOfCollections = 12;
+const {
+  MILLISECONDS_PER_DAY,
+  SCDC_API_BASE_URL,
+  CACHE_DAYS,
+  NUMBER_OF_COLLECTIONS,
+} = require("./constants");
 
 function getLocationListFromSearchResults(postcodeSearchResults, address) {
   let matched_address = null;
@@ -44,7 +44,7 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 async function getPostcodeSearchFromSCDCWeb(postcode) {
   log.debug(`getPostcodeSearchFromSCDCWeb(postcode=${postcode})`);
   const postcodeSearchResults = await getJSON(
-    `${apiUrl}/address/search/?postCode=${postcode}`
+    `${SCDC_API_BASE_URL}/address/search/?postCode=${postcode}`
   );
   if (
     !Array.isArray(postcodeSearchResults) ||
@@ -77,7 +77,7 @@ async function getCollectionsFromLocationList(locationList) {
   const promises = [];
   for (let i = 0; i < maxConcurrent && i * step < locationList.length; i++) {
     const locationId = locationList[i * step];
-    const url = `${apiUrl}/collection/search/${locationId}/?numberOfCollections=${numberOfCollections}`;
+    const url = `${SCDC_API_BASE_URL}/collection/search/${locationId}/?numberOfCollections=${NUMBER_OF_COLLECTIONS}`;
     promises.push(
       getJSON(url)
         .then((r) => ({ locationId, collections: r.collections }))

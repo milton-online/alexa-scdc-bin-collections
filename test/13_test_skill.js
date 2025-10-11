@@ -3,50 +3,63 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-const { AlexaTest, LaunchRequestBuilder, IntentRequestBuilder } = require("ask-sdk-test");
+const {
+  AlexaTest,
+  LaunchRequestBuilder,
+  IntentRequestBuilder,
+} = require("ask-sdk-test");
 const log = require("loglevel");
 const util = require("util");
 const messages = require("../lambda/messages");
 const SpeakableDate = require("../lambda/speakabledate");
+const {
+  MILLISECONDS_PER_DAY,
+  TEST_POSTCODE,
+  TEST_POSTCODE_NO_SPACE,
+  TEST_DEVICE_ID,
+  TEST_USER_ID,
+  TEST_SKILL_ID,
+  TEST_ADDRESS_LINE1,
+} = require("../lambda/constants");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 
 ("use strict");
 
-const DEVICE_ID = "amzn1.ask.device.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-const USER_ID = "amzn1.ask.account.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-
 const testAddress = {
-  addressLine1: "241 No Such Street",
+  addressLine1: TEST_ADDRESS_LINE1,
   addressLine2: null,
   addressLine3: null,
   city: "Some town",
   stateOrRegion: null,
   districtOrCounty: null,
   countryCode: "GB",
-  postalCode: "CB24 6ZD",
+  postalCode: TEST_POSTCODE,
 };
 
 const mockAlexaDevice = {
-  deviceId: DEVICE_ID,
+  deviceId: TEST_DEVICE_ID,
   address: testAddress,
-  postalcode: "CB246ZD",
+  postalcode: TEST_POSTCODE_NO_SPACE,
   getPostcodeFromAddress: () => mockAlexaDevice,
   isSameLocationAsDevice: () => true,
 };
 
 const skillSettings = {
-  appId: "amzn1.ask.skill.a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0",
-  userId: USER_ID,
-  deviceId: DEVICE_ID,
+  appId: TEST_SKILL_ID,
+  userId: TEST_USER_ID,
+  deviceId: TEST_DEVICE_ID,
   locale: "en-GB",
 };
 
-const alexaTest = new AlexaTest(require("../lambda/index").handler, skillSettings);
+const alexaTest = new AlexaTest(
+  require("../lambda/index").handler,
+  skillSettings
+);
 
 const today = new SpeakableDate();
 today.setHours(13, 0);
-const yesterday = Date.now() - 86400000;
+const yesterday = Date.now() - MILLISECONDS_PER_DAY;
 
 const datedAttributes = {
   collections: [
@@ -63,7 +76,7 @@ const datedAttributes = {
   ],
   lastReportedBinTime: 0,
   fetchedOnDate: yesterday,
-  deviceId: DEVICE_ID,
+  deviceId: TEST_DEVICE_ID,
   alexaDevice: mockAlexaDevice,
   currentBinType: null,
   logLevel: "silent",
@@ -83,7 +96,7 @@ const todayAttributes = {
     },
   ],
   lastReportedBinTime: 0,
-  deviceId: DEVICE_ID,
+  deviceId: TEST_DEVICE_ID,
   alexaDevice: mockAlexaDevice,
   fetchedOnDate: yesterday,
   currentBinType: "DOMESTIC",
@@ -100,7 +113,7 @@ const tomorrowAttributes = {
   ],
   lastReportedBinTime: 0,
   fetchedOnDate: yesterday,
-  deviceId: DEVICE_ID,
+  deviceId: TEST_DEVICE_ID,
   alexaDevice: mockAlexaDevice,
   currentBinType: null,
   logLevel: "silent",
@@ -108,15 +121,19 @@ const tomorrowAttributes = {
 
 describe("Bin Collections Skill", function () {
   beforeEach(function () {
-    sinon.stub(AlexaDevice.prototype, "getAddressFromDevice").callsFake(function () {
-      this.deviceId = DEVICE_ID;
-      this.address = testAddress;
-      return Promise.resolve(this);
-    });
-    sinon.stub(AlexaDevice.prototype, "getPostcodeFromAddress").callsFake(function () {
-      this.postalcode = "CB246ZD";
-      return this;
-    });
+    sinon
+      .stub(AlexaDevice.prototype, "getAddressFromDevice")
+      .callsFake(function () {
+        this.deviceId = TEST_DEVICE_ID;
+        this.address = testAddress;
+        return Promise.resolve(this);
+      });
+    sinon
+      .stub(AlexaDevice.prototype, "getPostcodeFromAddress")
+      .callsFake(function () {
+        this.postalcode = TEST_POSTCODE_NO_SPACE;
+        return this;
+      });
     sinon.stub(AlexaDevice.prototype, "isSameLocationAsDevice").returns(true);
   });
 
@@ -153,11 +170,16 @@ describe("Bin Collections Skill", function () {
         hasAttributes: {
           missedQuestion: true,
           currentBinType: "DOMESTIC",
-          lastReportedBinTime: new SpeakableDate(todayAttributes.collections[0].date).getTime(),
+          lastReportedBinTime: new SpeakableDate(
+            todayAttributes.collections[0].date
+          ).getTime(),
         },
       },
       {
-        request: new IntentRequestBuilder(skillSettings, "AMAZON.YesIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "AMAZON.YesIntent"
+        ).build(),
         saysLike: "OK then.  The next black landfill collection will be on",
         hasCardTitle: "Next landfill collection",
         hasCardTextLike: "The next black landfill collection will be",
@@ -165,7 +187,9 @@ describe("Bin Collections Skill", function () {
         hasAttributes: {
           missedQuestion: false,
           currentBinType: "DOMESTIC",
-          lastReportedBinTime: new SpeakableDate(todayAttributes.collections[1].date).getTime(),
+          lastReportedBinTime: new SpeakableDate(
+            todayAttributes.collections[1].date
+          ).getTime(),
         },
       },
     ]);
@@ -175,7 +199,10 @@ describe("Bin Collections Skill", function () {
     todayAttributes.missedQuestion = false;
     alexaTest.test([
       {
-        request: new IntentRequestBuilder(skillSettings, "AMAZON.YesIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "AMAZON.YesIntent"
+        ).build(),
         says: messages.NO_QUESTION,
         repromptsNothing: true,
         withSessionAttributes: todayAttributes,
@@ -195,7 +222,9 @@ describe("Bin Collections Skill", function () {
         hasAttributes: {
           missedQuestion: false,
           currentBinType: "RECYCLE",
-          lastReportedBinTime: new SpeakableDate(datedAttributes.collections[1].date).getTime(),
+          lastReportedBinTime: new SpeakableDate(
+            datedAttributes.collections[1].date
+          ).getTime(),
         },
       },
     ]);
@@ -215,11 +244,16 @@ describe("Bin Collections Skill", function () {
         hasAttributes: {
           missedQuestion: true,
           currentBinType: "DOMESTIC",
-          lastReportedBinTime: new SpeakableDate(todayAttributes.collections[0].date).getTime(),
+          lastReportedBinTime: new SpeakableDate(
+            todayAttributes.collections[0].date
+          ).getTime(),
         },
       },
       {
-        request: new IntentRequestBuilder(skillSettings, "AMAZON.YesIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "AMAZON.YesIntent"
+        ).build(),
         saysLike: "OK then.  The next black landfill collection will be on",
         hasCardTitle: "Next landfill collection",
         hasCardTextLike: "The next black landfill collection will be",
@@ -227,7 +261,9 @@ describe("Bin Collections Skill", function () {
         hasAttributes: {
           missedQuestion: false,
           currentBinType: "DOMESTIC",
-          lastReportedBinTime: new SpeakableDate(todayAttributes.collections[1].date).getTime(),
+          lastReportedBinTime: new SpeakableDate(
+            todayAttributes.collections[1].date
+          ).getTime(),
         },
       },
     ]);
@@ -236,7 +272,10 @@ describe("Bin Collections Skill", function () {
   describe("WhichBinTodayIntent (today)", function () {
     alexaTest.test([
       {
-        request: new IntentRequestBuilder(skillSettings, "WhichBinTodayIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "WhichBinTodayIntent"
+        ).build(),
         says: "Today's bin collection is the black bin",
         repromptsNothing: true,
         withSessionAttributes: todayAttributes,
@@ -247,10 +286,14 @@ describe("Bin Collections Skill", function () {
   describe("WhichBinTodayIntent (tomorrow)", function () {
     alexaTest.test([
       {
-        request: new IntentRequestBuilder(skillSettings, "WhichBinTodayIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "WhichBinTodayIntent"
+        ).build(),
         says: "There is no bin collection due today.  But there is tomorrow.  It's the blue bin",
         hasCardTitle: "Collection tomorrow",
-        hasCardText: "There is no bin collection due today.  But there is tomorrow.  It's the blue bin",
+        hasCardText:
+          "There is no bin collection due today.  But there is tomorrow.  It's the blue bin",
         hasCardLargeImageUrlLike: "blue_bin_clipart",
         repromptsNothing: true,
         withSessionAttributes: tomorrowAttributes,
@@ -261,11 +304,14 @@ describe("Bin Collections Skill", function () {
   describe("WhoPutTheBinsOutIntent", function () {
     alexaTest.test([
       {
-        request: new IntentRequestBuilder(skillSettings, "WhoPutTheBinsOutIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "WhoPutTheBinsOutIntent"
+        ).build(),
         says: messages.WHOWHOWHO,
         repromptsNothing: true,
         withSessionAttributes: {
-          deviceId: DEVICE_ID,
+          deviceId: TEST_DEVICE_ID,
           alexaDevice: mockAlexaDevice,
           collections: [
             {
@@ -283,7 +329,9 @@ describe("Bin Collections Skill", function () {
   });
 
   describe("SetLogLevelIntent", function () {
-    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (testLevel) {
+    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (
+      testLevel
+    ) {
       alexaTest.test([
         {
           request: new IntentRequestBuilder(skillSettings, "SetLogLevelIntent")
