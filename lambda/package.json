@@ -1,6 +1,6 @@
 {
   "name": "bin-collections",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Alexa skill for querying south cambs bin collections",
   "main": "index.js",
   "scripts": {
@@ -11,21 +11,16 @@
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
-    "ask-sdk-model": "^1.86.0",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.12.0",
-    "follow-redirects": "^1.15.9",
-    "loglevel": "^1.9.2",
-    "moment": "^2.30.1",
-    "util": "^0.12.5"
+    "loglevel": "^1.9.2"
   },
   "devDependencies": {
-    "alexa-skill-test-framework": "milton-online/alexa-skill-test-framework#master",
     "ask-sdk-local-debug": "^1.1.0",
+    "ask-sdk-test": "^2.7.42",
     "eslint": "^8.45.0",
-    "mocha": "^9.1.3",
+    "mocha": "^10.8.2",
     "nyc": "^17.1.0",
-    "serialize-javascript": "^6.0.2",
     "should": "^13.2.3",
     "sinon": "^15.0.0"
   }
