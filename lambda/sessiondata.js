@@ -134,7 +134,7 @@ async function getFreshSessionData(handlerInput, alexaDevice) {
   AlexaDevice.callDirectiveService(
     handlerInput,
     messages.CONTACTING_SCDC
-  ).catch((err) => log.error(err));
+  ).catch(() => {});
 
   AlexaDevice.getConsentToken(requestEnvelope);
 
