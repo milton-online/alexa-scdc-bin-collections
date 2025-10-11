@@ -5,11 +5,12 @@
 
 const should = require("should");
 const process = require("process");
-const { Internal, attributesAreStale } = require("../lambda/sessiondata");
+const { Internal, attributesAreStale, getFreshSessionData, getFreshAttributes } = require("../lambda/sessiondata");
 const BinCollection = require("../lambda/bincollection");
 const SpeakableDate = require("../lambda/speakabledate");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
+const DataError = require("../lambda/errors/dataerror");
 
 ("use strict");
 
@@ -91,6 +92,28 @@ describe("sessiondata", function () {
       results[0].should.have.property("id");
     });
   });
+  describe("getLocationListFromSearchResults()", function () {
+    it("should handle address without addressLine1", function () {
+      const results = Internal.getLocationListFromSearchResults(
+        testPostcodeSearchResults,
+        {}
+      );
+      results.should.be.an.Array();
+      results.length.should.equal(1);
+    });
+    it("should put matched address first", function () {
+      const searchResults = [
+        { id: "100090161612", houseNumber: "240" },
+        { id: "100090161613", houseNumber: "241" },
+        { id: "100090161614", houseNumber: "242" },
+      ];
+      const results = Internal.getLocationListFromSearchResults(
+        searchResults,
+        testAddress
+      );
+      results[0].should.equal("100090161613");
+    });
+  });
   describe("mockalexadevice.isSameLocationAsDevice()", function () {
     it("otherdevice and mockdevice are same address", function () {
       mockalexadevice.isSameLocationAsDevice(mockOtherDevice).should.be.true;
@@ -102,7 +125,7 @@ describe("sessiondata", function () {
     });
   });
   describe("Fetching collections", function () {
-    it("getLocationListFromSearchResults()", function () {
+    it("getLocationListFromSearchResults() with matched address", function () {
       locationList = Internal.getLocationListFromSearchResults(
         testPostcodeSearchResults,
         mockalexadevice.address
@@ -157,6 +180,111 @@ describe("sessiondata", function () {
     testAttributes.missedQuestion = true;
     it("Old data with missed question flag set", function () {
       attributesAreStale(testAttributes, mockalexadevice).should.be.true;
+    });
+    it("should return true when no collections", function () {
+      const attrs = { ...testAttributes };
+      delete attrs.collections;
+      attributesAreStale(attrs, mockalexadevice).should.be.true;
+    });
+    it("should handle undefined alexaDevice", function () {
+      const attrs = {
+        ...testAttributes,
+        collections: [{ date: tomorrow.toISOString() }],
+        fetchedOnDate: Date.now(),
+        alexaDevice: undefined,
+      };
+      attributesAreStale(attrs, mockalexadevice).should.be.true;
+    });
+  });
+  describe("getFreshSessionData()", function () {
+    it("should fetch fresh session data successfully", async function () {
+      const mockDevice = new AlexaDevice();
+      mockDevice.deviceId = "device-123";
+      mockDevice.postalcode = "CB246ZD";
+      mockDevice.address = {
+        addressLine1: "241 No Such Street",
+        postalCode: "CB24 6ZD",
+      };
+
+      const handlerInput = {
+        requestEnvelope: {
+          request: { requestId: "req-123" },
+          context: {
+            System: {
+              apiEndpoint: "https://api.example.com",
+              apiAccessToken: "token-123",
+              device: { deviceId: "device-123" },
+            },
+          },
+        },
+        serviceClientFactory: {
+          getDirectiveServiceClient: () => ({
+            enqueue: sinon.stub().resolves(),
+          }),
+        },
+      };
+
+      this.timeout(10000);
+      try {
+        const data = await getFreshSessionData(handlerInput, mockDevice);
+        data.should.have.property("collections");
+        data.should.have.property("deviceId");
+        data.deviceId.should.equal("device-123");
+        data.should.have.property("fetchedOnDate");
+        data.should.have.property("alexaDevice");
+      } catch (e) {
+        if (e instanceof DataError) {
+          console.log("SCDC API unavailable, skipping test");
+        } else {
+          throw e;
+        }
+      }
+    });
+  });
+  describe("getFreshAttributes()", function () {
+    it("should set attributes correctly", async function () {
+      const mockDevice = new AlexaDevice();
+      mockDevice.deviceId = "device-456";
+      mockDevice.postalcode = "CB246ZD";
+      mockDevice.address = {
+        addressLine1: "241 No Such Street",
+        postalCode: "CB24 6ZD",
+      };
+
+      const handlerInput = {
+        requestEnvelope: {
+          request: { requestId: "req-456" },
+          context: {
+            System: {
+              apiEndpoint: "https://api.example.com",
+              apiAccessToken: "token-456",
+              device: { deviceId: "device-456" },
+            },
+          },
+        },
+        serviceClientFactory: {
+          getDirectiveServiceClient: () => ({
+            enqueue: sinon.stub().resolves(),
+          }),
+        },
+        attributesManager: {
+          setSessionAttributes: sinon.stub(),
+          setPersistentAttributes: sinon.stub(),
+        },
+      };
+
+      this.timeout(10000);
+      try {
+        await getFreshAttributes(handlerInput, mockDevice);
+        handlerInput.attributesManager.setSessionAttributes.calledOnce.should.be.true();
+        handlerInput.attributesManager.setPersistentAttributes.calledOnce.should.be.true();
+      } catch (e) {
+        if (e instanceof DataError) {
+          console.log("SCDC API unavailable, skipping test");
+        } else {
+          throw e;
+        }
+      }
     });
   });
 });

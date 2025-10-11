@@ -1,5 +1,5 @@
-// Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -7,68 +7,113 @@ const should = require("should");
 const sinon = require("sinon");
 const ProgressiveLoader = require("../lambda/progressiveLoader");
 
+("use strict");
+
 describe("ProgressiveLoader", function () {
-  let mockHandlerInput, mockAlexaDevice;
+  let clock;
 
   beforeEach(function () {
-    mockHandlerInput = {
-      attributesManager: {
-        getSessionAttributes: sinon.stub(),
-        setSessionAttributes: sinon.stub()
-      }
-    };
-    mockAlexaDevice = { deviceId: "test-device" };
+    clock = sinon.useFakeTimers();
+  });
+
+  afterEach(function () {
+    clock.restore();
   });
 
   describe("loadWithFallback()", function () {
     it("should return cached data when available", async function () {
-      const attributes = {
-        collections: [{ date: "2025-01-20T00:00:00Z" }],
-        fetchedOnDate: Date.now() - 1000
+      const handlerInput = {
+        attributesManager: {
+          getSessionAttributes: sinon.stub().returns({
+            collections: [{ date: "2025-01-01" }],
+            fetchedOnDate: Date.now(),
+          }),
+        },
       };
-      mockHandlerInput.attributesManager.getSessionAttributes.returns(attributes);
+      const alexaDevice = { deviceId: "test-device" };
 
-      const result = await ProgressiveLoader.loadWithFallback(mockHandlerInput, mockAlexaDevice);
+      const result = await ProgressiveLoader.loadWithFallback(handlerInput, alexaDevice);
       
+      result.should.have.property("collections");
       result.should.have.property("fromCache", true);
-      result.collections.should.equal(attributes.collections);
+      result.collections.length.should.equal(1);
     });
 
-    it("should identify when no cache exists", function () {
-      mockHandlerInput.attributesManager.getSessionAttributes.returns({});
+    it("should trigger background refresh for old data", async function () {
+      const oldDate = Date.now() - 13 * 60 * 60 * 1000; // 13 hours ago
+      const handlerInput = {
+        attributesManager: {
+          getSessionAttributes: sinon.stub().returns({
+            collections: [{ date: "2025-01-01" }],
+            fetchedOnDate: oldDate,
+          }),
+        },
+      };
+      const alexaDevice = { deviceId: "test-device" };
+
+      const result = await ProgressiveLoader.loadWithFallback(handlerInput, alexaDevice);
       
-      // Test the condition that determines if fresh data is needed
-      const attributes = mockHandlerInput.attributesManager.getSessionAttributes();
-      const hasValidCache = !!(attributes.collections && attributes.collections.length > 0);
+      result.should.have.property("refreshing", true);
+    });
+
+    it("should not trigger background refresh for fresh data", async function () {
+      const recentDate = Date.now() - 1 * 60 * 60 * 1000; // 1 hour ago
+      const handlerInput = {
+        attributesManager: {
+          getSessionAttributes: sinon.stub().returns({
+            collections: [{ date: "2025-01-01" }],
+            fetchedOnDate: recentDate,
+          }),
+        },
+      };
+      const alexaDevice = { deviceId: "test-device" };
+
+      const result = await ProgressiveLoader.loadWithFallback(handlerInput, alexaDevice);
       
-      hasValidCache.should.equal(false);
+      result.should.have.property("refreshing", false);
     });
   });
 
   describe("buildQuickResponse()", function () {
     it("should build response with cache flag", function () {
       const attributes = {
-        collections: [{ date: "2025-01-20T00:00:00Z" }],
-        fetchedOnDate: Date.now()
+        collections: [{ date: "2025-01-01" }],
+        fetchedOnDate: Date.now(),
       };
 
       const result = ProgressiveLoader.buildQuickResponse(attributes);
       
-      result.should.have.property("fromCache", true);
       result.should.have.property("collections");
+      result.should.have.property("fromCache", true);
       result.should.have.property("refreshing");
     });
   });
 
   describe("shouldRefreshInBackground()", function () {
-    it("should refresh when data is old", function () {
+    it("should return true for old data", function () {
       const oldDate = Date.now() - 13 * 60 * 60 * 1000; // 13 hours ago
-      ProgressiveLoader.shouldRefreshInBackground({ fetchedOnDate: oldDate }).should.equal(true);
+      const attributes = { fetchedOnDate: oldDate };
+
+      ProgressiveLoader.shouldRefreshInBackground(attributes).should.be.true();
     });
 
-    it("should not refresh when data is fresh", function () {
+    it("should return false for fresh data", function () {
       const recentDate = Date.now() - 1 * 60 * 60 * 1000; // 1 hour ago
-      ProgressiveLoader.shouldRefreshInBackground({ fetchedOnDate: recentDate }).should.equal(false);
+      const attributes = { fetchedOnDate: recentDate };
+
+      ProgressiveLoader.shouldRefreshInBackground(attributes).should.be.false();
+    });
+  });
+
+  describe("refreshInBackground()", function () {
+    it("should schedule background refresh", async function () {
+      const handlerInput = { test: "input" };
+      const alexaDevice = { deviceId: "test-device" };
+
+      await ProgressiveLoader.refreshInBackground(handlerInput, alexaDevice);
+      
+      // Verify setTimeout was called
+      clock.countTimers().should.be.greaterThan(0);
     });
   });
 });
