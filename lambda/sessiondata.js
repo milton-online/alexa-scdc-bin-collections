@@ -1,5 +1,5 @@
 // Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -21,10 +21,13 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
   let houseNumber = "no_address";
 
   if (address.addressLine1) {
-    [houseNumber] = address.addressLine1.match(/^[^ ]*/);
-    matched_address = postcodeSearchResults.find(
-      (item) => item.houseNumber == houseNumber
-    );
+    const match = address.addressLine1.match(/^[^ ]*/);
+    if (match) {
+      [houseNumber] = match;
+      matched_address = postcodeSearchResults.find(
+        (item) => item.houseNumber === houseNumber
+      );
+    }
   }
 
   // Return the complete list of locations in this postCode
@@ -32,30 +35,28 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 
   // put the matched address at the front of the list if we found one
   if (matched_address) {
-    locationList.unshift(matched_address.id);
+    locationList = [matched_address.id, ...locationList];
   }
 
   return locationList;
 }
 
-function getPostcodeSearchFromSCDCWeb(postcode) {
+async function getPostcodeSearchFromSCDCWeb(postcode) {
   log.debug(`getPostcodeSearchFromSCDCWeb(postcode=${postcode})`);
-  return new Promise((resolve, reject) => {
-    getJSON(`${apiUrl}/address/search/?postCode=${postcode}`)
-      .then((postcodeSearchResults) => {
-        if (postcodeSearchResults.length < 1) {
-          reject(
-            new DataError(
-              "SCDC returned no locations for postcode starting " +
-                postcode.slice(0, -4),
-              messages.POSTCODE_LOOKUP_FAIL
-            )
-          );
-        }
-        resolve(postcodeSearchResults);
-      })
-      .catch((e) => reject(e));
-  });
+  const postcodeSearchResults = await getJSON(
+    `${apiUrl}/address/search/?postCode=${postcode}`
+  );
+  if (
+    !Array.isArray(postcodeSearchResults) ||
+    postcodeSearchResults.length < 1
+  ) {
+    throw new DataError(
+      "SCDC returned no locations for postcode starting " +
+        postcode.slice(0, -4),
+      messages.POSTCODE_LOOKUP_FAIL
+    );
+  }
+  return postcodeSearchResults;
 }
 
 async function getLocationList(alexaDevice) {
@@ -71,7 +72,7 @@ async function getLocationList(alexaDevice) {
 async function getCollectionsFromLocationList(locationList) {
   // Try parallel requests for better performance
   const maxConcurrent = Math.min(3, locationList.length);
-  const step = Math.max(1, ~~(locationList.length / maxConcurrent));
+  const step = Math.max(1, Math.floor(locationList.length / maxConcurrent));
 
   const promises = [];
   for (let i = 0; i < maxConcurrent && i * step < locationList.length; i++) {
@@ -103,38 +104,30 @@ async function getFreshAttributes(handlerInput, alexaDevice) {
 }
 
 function attributesAreStale(attributes, thisDevice) {
-  // Check data is not stale (more than a week old, for a different
-  // device, or where the first collection is in the past)
-
-  if (attributes.collections) {
-    const midnightToday = new SpeakableDate().setToMidnight().getTime();
-    attributes.midnightToday = midnightToday;
-
-    if (!attributes.alexaDevice === undefined) {
-      if (attributes.alexaDevice === thisDevice.deviceId) {
-        attributes.alexaDevice === thisDevice;
-      } else {
-        return true;
-      }
-    }
-
-    if (thisDevice.isSameLocationAsDevice(attributes.alexaDevice)) {
-      const firstCollectionDate = new Date(
-        attributes.collections[0].date
-      ).getTime();
-      if (firstCollectionDate >= midnightToday) {
-        const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
-
-        if (attributes.fetchedOnDate > aWeekAgo) {
-          return false;
-        }
-      }
-    }
+  if (!attributes.collections) {
+    return true;
   }
-  return true;
+
+  if (!attributes.alexaDevice) {
+    return true;
+  }
+
+  if (attributes.deviceId !== thisDevice.deviceId) {
+    return true;
+  }
+
+  if (!thisDevice.isSameLocationAsDevice(attributes.alexaDevice)) {
+    return true;
+  }
+
+  const midnightToday = new SpeakableDate().setToMidnight().getTime();
+  attributes.midnightToday = midnightToday;
+
+  const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
+  return attributes.fetchedOnDate <= aWeekAgo;
 }
 
-function getFreshSessionData(handlerInput, alexaDevice) {
+async function getFreshSessionData(handlerInput, alexaDevice) {
   log.debug(`getFreshSessionData(): ${alexaDevice.postalcode}`);
   const { requestEnvelope } = handlerInput;
 
@@ -145,24 +138,21 @@ function getFreshSessionData(handlerInput, alexaDevice) {
 
   AlexaDevice.getConsentToken(requestEnvelope);
 
-  return new Promise((resolve, reject) => {
-    getLocationList(alexaDevice)
-      .then((locationList) => getCollectionsFromLocationList(locationList))
-      .then((data) => {
-        Object.assign(data, {
-          missedQuestion: false,
-          areDirty: true,
-          midnightToday: new SpeakableDate().setToMidnight().getTime(),
-          lastReportedBinTime: 0,
-          currentBinType: null,
-          fetchedOnDate: Date.now(),
-          deviceId: alexaDevice.deviceId,
-          alexaDevice: alexaDevice,
-        });
-        resolve(data);
-      })
-      .catch((e) => reject(e));
+  const locationList = await getLocationList(alexaDevice);
+  const data = await getCollectionsFromLocationList(locationList);
+
+  Object.assign(data, {
+    missedQuestion: false,
+    areDirty: true,
+    midnightToday: new SpeakableDate().setToMidnight().getTime(),
+    lastReportedBinTime: 0,
+    currentBinType: null,
+    fetchedOnDate: Date.now(),
+    deviceId: alexaDevice.deviceId,
+    alexaDevice,
   });
+
+  return data;
 }
 
 module.exports = {

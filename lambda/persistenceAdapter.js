@@ -1,5 +1,5 @@
 // Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -19,25 +19,28 @@ function getLocalDynamoDBClient(options) {
 
 function getPersistenceAdapter() {
   if (process.env.DYNAMODB_LOCAL === "true") {
+    const localClient = getLocalDynamoDBClient({ port: 8000 });
     return new ddbAdapter.DynamoDbPersistenceAdapter({
       tableName: "test-bins-table",
       createTable: true,
-      dynamoDBClient: getLocalDynamoDBClient({ port: 8000 }),
+      dynamoDBClient: localClient,
       partitionKeyGenerator: (requestEnvelope) => {
         const userId = Alexa.getUserId(requestEnvelope);
         return userId.substring(userId.lastIndexOf(".") + 1);
       },
     });
-  } else {
-    return new ddbAdapter.DynamoDbPersistenceAdapter({
-      tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
-      createTable: false,
-      dynamoDBClient: new AWS.DynamoDB({
-        apiVersion: "latest",
-        region: process.env.DYNAMODB_PERSISTENCE_REGION,
-      }),
-    });
   }
+  
+  const productionClient = new AWS.DynamoDB({
+    apiVersion: "latest",
+    region: process.env.DYNAMODB_PERSISTENCE_REGION,
+  });
+  
+  return new ddbAdapter.DynamoDbPersistenceAdapter({
+    tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
+    createTable: false,
+    dynamoDBClient: productionClient,
+  });
 }
 
 module.exports = getPersistenceAdapter;

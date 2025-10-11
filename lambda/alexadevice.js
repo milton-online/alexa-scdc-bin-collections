@@ -1,5 +1,5 @@
 // Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,9 +8,14 @@ const DataError = require("./errors/dataerror");
 const messages = require("./messages");
 
 module.exports = class AlexaDevice {
-  constructor() {}
-
   static getConsentToken(requestEnvelope) {
+    if (!requestEnvelope?.context?.System) {
+      throw new DataError(
+        "No consent token",
+        messages.NOTIFY_MISSING_PERMISSIONS
+      );
+    }
+
     const consentToken = requestEnvelope.context.System.apiAccessToken;
 
     if (!consentToken) {
@@ -23,29 +28,44 @@ module.exports = class AlexaDevice {
     return consentToken;
   }
 
-  static callDirectiveService(handlerInput, message) {
-    const requestEnvelope = handlerInput.requestEnvelope;
-    const directiveServiceClient =
-      handlerInput.serviceClientFactory.getDirectiveServiceClient();
+  static async callDirectiveService(handlerInput, message) {
+    try {
+      const requestEnvelope = handlerInput.requestEnvelope;
+      const directiveServiceClient =
+        handlerInput.serviceClientFactory.getDirectiveServiceClient();
 
-    const requestId = requestEnvelope.request.requestId;
-    const endpoint = requestEnvelope.context.System.apiEndpoint;
-    const token = Alexa.getApiAccessToken(requestEnvelope);
+      const requestId = requestEnvelope.request.requestId;
+      const endpoint = requestEnvelope.context.System.apiEndpoint;
+      const token = Alexa.getApiAccessToken(requestEnvelope);
 
-    const directive = {
-      header: {
-        requestId,
-      },
-      directive: {
-        type: "VoicePlayer.Speak",
-        speech: message,
-      },
-    };
+      const directive = {
+        header: {
+          requestId,
+        },
+        directive: {
+          type: "VoicePlayer.Speak",
+          speech: message,
+        },
+      };
 
-    return directiveServiceClient.enqueue(directive, endpoint, token);
+      return await directiveServiceClient.enqueue(directive, endpoint, token);
+      // amazonq-ignore-next-line
+    } catch (e) {
+      // Directive service failures are non-critical, just log and continue
+      return Promise.resolve();
+    }
   }
 
   isSameLocationAsDevice(otherDevice) {
+    if (!otherDevice?.address || !this.address) {
+      return false;
+    }
+    if (!otherDevice.address.addressLine1 || !this.address.addressLine1) {
+      return false;
+    }
+    if (!otherDevice.address.postalCode || !this.address.postalCode) {
+      return false;
+    }
     return (
       otherDevice.address.addressLine1.toUpperCase() ===
         this.address.addressLine1.toUpperCase() &&
@@ -68,9 +88,10 @@ module.exports = class AlexaDevice {
       this.postalcode = "CB246ZD";
     } else {
       // get rid of the space in the postcode
-      this.postalcode =
-        this.address.postalCode.slice(0, -4) +
-        this.address.postalCode.slice(-3);
+      this.postalcode = `${this.address.postalCode.slice(
+        0,
+        -4
+      )}${this.address.postalCode.slice(-3)}`;
     }
     return this;
   }

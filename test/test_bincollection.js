@@ -61,4 +61,23 @@ describe("BinCollection", function () {
         .should.equal("green, blue and black bins");
     });
   });
+
+  describe("error handling", function () {
+    it("should throw error for unknown bin type", function () {
+      (() => {
+        BinCollection.getBinType("UNKNOWN");
+      }).should.throw(Error, { message: "Unknown bin type: UNKNOWN" });
+    });
+
+    it("should throw error when getting colour for unknown bin type", function () {
+      const badCollection = new BinCollection({
+        date: "2020-01-19T00:00:00Z",
+        roundTypes: ["INVALID_TYPE"],
+        slippedCollection: false,
+      });
+      (() => {
+        badCollection.getColour();
+      }).should.throw(Error, { message: "Unknown bin type: INVALID_TYPE" });
+    });
+  });
 });

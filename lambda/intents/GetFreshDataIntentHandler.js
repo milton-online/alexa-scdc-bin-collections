@@ -1,5 +1,5 @@
-// Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,6 +16,10 @@ const GetFreshDataIntentHandler = {
   },
   async handle(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (!attributes.alexaDevice) {
+      throw new Error("No device information available");
+    }
 
     await getFreshAttributes(handlerInput, attributes.alexaDevice);
 

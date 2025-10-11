@@ -8,18 +8,19 @@ const sinon = require("sinon");
 const ErrorHandler = require("../lambda/errors/ErrorHandler");
 const DataError = require("../lambda/errors/dataerror");
 const messages = require("../lambda/messages");
+const log = require("loglevel");
 
 ("use strict");
 
 describe("ErrorHandler", function () {
-  let consoleErrorStub;
+  let logErrorStub;
 
   beforeEach(function () {
-    consoleErrorStub = sinon.stub(console, "error");
+    logErrorStub = sinon.stub(log, "error");
   });
 
   afterEach(function () {
-    consoleErrorStub.restore();
+    logErrorStub.restore();
   });
 
   describe("canHandle()", function () {
@@ -43,7 +44,7 @@ describe("ErrorHandler", function () {
 
       handlerInput.responseBuilder.speak.calledWith("Custom error message").should.be.true();
       result.should.equal(mockResponse);
-      consoleErrorStub.calledOnce.should.be.true();
+      logErrorStub.calledOnce.should.be.true();
     });
 
     it("should handle DataError with missing permissions", function () {
@@ -78,7 +79,7 @@ describe("ErrorHandler", function () {
 
       handlerInput.responseBuilder.speak.calledWith(messages.ERROR).should.be.true();
       result.should.equal(mockResponse);
-      consoleErrorStub.calledOnce.should.be.true();
+      logErrorStub.calledOnce.should.be.true();
     });
   });
 });

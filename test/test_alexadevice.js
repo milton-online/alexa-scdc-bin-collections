@@ -127,6 +127,60 @@ describe("AlexaDevice", function () {
 
       device.isSameLocationAsDevice(otherDevice).should.be.false();
     });
+
+    it("should return false when this device has no address", function () {
+      const device = new AlexaDevice();
+      const otherDevice = {
+        address: {
+          addressLine1: "123 Main St",
+          postalCode: "CB24 6ZD",
+        },
+      };
+
+      device.isSameLocationAsDevice(otherDevice).should.be.false();
+    });
+
+    it("should return false when other device has no address", function () {
+      const device = new AlexaDevice();
+      device.address = {
+        addressLine1: "123 Main St",
+        postalCode: "CB24 6ZD",
+      };
+
+      device.isSameLocationAsDevice({}).should.be.false();
+    });
+
+    it("should return false when addressLine1 is missing", function () {
+      const device = new AlexaDevice();
+      device.address = {
+        addressLine1: "123 Main St",
+        postalCode: "CB24 6ZD",
+      };
+
+      const otherDevice = {
+        address: {
+          postalCode: "CB24 6ZD",
+        },
+      };
+
+      device.isSameLocationAsDevice(otherDevice).should.be.false();
+    });
+
+    it("should return false when postalCode is missing", function () {
+      const device = new AlexaDevice();
+      device.address = {
+        addressLine1: "123 Main St",
+        postalCode: "CB24 6ZD",
+      };
+
+      const otherDevice = {
+        address: {
+          addressLine1: "123 Main St",
+        },
+      };
+
+      device.isSameLocationAsDevice(otherDevice).should.be.false();
+    });
   });
 
   describe("getPostcodeFromAddress()", function () {

@@ -1,10 +1,11 @@
 // Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 // Progressive data loading for immediate response
 const { getFreshSessionData } = require("./sessiondata");
+const log = require("loglevel");
 
 class ProgressiveLoader {
   static async loadWithFallback(handlerInput, alexaDevice) {
@@ -13,26 +14,25 @@ class ProgressiveLoader {
 
     // If we have any cached data, use it immediately
     if (attributes.collections && attributes.collections.length > 0) {
-      // Return cached data first
-      const cachedResponse = this.buildQuickResponse(attributes);
-
+      const shouldRefresh = this.shouldRefreshInBackground(attributes);
+      
       // Trigger background refresh if needed
-      if (this.shouldRefreshInBackground(attributes)) {
+      if (shouldRefresh) {
         this.refreshInBackground(handlerInput, alexaDevice);
       }
 
-      return cachedResponse;
+      return this.buildQuickResponse(attributes, shouldRefresh);
     }
 
     // No cache - must fetch fresh data
     return getFreshSessionData(handlerInput, alexaDevice);
   }
 
-  static buildQuickResponse(attributes) {
+  static buildQuickResponse(attributes, refreshing) {
     return {
       collections: attributes.collections,
       fromCache: true,
-      refreshing: this.shouldRefreshInBackground(attributes),
+      refreshing,
     };
   }
 
@@ -47,7 +47,7 @@ class ProgressiveLoader {
       try {
         await getFreshSessionData(handlerInput, alexaDevice);
       } catch (err) {
-        console.log("Background refresh failed:", err.message);
+        log.error("Background refresh failed");
       }
     }, 100);
   }

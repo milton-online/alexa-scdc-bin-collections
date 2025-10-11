@@ -1,5 +1,5 @@
 // Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,34 +12,39 @@ const binTypes = {
   RECYCLE: {
     colour: "blue",
     name: "recycling",
-    smallUrl: SCDC_MEDIA_BASE_URL + "1123/blue_bin_clipart.png",
-    largeUrl: SCDC_MEDIA_BASE_URL + "1123/blue_bin_clipart.png",
+    smallUrl: `${SCDC_MEDIA_BASE_URL}1123/blue_bin_clipart.png`,
+    largeUrl: `${SCDC_MEDIA_BASE_URL}1123/blue_bin_clipart.png`,
   },
   DOMESTIC: {
     colour: "black",
     name: "landfill",
-    smallUrl: SCDC_MEDIA_BASE_URL + "1122/black_bin.png",
-    largeUrl: SCDC_MEDIA_BASE_URL + "1122/black_bin.png",
+    smallUrl: `${SCDC_MEDIA_BASE_URL}1122/black_bin.png`,
+    largeUrl: `${SCDC_MEDIA_BASE_URL}1122/black_bin.png`,
   },
   ORGANIC: {
     colour: "green",
     name: "compostable",
-    smallUrl: SCDC_MEDIA_BASE_URL + "1118/green_bin.png",
-    largeUrl: SCDC_MEDIA_BASE_URL + "1118/green_bin.png",
+    smallUrl: `${SCDC_MEDIA_BASE_URL}1118/green_bin.png`,
+    largeUrl: `${SCDC_MEDIA_BASE_URL}1118/green_bin.png`,
   },
 };
 
 module.exports = class BinCollection {
   static getBinType(binType) {
+    if (!binTypes[binType]) {
+      throw new Error(`Unknown bin type: ${binType}`);
+    }
     return binTypes[binType];
   }
 
   static getColourForBinType(binType) {
-    return binTypes[binType].colour;
+    const type = this.getBinType(binType);
+    return type.colour;
   }
 
   static getNameForBinType(binType) {
-    return binTypes[binType].name;
+    const type = this.getBinType(binType);
+    return type.name;
   }
 
   constructor(jsondata) {
@@ -76,39 +81,40 @@ module.exports = class BinCollection {
     return this.date.isTomorrow();
   }
 
+  _getFirstBinType() {
+    if (!this._cachedFirstType) {
+      this._cachedFirstType = BinCollection.getBinType(this.roundTypes[0]);
+    }
+    return this._cachedFirstType;
+  }
+
   getSmallImageUrl() {
-    return binTypes[this.roundTypes[0]].smallUrl;
+    return this._getFirstBinType().smallUrl;
   }
 
   getLargeImageUrl() {
-    return binTypes[this.roundTypes[0]].largeUrl;
+    return this._getFirstBinType().largeUrl;
   }
 
   getName() {
-    return binTypes[this.roundTypes[0]].name;
+    return this._getFirstBinType().name;
   }
 
   getColour() {
-    return binTypes[this.roundTypes[0]].colour;
+    return this._getFirstBinType().colour;
   }
 
   getColoursSpeech() {
-    let speakOutput;
-
-    const colours = this.roundTypes.map((k) => binTypes[k].colour);
+    const colours = this.roundTypes.map(
+      (k) => BinCollection.getBinType(k).colour
+    );
 
     if (colours.length === 1) {
-      speakOutput = `${colours[0]}`;
-    } else {
-      speakOutput = `${colours.slice(0, -1).join(", ")} and ${
-        colours[colours.length - 1]
-      }`;
-    }
-    speakOutput += " bin";
-    if (colours.length !== 1) {
-      speakOutput += "s";
+      return `${colours[0]} bin`;
     }
 
-    return speakOutput;
+    const lastColour = colours.at(-1);
+    const otherColours = colours.slice(0, -1).join(", ");
+    return `${otherColours} and ${lastColour} bins`;
   }
 };

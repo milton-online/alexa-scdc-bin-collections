@@ -1,5 +1,5 @@
 // Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,7 +13,7 @@ const NoIntentHandler = {
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
       Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.NoIntent" &&
-      attributes.missedQuestion === true
+      attributes?.missedQuestion === true
     );
   },
   handle(handlerInput) {

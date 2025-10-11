@@ -1,5 +1,5 @@
 // Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -19,8 +19,32 @@ const httpAgent = axios.create({
   },
 });
 
+// amazonq-ignore-next-line
 function getJSON(url) {
   log.debug(`getJSON: ${url}`);
+
+  // Validate URL to prevent SSRF
+  const allowedHosts = [
+    "servicelayer3c.azure-api.net",
+    "localhost",
+    "127.0.0.1",
+  ];
+  try {
+    const parsedUrl = new URL(url);
+    if (!allowedHosts.includes(parsedUrl.hostname)) {
+      return Promise.reject(
+        new DataError(
+          `Invalid URL host: ${parsedUrl.hostname}`,
+          messages.WEB_ERROR
+        )
+      );
+    }
+  } catch (e) {
+    return Promise.reject(
+      new DataError(`Invalid URL: ${url}`, messages.WEB_ERROR)
+    );
+  }
+
   return new Promise(function (resolve, reject) {
     httpAgent
       .get(url)

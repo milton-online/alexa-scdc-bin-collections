@@ -1,5 +1,5 @@
 // Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,17 +8,14 @@ module.exports = class SpeakableDate extends Date {
     return new SpeakableDate(this);
   }
 
+  // amazonq-ignore-next-line
   addDays(days) {
     this.setDate(this.getDate() + days);
     return this;
   }
 
   setToMidnight() {
-    this.setHours(0);
-    this.setMinutes(0);
-    this.setSeconds(0);
-    this.setMilliseconds(0);
-    return this;
+    return this.setHours(0, 0, 0, 0), this;
   }
 
   isSameDateAs(somedate) {
@@ -30,8 +27,7 @@ module.exports = class SpeakableDate extends Date {
   }
 
   isToday() {
-    const today = new Date();
-    return this.isSameDateAs(today);
+    return this.isSameDateAs(new Date());
   }
 
   isThisAfternoon() {
@@ -47,10 +43,10 @@ module.exports = class SpeakableDate extends Date {
   getDateSpeech() {
     if (this.isToday()) {
       return "today.";
-    } else if (this.isTomorrow()) {
-      return "tomorrow.";
-    } else {
-      return `on ${this.toDateString().slice(0, -4)}.`;
     }
+    if (this.isTomorrow()) {
+      return "tomorrow.";
+    }
+    return `on ${this.toDateString().slice(0, -4)}.`;
   }
 };

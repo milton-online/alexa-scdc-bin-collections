@@ -1,5 +1,5 @@
 // Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -20,6 +20,9 @@ const WhichBinTodayIntentHandler = {
     const attributes = attributesManager.getSessionAttributes();
     attributes.lastReportedBinTime = 0;
     const collection = getNextCollection(attributes);
+    if (!collection) {
+      throw new Error("No upcoming collections found");
+    }
     attributes.currentBinType = collection.roundTypes[0];
     attributes.lastReportedBinTime = collection.date.getTime();
     attributes.missedQuestion = false;

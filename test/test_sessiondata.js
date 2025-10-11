@@ -114,6 +114,24 @@ describe("sessiondata", function () {
       );
       results[0].should.equal("100090161613");
     });
+    it("should handle house name without number", function () {
+      const searchResults = [
+        { id: "100090161612", houseNumber: "240" },
+        { id: "100090161613", houseNumber: "241" },
+        { id: "100090161614", houseNumber: "242" },
+      ];
+      const houseNameAddress = {
+        addressLine1: "Rose Cottage",
+        postalCode: "CB24 6ZD",
+      };
+      const results = Internal.getLocationListFromSearchResults(
+        searchResults,
+        houseNameAddress
+      );
+      results.should.be.an.Array();
+      results.length.should.equal(3);
+      results[0].should.equal("100090161612");
+    });
   });
   describe("mockalexadevice.isSameLocationAsDevice()", function () {
     it("otherdevice and mockdevice are same address", function () {
@@ -193,6 +211,53 @@ describe("sessiondata", function () {
         collections: [{ date: tomorrow.toISOString() }],
         fetchedOnDate: Date.now(),
         alexaDevice: undefined,
+      };
+      attributesAreStale(attrs, mockalexadevice).should.be.true;
+    });
+    it("should return true when all collections are in the past", function () {
+      const attrs = {
+        ...testAttributes,
+        collections: [
+          { date: today.clone().addDays(-7).toISOString(), roundTypes: ["DOMESTIC"] },
+          { date: today.clone().addDays(-1).toISOString(), roundTypes: ["RECYCLE"] },
+        ],
+        fetchedOnDate: yesterday,
+        alexaDevice: mockalexadevice,
+        deviceId: DEVICE_ID,
+      };
+      attributesAreStale(attrs, mockalexadevice).should.be.true;
+    });
+    it("should return false when first collection is past but later ones are future", function () {
+      const attrs = {
+        ...testAttributes,
+        collections: [
+          { date: today.clone().addDays(-1).toISOString(), roundTypes: ["DOMESTIC"] },
+          { date: tomorrow.toISOString(), roundTypes: ["RECYCLE"] },
+        ],
+        fetchedOnDate: yesterday,
+        alexaDevice: mockalexadevice,
+        deviceId: DEVICE_ID,
+      };
+      attributesAreStale(attrs, mockalexadevice).should.be.false;
+    });
+    it("should return true when device ID differs", function () {
+      const attrs = {
+        ...testAttributes,
+        collections: [{ date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] }],
+        fetchedOnDate: yesterday,
+        alexaDevice: mockalexadevice,
+        deviceId: OTHER_DEVICE,
+      };
+      attributesAreStale(attrs, mockalexadevice).should.be.true;
+    });
+    it("should return true when data is exactly 7 days old", function () {
+      const sevendaysago = Date.now() - MILLISCONDS_PER_DAY * 7;
+      const attrs = {
+        ...testAttributes,
+        collections: [{ date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] }],
+        fetchedOnDate: sevendaysago,
+        alexaDevice: mockalexadevice,
+        deviceId: DEVICE_ID,
       };
       attributesAreStale(attrs, mockalexadevice).should.be.true;
     });

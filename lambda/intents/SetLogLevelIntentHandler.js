@@ -1,5 +1,5 @@
 // Copyright 2020-2022 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2024 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,7 +25,12 @@ const SetLogLevelIntentHandler = {
 
     const attributes = attributesManager.getSessionAttributes();
     attributes.logLevel = logLevel;
-    log.setLevel(logLevel);
+    
+    const validLevels = ["trace", "debug", "info", "warn", "error", "silent"];
+    if (validLevels.includes(logLevel)) {
+      log.setLevel(logLevel);
+    }
+    
     attributesManager.setSessionAttributes(attributes);
 
     return responseBuilder
