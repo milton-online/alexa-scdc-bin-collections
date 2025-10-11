@@ -9,6 +9,9 @@
   },
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
