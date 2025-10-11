@@ -1,0 +1,5 @@
+{
+  "ignoredFindings": [
+    "javascript-lazy-load-module"
+  ]
+}
