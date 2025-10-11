@@ -25,7 +25,7 @@ To run the test suite, navigate to the lambda directory of the checkout and run:
 Debugging locally within VSCode requires the use of a local DynamoDB installation.
 This is most easily installed and run using a Docker container, so you will need docker desktop installed.
 
-1. In a terminal window, navigate to the `dynamodb-local` directory, and run `docker-compose up`.  This will run dynamodb in a container on port 8000.  You should see a summary of information about the container.
+1. In a terminal window, navigate to the `dynamodb-local` directory, and run `docker compose up`.  This will run dynamodb in a container on port 8000.  You should see a summary of information about the container.
 2. You can inspect the contents of the local dynamodb database with:
 ```bash
 aws dynamodb list-tables --endpoint-url http://localhost:8000

@@ -7,6 +7,7 @@ const should = require("should");
 const sinon = require("sinon");
 const AWS = require("aws-sdk");
 const { execSync } = require("child_process");
+const path = require("path");
 
 ("use strict");
 
@@ -14,6 +15,7 @@ const TEST_TABLE_NAME = "prod-table";
 const TEST_REGION_US = "us-east-1";
 const TEST_REGION_EU = "eu-west-1";
 const LOCAL_DYNAMODB_ENDPOINT = "http://localhost:8000";
+const DYNAMODB_DIR = path.join(__dirname, "../dynamodb-local");
 
 function isDockerRunning() {
   try {
@@ -27,10 +29,12 @@ function isDockerRunning() {
 function startDynamoDB() {
   try {
     execSync("docker compose up -d", {
-      cwd: "../dynamodb-local",
+      cwd: DYNAMODB_DIR,
       stdio: "ignore",
+      shell: true,
+      timeout: 10000,
     });
-    execSync("sleep 2");
+    execSync("sleep 3", { shell: true });
   } catch (e) {
     console.log("Failed to start DynamoDB:", e.message);
   }
@@ -39,8 +43,9 @@ function startDynamoDB() {
 function stopDynamoDB() {
   try {
     execSync("docker compose down", {
-      cwd: "../dynamodb-local",
+      cwd: DYNAMODB_DIR,
       stdio: "ignore",
+      shell: true,
     });
   } catch (e) {
     console.log("Failed to stop DynamoDB:", e.message);
@@ -53,10 +58,12 @@ describe("persistenceAdapter", function () {
   let envBackup;
   let getPersistenceAdapter;
 
-  before(function () {
+  before(function (done) {
+    this.timeout(15000);
     if (dockerAvailable) {
       startDynamoDB();
     }
+    done();
   });
 
   after(function () {

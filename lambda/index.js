@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const Alexa = require("ask-sdk-core");
 
 const LaunchRequestHandler = require("./intents/LaunchRequestHandler");
@@ -25,8 +27,6 @@ const PersistenceSavingInterceptor = require("./interceptors/PersistenceSavingIn
 const ErrorHandler = require("./errors/ErrorHandler");
 
 const getPersistenceAdapter = require("./persistenceAdapter");
-
-("use strict");
 
 exports.handler = Alexa.SkillBuilders.custom()
   .withPersistenceAdapter(getPersistenceAdapter())
