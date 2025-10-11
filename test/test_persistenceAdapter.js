@@ -115,6 +115,7 @@ describe("persistenceAdapter", function () {
   (dockerAvailable ? it : it.skip)(
     "should configure local DynamoDB client with correct endpoint",
     function () {
+      delete process.env.SKIP_DYNAMODB;
       process.env.DYNAMODB_LOCAL = "true";
       const configSpy = sinon.spy(AWS.config, "update");
 

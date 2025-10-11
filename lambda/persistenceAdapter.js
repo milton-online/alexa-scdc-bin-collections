@@ -17,7 +17,19 @@ function getLocalDynamoDBClient(options) {
   return new AWS.DynamoDB();
 }
 
+class NoOpPersistenceAdapter {
+  async getAttributes() {
+    return {};
+  }
+  async saveAttributes() {}
+  async deleteAttributes() {}
+}
+
 function getPersistenceAdapter() {
+  if (process.env.SKIP_DYNAMODB === "true") {
+    return new NoOpPersistenceAdapter();
+  }
+  
   if (process.env.DYNAMODB_LOCAL === "true") {
     const localClient = getLocalDynamoDBClient({ port: 8000 });
     return new ddbAdapter.DynamoDbPersistenceAdapter({

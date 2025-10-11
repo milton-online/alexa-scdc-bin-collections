@@ -10,3 +10,6 @@ const log = require("loglevel");
 if (!process.env.DEBUG_TESTS) {
   log.disableAll();
 }
+
+// Skip DynamoDB for skill tests (use withSessionAttributes instead)
+process.env.SKIP_DYNAMODB = "true";
