@@ -45,11 +45,11 @@ function getPersistenceAdapter() {
   
   const productionClient = new AWS.DynamoDB({
     apiVersion: "latest",
-    region: process.env.DYNAMODB_PERSISTENCE_REGION,
+    region: process.env.DYNAMODB_PERSISTENCE_REGION || "us-east-1",
   });
   
   return new ddbAdapter.DynamoDbPersistenceAdapter({
-    tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME,
+    tableName: process.env.DYNAMODB_PERSISTENCE_TABLE_NAME || "bin-collections",
     createTable: false,
     dynamoDBClient: productionClient,
   });

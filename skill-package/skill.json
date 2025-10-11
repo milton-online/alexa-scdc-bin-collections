@@ -15,7 +15,7 @@
             "recycling"
           ],
           "name": "South Cambridgeshire Bin Collection Information",
-          "description": "This skill uses the address configured in your Alexa device to look up your upcoming waste collections on South Cambridgeshire District Council\u0027s website.  You need to be resident in South Cambridgeshire for this to be useful.\n\nThe skill is a community project, and is not a product of, or supported by, South Cambridgeshire District Council.\n\nPlease report bugs and enhancement requests at:\nhttps://github.com/milton-online/alexa-scdc-bin-collections/issues",
+          "description": "This skill uses the address configured in your Alexa device to look up your upcoming waste collections on South Cambridgeshire District Council's website.  You need to be resident in South Cambridgeshire for this to be useful.\n\nThe skill is a community project, and is not a product of, or supported by, South Cambridgeshire District Council.\n\nPlease report bugs and enhancement requests at:\nhttps://github.com/milton-online/alexa-scdc-bin-collections/issues",
           "smallIconUri": "file://assets/images/en-GB_smallIconUri.png",
           "updatesDescription": "Fixed a bug which occasionally could cause the skill to return a collection in the past.",
           "largeIconUri": "file://assets/images/en-GB_largeIconUri.png"
@@ -35,7 +35,7 @@
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:us-east-1:643132677536:function:a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0:Release_1"
+          "uri": "arn:aws:lambda:eu-west-1:189672740245:function:ask-SouthCambridgeshireBinColle-AlexaSkillFunction-xMirTpOo0Ymt"
         },
         "interfaces": []
       }
