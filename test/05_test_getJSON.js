@@ -30,6 +30,7 @@ describe("getJSON", function () {
   });
 
   it("slow should throw Timeout", function () {
+    this.slow(300);
     nock(base).get("/slow").delay(200).reply(200, "test");
 
     return getJSON(`${base}/slow`, 100).should.be.rejectedWith({
