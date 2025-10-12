@@ -62,6 +62,7 @@ Resources:
       Handler: !Ref LambdaHandler
       Runtime: !Ref LambdaRuntime
       Role: !GetAtt AlexaSkillIAMRole.Arn
+      Architectures: [arm64]
       MemorySize: 512
       Timeout: 60
       Environment:
