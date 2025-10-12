@@ -10,6 +10,7 @@ const {
   LaunchRequestBuilder,
   IntentRequestBuilder,
 } = require("ask-sdk-test");
+const nock = require("nock");
 const log = require("loglevel");
 const util = require("util");
 const messages = require("../lambda/messages");
@@ -145,6 +146,7 @@ describe("Bin Collections Skill", function () {
   describe("LaunchRequest", function () {
     alexaTest.test([
       {
+        description: "should announce next collection with fresh data",
         request: new LaunchRequestBuilder(skillSettings).build(),
         says: "Your next collection is the black bin, on Sun Sep 18 .",
         repromptsNothing: true,
@@ -154,6 +156,55 @@ describe("Bin Collections Skill", function () {
           currentBinType: "DOMESTIC",
           lastReportedBinTime: 16779225600000,
         },
+      },
+    ]);
+  });
+
+  describe("LaunchRequest (stale data)", function () {
+    const staleAttributes = {
+      collections: [
+        {
+          date: "2501-09-18T00:00:00Z",
+          roundTypes: ["DOMESTIC"],
+          slippedCollection: false,
+        },
+      ],
+      lastReportedBinTime: 0,
+      fetchedOnDate: Date.now() - MILLISECONDS_PER_DAY * 8,
+      deviceId: TEST_DEVICE_ID,
+      alexaDevice: mockAlexaDevice,
+      currentBinType: null,
+      logLevel: "silent",
+    };
+
+    beforeEach(() => {
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/address\/search\/\?postCode=.*/)
+        .reply(200, [{ id: "100090161613", houseNumber: "42" }]);
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/collection\/search\/.*\?numberOfCollections=12/)
+        .reply(200, {
+          collections: [
+            {
+              date: "2501-09-20T00:00:00Z",
+              roundTypes: ["RECYCLE"],
+              slippedCollection: false,
+            },
+          ],
+        });
+    });
+
+    afterEach(() => {
+      nock.cleanAll();
+    });
+
+    alexaTest.test([
+      {
+        description: "should fetch fresh data when stale",
+        request: new LaunchRequestBuilder(skillSettings).build(),
+        saysLike: "Your next collection is the blue",
+        repromptsNothing: true,
+        withSessionAttributes: staleAttributes,
       },
     ]);
   });
@@ -325,6 +376,70 @@ describe("Bin Collections Skill", function () {
           lastReportedBinTime: 0,
           currentBinType: null,
         },
+      },
+    ]);
+  });
+
+  describe("GetFreshDataIntent", function () {
+    beforeEach(() => {
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/address\/search\/\?postCode=.*/)
+        .reply(200, [{ id: "100090161613", houseNumber: "42" }]);
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/collection\/search\/.*\?numberOfCollections=12/)
+        .reply(200, {
+          collections: [
+            {
+              date: today.clone().addDays(1).toISOString(),
+              roundTypes: ["DOMESTIC"],
+              slippedCollection: false,
+            },
+          ],
+        });
+    });
+
+    afterEach(() => {
+      nock.cleanAll();
+    });
+
+    alexaTest.test([
+      {
+        description: "should fetch fresh data and confirm",
+        request: new IntentRequestBuilder(skillSettings, "GetFreshDataIntent").build(),
+        saysLike: "I'm up to date with the council",
+        shouldEndSession: false,
+        withSessionAttributes: datedAttributes,
+      },
+    ]);
+  });
+
+  describe("WhichBinTodayIntent (no collection)", function () {
+    const noCollectionAttributes = {
+      collections: [
+        {
+          date: today.clone().addDays(3).toISOString(),
+          roundTypes: ["DOMESTIC"],
+          slippedCollection: false,
+        },
+      ],
+      lastReportedBinTime: 0,
+      fetchedOnDate: yesterday,
+      deviceId: TEST_DEVICE_ID,
+      alexaDevice: mockAlexaDevice,
+      currentBinType: null,
+      logLevel: "silent",
+    };
+    alexaTest.test([
+      {
+        description: "should report no collection today or tomorrow",
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "WhichBinTodayIntent"
+        ).build(),
+        says: "There is no bin collection due today.",
+        hasCardTitle: "No collection today",
+        repromptsNothing: true,
+        withSessionAttributes: noCollectionAttributes,
       },
     ]);
   });

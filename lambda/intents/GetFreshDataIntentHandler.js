@@ -5,6 +5,7 @@
 
 const Alexa = require("ask-sdk-core");
 const messages = require("../messages");
+const DataError = require("../errors/dataerror");
 const { getFreshAttributes } = require("../sessiondata");
 
 const GetFreshDataIntentHandler = {
@@ -21,12 +22,20 @@ const GetFreshDataIntentHandler = {
       throw new Error("No device information available");
     }
 
-    await getFreshAttributes(handlerInput, attributes.alexaDevice);
-
-    return handlerInput.responseBuilder
-      .speak(messages.GOT_FRESH_DATA)
-      .withShouldEndSession(false)
-      .getResponse();
+    try {
+      await getFreshAttributes(handlerInput, attributes.alexaDevice);
+      return handlerInput.responseBuilder
+        .speak(messages.GOT_FRESH_DATA)
+        .withShouldEndSession(false)
+        .getResponse();
+    } catch (error) {
+      if (error instanceof DataError || error.name === "DataError") {
+        return handlerInput.responseBuilder
+          .speak(error.speech)
+          .getResponse();
+      }
+      throw error;
+    }
   },
 };
 
