@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 const CancelAndStopIntentHandler = require("../lambda/intents/CancelAndStopIntentHandler");
@@ -13,7 +15,6 @@ const NoIntentHandler = require("../lambda/intents/NoIntentHandler");
 const GetFreshDataIntentHandler = require("../lambda/intents/GetFreshDataIntentHandler");
 const { resolveToCanonicalSlotValue } = require("../lambda/intents/slotResolver");
 
-("use strict");
 
 describe("Intent Handlers", function () {
   describe("CancelAndStopIntentHandler", function () {

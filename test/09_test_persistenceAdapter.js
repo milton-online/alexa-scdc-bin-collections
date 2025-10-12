@@ -3,13 +3,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 const AWS = require("aws-sdk");
 const { execSync } = require("child_process");
 const path = require("path");
 
-("use strict");
 
 const TEST_TABLE_NAME = "prod-table";
 const TEST_REGION_US = "us-east-1";

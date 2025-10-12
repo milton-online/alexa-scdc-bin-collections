@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const process = require("process");
 const { Internal, attributesAreStale, getFreshSessionData, getFreshAttributes } = require("../lambda/sessiondata");
@@ -21,7 +23,6 @@ const AlexaDevice = require("../lambda/alexadevice");
 const DataError = require("../lambda/errors/dataerror");
 const log = require("loglevel");
 
-("use strict");
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);

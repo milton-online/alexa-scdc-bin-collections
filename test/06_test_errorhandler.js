@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 const ErrorHandler = require("../lambda/errors/ErrorHandler");
@@ -10,7 +12,6 @@ const DataError = require("../lambda/errors/dataerror");
 const messages = require("../lambda/messages");
 const log = require("loglevel");
 
-("use strict");
 
 describe("ErrorHandler", function () {
   let logErrorStub;

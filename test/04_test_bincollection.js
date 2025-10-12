@@ -3,12 +3,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const BinCollection = require("../lambda/bincollection");
 const messages = require("../lambda/messages");
 const { MILLISECONDS_PER_DAY } = require("../lambda/constants");
 
-("use strict");
 
 const slippedExample = new BinCollection({
   date: "2020-01-19T00:00:00Z",

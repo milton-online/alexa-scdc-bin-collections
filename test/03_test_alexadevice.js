@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
@@ -12,7 +14,6 @@ const {
   TEST_POSTCODE_NO_SPACE,
 } = require("../lambda/constants");
 
-("use strict");
 
 describe("AlexaDevice", function () {
   describe("constructor", function () {

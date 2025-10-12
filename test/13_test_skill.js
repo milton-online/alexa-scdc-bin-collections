@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const {
   AlexaTest,
   LaunchRequestBuilder,
@@ -24,7 +26,6 @@ const {
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 
-("use strict");
 
 const testAddress = {
   addressLine1: TEST_ADDRESS_LINE1,

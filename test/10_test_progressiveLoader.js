@@ -3,11 +3,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 const ProgressiveLoader = require("../lambda/progressiveLoader");
 
-("use strict");
 
 describe("ProgressiveLoader", function () {
   let clock;
