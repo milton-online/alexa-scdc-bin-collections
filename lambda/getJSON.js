@@ -11,7 +11,7 @@ const messages = require("./messages");
 
 // Reuse HTTP agent for connection pooling
 const httpAgent = axios.create({
-  timeout: 3000,
+  timeout: process.env.HTTP_TIMEOUT || 3000,
   maxRedirects: 2,
   headers: {
     Accept: "application/json",
@@ -19,8 +19,7 @@ const httpAgent = axios.create({
   },
 });
 
-// amazonq-ignore-next-line
-function getJSON(url) {
+function getJSON(url, timeout) {
   log.debug(`getJSON: ${url}`);
 
   // Validate URL to prevent SSRF
@@ -46,8 +45,9 @@ function getJSON(url) {
   }
 
   return new Promise(function (resolve, reject) {
+    const config = timeout ? { timeout } : {};
     httpAgent
-      .get(url)
+      .get(url, config)
       .then((res) => {
         resolve(res.data);
       })
