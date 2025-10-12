@@ -8,7 +8,7 @@ const MILLISECONDS_PER_DAY = 86400000;
 
 // API URLs
 const SCDC_API_BASE_URL = "https://servicelayer3c.azure-api.net/wastecalendar";
-const SCDC_MEDIA_BASE_URL = "https://www.scambs.gov.uk/media/";
+const IMAGES_BASE_URL = "https://www.aws.thecutts.org/bin-collections-assets/";
 
 // Cache configuration
 const CACHE_DAYS = 7;
@@ -26,7 +26,7 @@ const TEST_SKILL_ID = "amzn1.ask.skill.a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0";
 module.exports = {
   MILLISECONDS_PER_DAY,
   SCDC_API_BASE_URL,
-  SCDC_MEDIA_BASE_URL,
+  SCDC_MEDIA_BASE_URL: IMAGES_BASE_URL,
   CACHE_DAYS,
   NUMBER_OF_COLLECTIONS,
   TEST_DEVICE_ID,

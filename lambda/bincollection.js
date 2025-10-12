@@ -5,26 +5,26 @@
 
 const SpeakableDate = require("./speakabledate");
 const messages = require("./messages");
-const { SCDC_MEDIA_BASE_URL } = require("./constants");
+const { IMAGES_BASE_URL } = require("./constants");
 
 const binTypes = {
   RECYCLE: {
     colour: "blue",
     name: "recycling",
-    smallUrl: `${SCDC_MEDIA_BASE_URL}1123/blue_bin_clipart.png`,
-    largeUrl: `${SCDC_MEDIA_BASE_URL}1123/blue_bin_clipart.png`,
+    smallUrl: `${IMAGES_BASE_URL}blue_small.png`,
+    largeUrl: `${IMAGES_BASE_URL}blue_large.png`,
   },
   DOMESTIC: {
     colour: "black",
     name: "landfill",
-    smallUrl: `${SCDC_MEDIA_BASE_URL}1122/black_bin.png`,
-    largeUrl: `${SCDC_MEDIA_BASE_URL}1122/black_bin.png`,
+    smallUrl: `${IMAGES_BASE_URL}black_small.png`,
+    largeUrl: `${IMAGES_BASE_URL}black_large.png`,
   },
   ORGANIC: {
     colour: "green",
     name: "compostable",
-    smallUrl: `${SCDC_MEDIA_BASE_URL}1118/green_bin.png`,
-    largeUrl: `${SCDC_MEDIA_BASE_URL}1118/green_bin.png`,
+    smallUrl: `${IMAGES_BASE_URL}green_small.png`,
+    largeUrl: `${IMAGES_BASE_URL}green_large.png`,
   },
 };
 
