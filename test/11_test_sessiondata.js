@@ -7,7 +7,6 @@
 
 const should = require("should");
 const nock = require("nock");
-const process = require("process");
 const {
   Internal,
   attributesAreStale,
@@ -118,6 +117,19 @@ describe("sessiondata", function () {
       results = await Internal.getPostcodeSearchFromSCDCWeb(TEST_POSTCODE_MOCK);
       results.length.should.be.greaterThan(0);
       results[0].should.have.property("id");
+    });
+
+    it("should throw DataError when postcode not found", async function () {
+      nock("https://servicelayer3c.azure-api.net")
+        .get("/wastecalendar/address/search/?postCode=XX99XX")
+        .reply(200, []);
+
+      await Internal.getPostcodeSearchFromSCDCWeb(
+        "XX99XX"
+      ).should.be.rejectedWith({
+        name: "DataError",
+        message: "SCDC returned no locations for postcode starting XX",
+      });
     });
   });
   describe("getLocationListFromSearchResults()", function () {
