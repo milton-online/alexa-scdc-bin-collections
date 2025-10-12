@@ -9,10 +9,10 @@ const should = require("should");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 const DataError = require("../lambda/errors/dataerror");
-const {
-  TEST_POSTCODE,
-  TEST_POSTCODE_NO_SPACE,
-} = require("../lambda/constants");
+
+const TEST_POSTCODE = "TE5 7PC";
+const TEST_POSTCODE_NO_SPACE = "TE57PC";
+const AMAZON_VALIDATION_POSTCODE = "CB246ZD";
 
 
 describe("AlexaDevice", function () {
@@ -199,7 +199,7 @@ describe("AlexaDevice", function () {
       device.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
     });
 
-    it("should handle US test address", function () {
+    it("should handle Amazon validation address", function () {
       const device = new AlexaDevice();
       device.address = {
         countryCode: "US",
@@ -207,7 +207,7 @@ describe("AlexaDevice", function () {
       };
 
       device.getPostcodeFromAddress();
-      device.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
+      device.postalcode.should.equal(AMAZON_VALIDATION_POSTCODE);
     });
 
     it("should throw DataError when postcode is null", function () {

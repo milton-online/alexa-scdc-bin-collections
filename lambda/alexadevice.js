@@ -7,6 +7,13 @@ const Alexa = require("ask-sdk-core");
 const DataError = require("./errors/dataerror");
 const messages = require("./messages");
 
+// Amazon's validation address for skill certification
+const ALEXA_CERTIFICATION_ADDRESS = {
+  countryCode: "US",
+  postalCode: "20146",
+};
+const ALEXA_CERTIFICATION_POSTCODE = "CB246ZD";
+
 module.exports = class AlexaDevice {
   static getConsentToken(requestEnvelope) {
     if (!requestEnvelope?.context?.System) {
@@ -51,7 +58,7 @@ module.exports = class AlexaDevice {
       return await directiveServiceClient.enqueue(directive, endpoint, token);
       // amazonq-ignore-next-line
     } catch (e) {
-      // Directive service failures are non-critical, just log and continue
+      // Directive service failures are non-critical, just continue
       return Promise.resolve();
     }
   }
@@ -80,14 +87,14 @@ module.exports = class AlexaDevice {
     }
 
     if (
-      this.address.countryCode === "US" &&
-      this.address.postalCode === "20146"
+      this.address.countryCode === ALEXA_CERTIFICATION_ADDRESS.countryCode &&
+      this.address.postalCode === ALEXA_CERTIFICATION_ADDRESS.postalCode
     ) {
-      // This is a testing address for Amazon hosted skills, and causes failures during live deployment
-      // Return a special result to avoid the test failure
-      this.postalcode = "CB246ZD";
+      // Amazon uses this test address during skill certification
+      // Map it to a valid SCDC postcode to pass validation
+      this.postalcode = ALEXA_CERTIFICATION_POSTCODE;
     } else {
-      // get rid of the space in the postcode
+      // Remove space from UK postcode
       this.postalcode = `${this.address.postalCode.slice(
         0,
         -4
