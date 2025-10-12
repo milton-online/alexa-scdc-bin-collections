@@ -11,20 +11,20 @@ const binTypes = {
   RECYCLE: {
     colour: "blue",
     name: "recycling",
-    smallUrl: `${IMAGES_BASE_URL}blue_small.png`,
-    largeUrl: `${IMAGES_BASE_URL}blue_large.png`,
+    smallUrl: `${IMAGES_BASE_URL}blue_small.jpg`,
+    largeUrl: `${IMAGES_BASE_URL}blue_large.jpg`,
   },
   DOMESTIC: {
     colour: "black",
     name: "landfill",
-    smallUrl: `${IMAGES_BASE_URL}black_small.png`,
-    largeUrl: `${IMAGES_BASE_URL}black_large.png`,
+    smallUrl: `${IMAGES_BASE_URL}black_small.jpg`,
+    largeUrl: `${IMAGES_BASE_URL}black_large.jpg`,
   },
   ORGANIC: {
     colour: "green",
     name: "compostable",
-    smallUrl: `${IMAGES_BASE_URL}green_small.png`,
-    largeUrl: `${IMAGES_BASE_URL}green_large.png`,
+    smallUrl: `${IMAGES_BASE_URL}green_small.jpg`,
+    largeUrl: `${IMAGES_BASE_URL}green_large.jpg`,
   },
 };
 
