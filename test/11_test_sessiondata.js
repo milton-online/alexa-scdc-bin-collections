@@ -6,23 +6,22 @@
 "use strict";
 
 const should = require("should");
+const nock = require("nock");
 const process = require("process");
-const { Internal, attributesAreStale, getFreshSessionData, getFreshAttributes } = require("../lambda/sessiondata");
-const BinCollection = require("../lambda/bincollection");
+const {
+  Internal,
+  attributesAreStale,
+  getFreshSessionData,
+  getFreshAttributes,
+} = require("../lambda/sessiondata");
 const SpeakableDate = require("../lambda/speakabledate");
 const {
   MILLISECONDS_PER_DAY,
-  TEST_POSTCODE,
-  TEST_POSTCODE_NO_SPACE,
   TEST_DEVICE_ID,
   TEST_OTHER_DEVICE_ID,
-  TEST_ADDRESS_LINE1,
 } = require("../lambda/constants");
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
-const DataError = require("../lambda/errors/dataerror");
-const log = require("loglevel");
-
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);
@@ -33,39 +32,56 @@ const DEVICE_ID = TEST_DEVICE_ID;
 const OTHER_DEVICE = TEST_OTHER_DEVICE_ID;
 
 const testAddress = {
-  addressLine1: TEST_ADDRESS_LINE1,
+  addressLine1: "42 Fake Street",
   addressLine2: null,
   addressLine3: null,
-  city: "Some town",
+  city: "Testville",
   stateOrRegion: null,
   districtOrCounty: null,
   countryCode: "GB",
-  postalCode: TEST_POSTCODE,
+  postalCode: "TE5 7PC",
 };
+
+const TEST_POSTCODE_MOCK = "TE57PC";
 
 const mockalexadevice = sinon.createStubInstance(AlexaDevice);
 mockalexadevice.deviceId = DEVICE_ID;
 mockalexadevice.address = testAddress;
-mockalexadevice.postalcode = TEST_POSTCODE_NO_SPACE;
+mockalexadevice.postalcode = TEST_POSTCODE_MOCK;
 mockalexadevice.getPostcodeFromAddress.returns(mockalexadevice);
 mockalexadevice.isSameLocationAsDevice.returns(true);
 
 const mockOtherDevice = sinon.createStubInstance(AlexaDevice);
 mockOtherDevice.deviceId = OTHER_DEVICE;
 mockOtherDevice.address = testAddress;
-mockOtherDevice.postalcode = TEST_POSTCODE_NO_SPACE;
+mockOtherDevice.postalcode = TEST_POSTCODE_MOCK;
 mockOtherDevice.getPostcodeFromAddress.returns(mockOtherDevice);
 mockOtherDevice.isSameLocationAsDevice.returns(true);
 
 const testPostcodeSearchResults = [
   {
     id: "100090161613",
-    houseNumber: "241",
-    street: "No Such Street",
-    town: "Sometown",
-    postCode: TEST_POSTCODE_NO_SPACE,
+    houseNumber: "42",
+    street: "Fake Street",
+    town: "Testville",
+    postCode: TEST_POSTCODE_MOCK,
   },
 ];
+
+const mockCollectionsResponse = {
+  collections: [
+    {
+      date: new SpeakableDate().addDays(1).toISOString(),
+      roundTypes: ["DOMESTIC"],
+      slippedCollection: false,
+    },
+    {
+      date: new SpeakableDate().addDays(8).toISOString(),
+      roundTypes: ["RECYCLE"],
+      slippedCollection: false,
+    },
+  ],
+};
 
 const testAttributes = {
   collections: [
@@ -92,9 +108,14 @@ describe("sessiondata", function () {
   let results;
   let locationList;
   describe("getPostcodeSearchFromSCDCWeb()", function () {
-    this.slow(5000);
-    it("fetching results - might fail if SCDC web is down", async function () {
-      results = await Internal.getPostcodeSearchFromSCDCWeb(TEST_POSTCODE_NO_SPACE);
+    afterEach(() => nock.cleanAll());
+
+    it("fetching results", async function () {
+      nock("https://servicelayer3c.azure-api.net")
+        .get(`/wastecalendar/address/search/?postCode=${TEST_POSTCODE_MOCK}`)
+        .reply(200, testPostcodeSearchResults);
+
+      results = await Internal.getPostcodeSearchFromSCDCWeb(TEST_POSTCODE_MOCK);
       results.length.should.be.greaterThan(0);
       results[0].should.have.property("id");
     });
@@ -110,9 +131,9 @@ describe("sessiondata", function () {
     });
     it("should put matched address first", function () {
       const searchResults = [
-        { id: "100090161612", houseNumber: "240" },
-        { id: "100090161613", houseNumber: "241" },
-        { id: "100090161614", houseNumber: "242" },
+        { id: "100090161612", houseNumber: "41" },
+        { id: "100090161613", houseNumber: "42" },
+        { id: "100090161614", houseNumber: "43" },
       ];
       const results = Internal.getLocationListFromSearchResults(
         searchResults,
@@ -122,13 +143,13 @@ describe("sessiondata", function () {
     });
     it("should handle house name without number", function () {
       const searchResults = [
-        { id: "100090161612", houseNumber: "240" },
-        { id: "100090161613", houseNumber: "241" },
-        { id: "100090161614", houseNumber: "242" },
+        { id: "100090161612", houseNumber: "41" },
+        { id: "100090161613", houseNumber: "42" },
+        { id: "100090161614", houseNumber: "43" },
       ];
       const houseNameAddress = {
         addressLine1: "Rose Cottage",
-        postalCode: TEST_POSTCODE,
+        postalCode: "TE5 7PC",
       };
       const results = Internal.getLocationListFromSearchResults(
         searchResults,
@@ -146,10 +167,12 @@ describe("sessiondata", function () {
   });
   describe("alexaDevice.getPostcodeFromAddress()", function () {
     it("withspace", function () {
-      mockalexadevice.postalcode.should.equal(TEST_POSTCODE_NO_SPACE);
+      mockalexadevice.postalcode.should.equal(TEST_POSTCODE_MOCK);
     });
   });
   describe("Fetching collections", function () {
+    afterEach(() => nock.cleanAll());
+
     it("getLocationListFromSearchResults() with matched address", function () {
       locationList = Internal.getLocationListFromSearchResults(
         testPostcodeSearchResults,
@@ -157,18 +180,15 @@ describe("sessiondata", function () {
       );
       locationList[0].should.equal("100090161613");
     });
-    // Debugging comms with the SCDC API only makes sense during interactive
-    // coding, and shouldn't be attempted in other contexts
-    if (process.env.DEBUG_SCDC === "1") {
-      it("getCollectionsFromLocationList()", async function () {
-        let r = await Internal.getCollectionsFromLocationList(locationList);
-        r.collections.length.should.be.greaterThan(0);
-        //const bc = new BinCollection(r.collections[0]);
-        //if (!bc.slippedCollection) {
-        //  bc.date.getDay().should.equal(5); // Friday
-        //}
-      });
-    }
+
+    it("getCollectionsFromLocationList()", async function () {
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/collection\/search\/.*\?numberOfCollections=12/)
+        .reply(200, mockCollectionsResponse);
+
+      const r = await Internal.getCollectionsFromLocationList(locationList);
+      r.collections.length.should.be.greaterThan(0);
+    });
   });
   describe("attributesAreStale()", function () {
     it("Data fetched yesterday, collection today", function () {
@@ -189,9 +209,9 @@ describe("sessiondata", function () {
       attributesAreStale(testAttributes, mockOtherDevice).should.be.false;
     });
     it("Data fresh but from device with different postcode", function () {
-      mockOtherDevice.address.postalCode = "CB24 6ZX";
-      mockOtherDevice.postalcode = "CB246ZX";
-      mockOtherDevice.postalcode.should.equal("CB246ZX");
+      mockOtherDevice.address.postalCode = "TE5 8AB";
+      mockOtherDevice.postalcode = "TE58AB";
+      mockOtherDevice.postalcode.should.equal("TE58AB");
       attributesAreStale(testAttributes, mockOtherDevice).should.be.true;
     });
     testAttributes.fetchedOnDate = amonthago;
@@ -224,8 +244,14 @@ describe("sessiondata", function () {
       const attrs = {
         ...testAttributes,
         collections: [
-          { date: today.clone().addDays(-7).toISOString(), roundTypes: ["DOMESTIC"] },
-          { date: today.clone().addDays(-1).toISOString(), roundTypes: ["RECYCLE"] },
+          {
+            date: today.clone().addDays(-7).toISOString(),
+            roundTypes: ["DOMESTIC"],
+          },
+          {
+            date: today.clone().addDays(-1).toISOString(),
+            roundTypes: ["RECYCLE"],
+          },
         ],
         fetchedOnDate: yesterday,
         alexaDevice: mockalexadevice,
@@ -237,7 +263,10 @@ describe("sessiondata", function () {
       const attrs = {
         ...testAttributes,
         collections: [
-          { date: today.clone().addDays(-1).toISOString(), roundTypes: ["DOMESTIC"] },
+          {
+            date: today.clone().addDays(-1).toISOString(),
+            roundTypes: ["DOMESTIC"],
+          },
           { date: tomorrow.toISOString(), roundTypes: ["RECYCLE"] },
         ],
         fetchedOnDate: yesterday,
@@ -249,7 +278,9 @@ describe("sessiondata", function () {
     it("should return true when device ID differs", function () {
       const attrs = {
         ...testAttributes,
-        collections: [{ date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] }],
+        collections: [
+          { date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] },
+        ],
         fetchedOnDate: yesterday,
         alexaDevice: mockalexadevice,
         deviceId: OTHER_DEVICE,
@@ -260,7 +291,9 @@ describe("sessiondata", function () {
       const sevendaysago = Date.now() - MILLISECONDS_PER_DAY * 7;
       const attrs = {
         ...testAttributes,
-        collections: [{ date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] }],
+        collections: [
+          { date: tomorrow.toISOString(), roundTypes: ["DOMESTIC"] },
+        ],
         fetchedOnDate: sevendaysago,
         alexaDevice: mockalexadevice,
         deviceId: DEVICE_ID,
@@ -269,14 +302,24 @@ describe("sessiondata", function () {
     });
   });
   describe("getFreshSessionData()", function () {
+    afterEach(() => nock.cleanAll());
+
     it("should fetch fresh session data successfully", async function () {
       const mockDevice = new AlexaDevice();
       mockDevice.deviceId = "device-123";
-      mockDevice.postalcode = TEST_POSTCODE_NO_SPACE;
+      mockDevice.postalcode = TEST_POSTCODE_MOCK;
       mockDevice.address = {
-        addressLine1: "241 No Such Street",
-        postalCode: TEST_POSTCODE,
+        addressLine1: "42 Fake Street",
+        postalCode: "TE5 7PC",
       };
+
+      nock("https://servicelayer3c.azure-api.net")
+        .get(`/wastecalendar/address/search/?postCode=${TEST_POSTCODE_MOCK}`)
+        .reply(200, testPostcodeSearchResults);
+
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/collection\/search\/.*\?numberOfCollections=12/)
+        .reply(200, mockCollectionsResponse);
 
       const handlerInput = {
         requestEnvelope: {
@@ -296,32 +339,33 @@ describe("sessiondata", function () {
         },
       };
 
-      this.timeout(10000);
-      try {
-        const data = await getFreshSessionData(handlerInput, mockDevice);
-        data.should.have.property("collections");
-        data.should.have.property("deviceId");
-        data.deviceId.should.equal("device-123");
-        data.should.have.property("fetchedOnDate");
-        data.should.have.property("alexaDevice");
-      } catch (e) {
-        if (e instanceof DataError) {
-          console.log("SCDC API unavailable, skipping test");
-        } else {
-          throw e;
-        }
-      }
+      const data = await getFreshSessionData(handlerInput, mockDevice);
+      data.should.have.property("collections");
+      data.should.have.property("deviceId");
+      data.deviceId.should.equal("device-123");
+      data.should.have.property("fetchedOnDate");
+      data.should.have.property("alexaDevice");
     });
   });
   describe("getFreshAttributes()", function () {
+    afterEach(() => nock.cleanAll());
+
     it("should set attributes correctly", async function () {
       const mockDevice = new AlexaDevice();
       mockDevice.deviceId = "device-456";
-      mockDevice.postalcode = TEST_POSTCODE_NO_SPACE;
+      mockDevice.postalcode = TEST_POSTCODE_MOCK;
       mockDevice.address = {
-        addressLine1: "241 No Such Street",
-        postalCode: TEST_POSTCODE,
+        addressLine1: "42 Fake Street",
+        postalCode: "TE5 7PC",
       };
+
+      nock("https://servicelayer3c.azure-api.net")
+        .get(`/wastecalendar/address/search/?postCode=${TEST_POSTCODE_MOCK}`)
+        .reply(200, testPostcodeSearchResults);
+
+      nock("https://servicelayer3c.azure-api.net")
+        .get(/\/wastecalendar\/collection\/search\/.*\?numberOfCollections=12/)
+        .reply(200, mockCollectionsResponse);
 
       const handlerInput = {
         requestEnvelope: {
@@ -345,18 +389,9 @@ describe("sessiondata", function () {
         },
       };
 
-      this.timeout(10000);
-      try {
-        await getFreshAttributes(handlerInput, mockDevice);
-        handlerInput.attributesManager.setSessionAttributes.calledOnce.should.be.true();
-        handlerInput.attributesManager.setPersistentAttributes.calledOnce.should.be.true();
-      } catch (e) {
-        if (e instanceof DataError) {
-          console.log("SCDC API unavailable, skipping test");
-        } else {
-          throw e;
-        }
-      }
+      await getFreshAttributes(handlerInput, mockDevice);
+      handlerInput.attributesManager.setSessionAttributes.calledOnce.should.be.true();
+      handlerInput.attributesManager.setPersistentAttributes.calledOnce.should.be.true();
     });
   });
 });
