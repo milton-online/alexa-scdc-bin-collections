@@ -51,8 +51,7 @@ async function getPostcodeSearchFromSCDCWeb(postcode) {
     postcodeSearchResults.length < 1
   ) {
     throw new DataError(
-      "SCDC returned no locations for postcode starting " +
-        postcode.slice(0, -4),
+      `SCDC returned no locations for postcode starting ${postcode.slice(0, -4)}`,
       messages.POSTCODE_LOOKUP_FAIL
     );
   }
