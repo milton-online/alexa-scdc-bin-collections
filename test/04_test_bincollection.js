@@ -82,4 +82,23 @@ describe("BinCollection", function () {
       }).should.throw(Error, { message: "Unknown bin type: INVALID_TYPE" });
     });
   });
+
+  describe("image URLs", function () {
+    const binTypes = ["RECYCLE", "DOMESTIC", "ORGANIC"];
+
+    binTypes.forEach((binType) => {
+      it(`should have valid HTTPS URLs for ${binType}`, function () {
+        const collection = new BinCollection({
+          date: "2025-01-01T00:00:00Z",
+          roundTypes: [binType],
+        });
+
+        const smallUrl = collection.getSmallImageUrl();
+        const largeUrl = collection.getLargeImageUrl();
+
+        smallUrl.should.startWith("https://");
+        largeUrl.should.startWith("https://");
+      });
+    });
+  });
 });
