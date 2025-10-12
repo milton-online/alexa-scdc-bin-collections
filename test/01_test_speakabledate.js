@@ -5,7 +5,7 @@
 
 const should = require("should");
 const SpeakableDate = require("../lambda/speakabledate");
-const { MILLISECONDS_PER_DAY } = require("../lambda/constants");
+const { ONE_DAY } = require("../lambda/constants");
 const jan31_a = new SpeakableDate("2020-01-31T00:00:00Z");
 const jan31_b = new SpeakableDate("2020-01-31T00:00:00Z");
 const feb1 = new SpeakableDate("2020-02-01T00:00:00Z");
@@ -15,7 +15,7 @@ today.setHours(6);
 const this_afternoon = new SpeakableDate();
 this_afternoon.setHours(12, 3);
 const tomorrow = new SpeakableDate();
-tomorrow.setTime(today.getTime() + MILLISECONDS_PER_DAY);
+tomorrow.setTime(today.getTime() + ONE_DAY);
 
 describe("SpeakableDate", function () {
   describe("isSameDateAs()", function () {

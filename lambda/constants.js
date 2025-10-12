@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Time constants
-const MILLISECONDS_PER_DAY = 86400000;
+const ONE_DAY = 86400000;
 
 // API URLs
 const SCDC_API_BASE_URL = "https://servicelayer3c.azure-api.net/wastecalendar";
@@ -24,7 +24,7 @@ const TEST_USER_ID =
 const TEST_SKILL_ID = "amzn1.ask.skill.a9f3e5f3-5a08-4a7a-a0fc-bc828e9787b0";
 
 module.exports = {
-  MILLISECONDS_PER_DAY,
+  ONE_DAY,
   SCDC_API_BASE_URL,
   IMAGES_BASE_URL,
   CACHE_DAYS,

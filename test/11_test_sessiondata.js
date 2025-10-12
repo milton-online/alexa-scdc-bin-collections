@@ -15,7 +15,7 @@ const {
 } = require("../lambda/sessiondata");
 const SpeakableDate = require("../lambda/speakabledate");
 const {
-  MILLISECONDS_PER_DAY,
+  ONE_DAY,
   TEST_DEVICE_ID,
   TEST_OTHER_DEVICE_ID,
 } = require("../lambda/constants");
@@ -24,9 +24,9 @@ const AlexaDevice = require("../lambda/alexadevice");
 
 const today = new SpeakableDate().setToMidnight();
 const tomorrow = new SpeakableDate().addDays(1);
-const yesterday = Date.now() - MILLISECONDS_PER_DAY;
-const sixdaysago = Date.now() - MILLISECONDS_PER_DAY * 6;
-const amonthago = Date.now() - MILLISECONDS_PER_DAY * 30;
+const yesterday = Date.now() - ONE_DAY;
+const sixdaysago = Date.now() - ONE_DAY * 6;
+const amonthago = Date.now() - ONE_DAY * 30;
 const DEVICE_ID = TEST_DEVICE_ID;
 const OTHER_DEVICE = TEST_OTHER_DEVICE_ID;
 
@@ -300,7 +300,7 @@ describe("sessiondata", function () {
       attributesAreStale(attrs, mockalexadevice).should.be.true;
     });
     it("should return true when data is exactly 7 days old", function () {
-      const sevendaysago = Date.now() - MILLISECONDS_PER_DAY * 7;
+      const sevendaysago = Date.now() - ONE_DAY * 7;
       const attrs = {
         ...testAttributes,
         collections: [

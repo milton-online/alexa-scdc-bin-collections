@@ -10,7 +10,7 @@ const messages = require("./messages");
 const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 const {
-  MILLISECONDS_PER_DAY,
+  ONE_DAY,
   SCDC_API_BASE_URL,
   CACHE_DAYS,
   NUMBER_OF_COLLECTIONS,
@@ -122,7 +122,7 @@ function attributesAreStale(attributes, thisDevice) {
   const midnightToday = new SpeakableDate().setToMidnight().getTime();
   attributes.midnightToday = midnightToday;
 
-  const aWeekAgo = midnightToday - CACHE_DAYS * MILLISECONDS_PER_DAY;
+  const aWeekAgo = midnightToday - CACHE_DAYS * ONE_DAY;
   return attributes.fetchedOnDate <= aWeekAgo;
 }
 

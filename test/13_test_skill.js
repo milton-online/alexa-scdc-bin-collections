@@ -16,7 +16,7 @@ const util = require("util");
 const messages = require("../lambda/messages");
 const SpeakableDate = require("../lambda/speakabledate");
 const {
-  MILLISECONDS_PER_DAY,
+  ONE_DAY,
   TEST_POSTCODE,
   TEST_POSTCODE_NO_SPACE,
   TEST_DEVICE_ID,
@@ -61,7 +61,7 @@ const alexaTest = new AlexaTest(
 
 const today = new SpeakableDate();
 today.setHours(13, 0);
-const yesterday = Date.now() - MILLISECONDS_PER_DAY;
+const yesterday = Date.now() - ONE_DAY;
 
 const datedAttributes = {
   collections: [
@@ -170,7 +170,7 @@ describe("Bin Collections Skill", function () {
         },
       ],
       lastReportedBinTime: 0,
-      fetchedOnDate: Date.now() - MILLISECONDS_PER_DAY * 8,
+      fetchedOnDate: Date.now() - ONE_DAY * 8,
       deviceId: TEST_DEVICE_ID,
       alexaDevice: mockAlexaDevice,
       currentBinType: null,
