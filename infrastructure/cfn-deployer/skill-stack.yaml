@@ -17,10 +17,8 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Tags:
-        - Key: Project
-          Value: AlexaSkill
-        - Key: Application
-          Value: BinCollections
+        - Key: project
+          Value: bin-collections
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -51,10 +49,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Tags:
-        - Key: Project
-          Value: AlexaSkill
-        - Key: Application
-          Value: BinCollections
+        - Key: project
+          Value: bin-collections
       Code:
         S3Bucket: !Ref CodeBucket
         S3Key: !Ref CodeKey
@@ -63,7 +59,7 @@ Resources:
       Runtime: !Ref LambdaRuntime
       Role: !GetAtt AlexaSkillIAMRole.Arn
       Architectures: [arm64]
-      MemorySize: 512
+      MemorySize: 256
       Timeout: 60
       Environment:
         Variables:
@@ -89,10 +85,8 @@ Resources:
       LogGroupName: !Sub /aws/lambda/${AlexaSkillFunction}
       RetentionInDays: 14
       Tags:
-        - Key: Project
-          Value: AlexaSkill
-        - Key: Application
-          Value: BinCollections
+        - Key: project
+          Value: bin-collections
 Outputs:
   SkillEndpoint:
     Description: LambdaARN for the regional endpoint
