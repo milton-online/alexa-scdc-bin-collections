@@ -5,6 +5,7 @@
 
 "use strict";
 
+const log = require("loglevel");
 const Alexa = require("ask-sdk-core");
 const getPersistenceAdapter = require("./persistenceAdapter");
 
@@ -28,11 +29,24 @@ const LoadBinCollectionsInterceptor = require("./interceptors/LoadBinCollections
 const PersistenceSavingInterceptor = require("./interceptors/PersistenceSavingInterceptor");
 const ErrorHandler = require("./errors/ErrorHandler");
 
-exports.handler = Alexa.SkillBuilders.custom()
-  .withPersistenceAdapter(getPersistenceAdapter())
-  .withApiClient(new Alexa.DefaultApiClient())
-  .addRequestHandlers(...handlers)
-  .addRequestInterceptors(LoadBinCollectionsInterceptor)
-  .addResponseInterceptors(PersistenceSavingInterceptor)
-  .addErrorHandlers(ErrorHandler)
-  .lambda();
+let skill;
+
+exports.handler = async (event, context) => {
+  log.info(`Request: ${JSON.stringify(event)}`);
+
+  if (!skill) {
+    skill = Alexa.SkillBuilders.custom()
+      .withPersistenceAdapter(getPersistenceAdapter())
+      .withApiClient(new Alexa.DefaultApiClient())
+      .addRequestHandlers(...handlers)
+      .addRequestInterceptors(LoadBinCollectionsInterceptor)
+      .addResponseInterceptors(PersistenceSavingInterceptor)
+      .addErrorHandlers(ErrorHandler)
+      .create();
+  }
+
+  const response = await skill.invoke(event, context);
+  log.info(`Response: ${JSON.stringify(response)}`);
+
+  return response;
+};
