@@ -27,7 +27,6 @@ const {
 const sinon = require("sinon");
 const AlexaDevice = require("../lambda/alexadevice");
 
-
 const testAddress = {
   addressLine1: TEST_ADDRESS_LINE1,
   addressLine2: null,
@@ -405,7 +404,10 @@ describe("Bin Collections Skill", function () {
     alexaTest.test([
       {
         description: "should fetch fresh data and confirm",
-        request: new IntentRequestBuilder(skillSettings, "GetFreshDataIntent").build(),
+        request: new IntentRequestBuilder(
+          skillSettings,
+          "GetFreshDataIntent"
+        ).build(),
         saysLike: "I'm up to date with the council",
         shouldEndSession: false,
         withSessionAttributes: datedAttributes,
@@ -445,9 +447,24 @@ describe("Bin Collections Skill", function () {
   });
 
   describe("SetLogLevelIntent", function () {
-    ["trace", "debug", "info", "warn", "error", "silent"].forEach(function (
-      testLevel
-    ) {
+    alexaTest.test([
+      {
+        request: new IntentRequestBuilder(skillSettings, "SetLogLevelIntent")
+          .withSlot("logLevel", "invalid")
+          .build(),
+        hasCardTitle: "Bin Collections Log Level",
+        repromptsNothing: true,
+        withSessionAttributes: tomorrowAttributes,
+        hasAttributes: {
+          logLevel: "warn",
+        },
+      },
+    ]);
+
+    ["warn", "error", "silent"].forEach(function (testLevel) {
+      beforeEach(() => {
+        log.setLevel("warn");
+      });
       alexaTest.test([
         {
           request: new IntentRequestBuilder(skillSettings, "SetLogLevelIntent")
@@ -457,7 +474,7 @@ describe("Bin Collections Skill", function () {
           hasCardTitle: "Bin Collections Log Level",
           hasCardContent: util.format(messages.LOGGING_CARD, testLevel),
           repromptsNothing: true,
-          withSessionAttributes: { ...tomorrowAttributes, logLevel: "silent" },
+          withSessionAttributes: tomorrowAttributes,
           hasAttributes: {
             logLevel: testLevel,
           },

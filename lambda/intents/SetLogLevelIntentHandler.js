@@ -19,18 +19,21 @@ const SetLogLevelIntentHandler = {
   handle(handlerInput) {
     let { requestEnvelope, responseBuilder, attributesManager } = handlerInput;
 
-    const logLevel = resolveToCanonicalSlotValue(
+    let logLevel = resolveToCanonicalSlotValue(
       requestEnvelope.request.intent.slots.logLevel
     );
 
     const attributes = attributesManager.getSessionAttributes();
-    attributes.logLevel = logLevel;
-    
+
     const validLevels = ["trace", "debug", "info", "warn", "error", "silent"];
     if (validLevels.includes(logLevel)) {
       log.setLevel(logLevel);
+    } else {
+      logLevel = validLevels[log.getLevel()];
     }
-    
+
+    attributes.logLevel = logLevel;
+
     attributesManager.setSessionAttributes(attributes);
 
     return responseBuilder
