@@ -5,6 +5,7 @@
 
 const should = require("should");
 const CacheManager = require("../lambda/cacheManager");
+const { CACHE_TTL, ONE_DAY } = require("../lambda/constants");
 
 describe("CacheManager", function () {
   describe("shouldRefreshCollections()", function () {
@@ -14,24 +15,24 @@ describe("CacheManager", function () {
 
     it("should refresh when no fetchedOnDate", function () {
       CacheManager.shouldRefreshCollections({
-        collections: [{ date: "2025-01-20T00:00:00Z" }]
+        collections: [{ date: "2025-01-20T00:00:00Z" }],
       }).should.equal(true);
     });
 
     it("should refresh when data is old", function () {
-      const oldDate = Date.now() - 25 * 60 * 60 * 1000; // 25 hours ago
+      const oldDate = Date.now() - 1.1 * CACHE_TTL.COLLECTIONS;
       CacheManager.shouldRefreshCollections({
         collections: [{ date: "2025-01-20T00:00:00Z" }],
-        fetchedOnDate: oldDate
+        fetchedOnDate: oldDate,
       }).should.equal(true);
     });
 
     it("should not refresh when data is fresh", function () {
       const recentDate = Date.now() - 1 * 60 * 60 * 1000; // 1 hour ago
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const tomorrow = new Date(Date.now() + ONE_DAY);
       CacheManager.shouldRefreshCollections({
         collections: [{ date: tomorrow.toISOString() }],
-        fetchedOnDate: recentDate
+        fetchedOnDate: recentDate,
       }).should.equal(false);
     });
   });
@@ -42,18 +43,18 @@ describe("CacheManager", function () {
     });
 
     it("should refresh when cache is old", function () {
-      const oldDate = Date.now() - 8 * 24 * 60 * 60 * 1000; // 8 days ago
+      const oldDate = Date.now() - 8 * ONE_DAY;
       CacheManager.shouldRefreshPostcode({
         postcodeCache: {},
-        postcodeCacheDate: oldDate
+        postcodeCacheDate: oldDate,
       }).should.equal(true);
     });
 
     it("should not refresh when cache is fresh", function () {
-      const recentDate = Date.now() - 1 * 24 * 60 * 60 * 1000; // 1 day ago
+      const recentDate = Date.now() - ONE_DAY;
       CacheManager.shouldRefreshPostcode({
         postcodeCache: {},
-        postcodeCacheDate: recentDate
+        postcodeCacheDate: recentDate,
       }).should.equal(false);
     });
   });

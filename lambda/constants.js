@@ -10,8 +10,12 @@ const ONE_DAY = 86400000;
 const SCDC_API_BASE_URL = "https://servicelayer3c.azure-api.net/wastecalendar";
 const IMAGES_BASE_URL = "https://www.aws.thecutts.org/bin-collections-assets/";
 
+const CACHE_TTL = {
+  COLLECTIONS: 7 * ONE_DAY,
+  POSTCODE_LOOKUP: 7 * ONE_DAY,
+};
+
 // Cache configuration
-const CACHE_DAYS = 7;
 const NUMBER_OF_COLLECTIONS = 12;
 
 // Test constants
@@ -27,7 +31,7 @@ module.exports = {
   ONE_DAY,
   SCDC_API_BASE_URL,
   IMAGES_BASE_URL,
-  CACHE_DAYS,
+  CACHE_TTL,
   NUMBER_OF_COLLECTIONS,
   TEST_DEVICE_ID,
   TEST_OTHER_DEVICE_ID,

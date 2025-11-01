@@ -10,9 +10,8 @@ const messages = require("./messages");
 const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
 const {
-  ONE_DAY,
+  CACHE_TTL,
   SCDC_API_BASE_URL,
-  CACHE_DAYS,
   NUMBER_OF_COLLECTIONS,
 } = require("./constants");
 
@@ -51,7 +50,10 @@ async function getPostcodeSearchFromSCDCWeb(postcode) {
     postcodeSearchResults.length < 1
   ) {
     throw new DataError(
-      `SCDC returned no locations for postcode starting ${postcode.slice(0, -4)}`,
+      `SCDC returned no locations for postcode starting ${postcode.slice(
+        0,
+        -4
+      )}`,
       messages.POSTCODE_LOOKUP_FAIL
     );
   }
@@ -122,8 +124,8 @@ function attributesAreStale(attributes, thisDevice) {
   const midnightToday = new SpeakableDate().setToMidnight().getTime();
   attributes.midnightToday = midnightToday;
 
-  const aWeekAgo = midnightToday - CACHE_DAYS * ONE_DAY;
-  return attributes.fetchedOnDate <= aWeekAgo;
+  const ageThreshold = midnightToday - CACHE_TTL.COLLECTIONS;
+  return attributes.fetchedOnDate <= ageThreshold;
 }
 
 async function getFreshSessionData(handlerInput, alexaDevice) {

@@ -10,13 +10,18 @@ const {
   LaunchRequestBuilder,
   IntentRequestBuilder,
 } = require("ask-sdk-test");
+
 const nock = require("nock");
 const log = require("loglevel");
 const util = require("util");
+const sinon = require("sinon");
+const AlexaDevice = require("../lambda/alexadevice");
 const messages = require("../lambda/messages");
 const SpeakableDate = require("../lambda/speakabledate");
+
 const {
   ONE_DAY,
+  CACHE_TTL,
   TEST_POSTCODE,
   TEST_POSTCODE_NO_SPACE,
   TEST_DEVICE_ID,
@@ -24,8 +29,6 @@ const {
   TEST_SKILL_ID,
   TEST_ADDRESS_LINE1,
 } = require("../lambda/constants");
-const sinon = require("sinon");
-const AlexaDevice = require("../lambda/alexadevice");
 
 const testAddress = {
   addressLine1: TEST_ADDRESS_LINE1,
@@ -169,7 +172,7 @@ describe("Bin Collections Skill", function () {
         },
       ],
       lastReportedBinTime: 0,
-      fetchedOnDate: Date.now() - ONE_DAY * 8,
+      fetchedOnDate: Date.now() - (CACHE_TTL.COLLECTIONS + ONE_DAY),
       deviceId: TEST_DEVICE_ID,
       alexaDevice: mockAlexaDevice,
       currentBinType: null,

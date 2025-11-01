@@ -3,10 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-const CACHE_TTL = {
-  COLLECTIONS: 24 * 60 * 60 * 1000, // 24 hours
-  POSTCODE_LOOKUP: 7 * 24 * 60 * 60 * 1000, // 7 days
-};
+const { CACHE_TTL } = require("./constants");
 
 class CacheManager {
   static shouldRefreshCollections(attributes) {

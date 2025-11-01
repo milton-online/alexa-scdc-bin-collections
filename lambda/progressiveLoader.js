@@ -6,6 +6,7 @@
 // Progressive data loading for immediate response
 const { getFreshSessionData } = require("./sessiondata");
 const log = require("loglevel");
+const { ONE_DAY } = require("./constants");
 
 class ProgressiveLoader {
   static async loadWithFallback(handlerInput, alexaDevice) {
@@ -15,7 +16,7 @@ class ProgressiveLoader {
     // If we have any cached data, use it immediately
     if (attributes.collections && attributes.collections.length > 0) {
       const shouldRefresh = this.shouldRefreshInBackground(attributes);
-      
+
       // Trigger background refresh if needed
       if (shouldRefresh) {
         this.refreshInBackground(handlerInput, alexaDevice);
@@ -38,7 +39,7 @@ class ProgressiveLoader {
 
   static shouldRefreshInBackground(attributes) {
     const age = Date.now() - (attributes.fetchedOnDate || 0);
-    return age > 12 * 60 * 60 * 1000; // 12 hours
+    return age > ONE_DAY / 2;
   }
 
   static async refreshInBackground(handlerInput, alexaDevice) {
