@@ -29,6 +29,13 @@ describe("getJSON", function () {
     });
   });
 
+  it("should reject requests to disallowed hostnames", function () {
+    nock("http://example.com").get("/").reply(200, "test");
+    return getJSON("http://example.com").should.be.rejectedWith({
+      name: "DataError",
+    });
+  });
+
   it("slow should throw Timeout", function () {
     this.slow(300);
     nock(base).get("/slow").delay(200).reply(200, "test");
