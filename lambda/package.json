@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cd .. && NODE_PATH=lambda/node_modules mocha --require test/setup.js",
-    "coverage": "nyc npm test"
+    "coverage": "npx nyc --reporter=html npm test"
   },
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",
