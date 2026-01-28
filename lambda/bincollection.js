@@ -5,6 +5,7 @@
 
 const SpeakableDate = require("./speakabledate");
 const messages = require("./messages");
+const DataError = require("./errors/dataerror");
 const { IMAGES_BASE_URL } = require("./constants");
 
 const binTypes = {
@@ -26,12 +27,21 @@ const binTypes = {
     smallUrl: `${IMAGES_BASE_URL}green_small.jpg`,
     largeUrl: `${IMAGES_BASE_URL}green_large.jpg`,
   },
+  FOOD: {
+    colour: "food caddy",
+    name: "food waste",
+    smallUrl: `${IMAGES_BASE_URL}caddy_small.jpg`,
+    largeUrl: `${IMAGES_BASE_URL}caddy_large.jpg`,
+  },
 };
 
 module.exports = class BinCollection {
   static getBinType(binType) {
     if (!binTypes[binType]) {
-      throw new Error(`Unknown bin type: ${binType}`);
+      throw new DataError(
+        `Unknown bin type: ${binType}`,
+        `I don't know about ${binType} bins yet. Please contact the developer to add support for this bin type.`
+      );
     }
     return binTypes[binType];
   }
@@ -105,7 +115,7 @@ module.exports = class BinCollection {
 
   getColoursSpeech() {
     const colours = this.roundTypes.map(
-      (k) => BinCollection.getBinType(k).colour
+      (k) => BinCollection.getBinType(k).colour,
     );
 
     if (colours.length === 1) {

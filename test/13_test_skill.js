@@ -485,4 +485,32 @@ describe("Bin Collections Skill", function () {
       ]);
     });
   });
+
+  describe("Unknown bin type handling", function () {
+    const unknownBinAttributes = {
+      collections: [
+        {
+          date: today.clone().addDays(1).toISOString(),
+          roundTypes: ["UNKNOWN_BIN_TYPE"],
+          slippedCollection: false,
+        },
+      ],
+      lastReportedBinTime: 0,
+      fetchedOnDate: yesterday,
+      deviceId: TEST_DEVICE_ID,
+      alexaDevice: mockAlexaDevice,
+      currentBinType: null,
+      logLevel: "silent",
+    };
+
+    alexaTest.test([
+      {
+        description: "should handle unknown bin types gracefully",
+        request: new LaunchRequestBuilder(skillSettings).build(),
+        says: "I don't know about UNKNOWN_BIN_TYPE bins yet. Please contact the developer to add support for this bin type.",
+        repromptsNothing: true,
+        withSessionAttributes: unknownBinAttributes,
+      },
+    ]);
+  });
 });
