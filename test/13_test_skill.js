@@ -1,5 +1,5 @@
-// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2026 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2020-2026 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
