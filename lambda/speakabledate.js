@@ -31,7 +31,8 @@ class SpeakableDate extends Date {
   }
 
   isThisAfternoon() {
-    return this.getHours() >= 12 && this.isToday();
+    const now = new Date();
+    return now.getHours() >= 12 && this.isToday();
   }
 
   isTomorrow() {

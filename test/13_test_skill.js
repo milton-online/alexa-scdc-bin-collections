@@ -58,7 +58,7 @@ const skillSettings = {
 
 const alexaTest = new AlexaTest(
   require("../lambda/index").handler,
-  skillSettings
+  skillSettings,
 );
 
 const today = new SpeakableDate();
@@ -212,6 +212,15 @@ describe("Bin Collections Skill", function () {
   });
 
   describe("LaunchRequest (today)", function () {
+    let clockStub;
+    beforeEach(() => {
+      clockStub = sinon.useFakeTimers(today.getTime());
+    });
+
+    afterEach(() => {
+      clockStub.restore();
+    });
+
     alexaTest.test([
       {
         request: new LaunchRequestBuilder(skillSettings).build(),
@@ -225,14 +234,14 @@ describe("Bin Collections Skill", function () {
           missedQuestion: true,
           currentBinType: "DOMESTIC",
           lastReportedBinTime: new SpeakableDate(
-            todayAttributes.collections[0].date
+            todayAttributes.collections[0].date,
           ).getTime(),
         },
       },
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "AMAZON.YesIntent"
+          "AMAZON.YesIntent",
         ).build(),
         saysLike: "OK then.  The next black landfill collection will be on",
         hasCardTitle: "Next landfill collection",
@@ -242,8 +251,100 @@ describe("Bin Collections Skill", function () {
           missedQuestion: false,
           currentBinType: "DOMESTIC",
           lastReportedBinTime: new SpeakableDate(
-            todayAttributes.collections[1].date
+            todayAttributes.collections[1].date,
           ).getTime(),
+        },
+      },
+    ]);
+  });
+
+  describe("LaunchRequest (today afternoon)", function () {
+    const afternoonToday = new SpeakableDate();
+    afternoonToday.setHours(18, 0); // 6 PM
+
+    const afternoonTodayAttributes = {
+      collections: [
+        {
+          date: afternoonToday.toISOString(),
+          roundTypes: ["DOMESTIC"],
+          slippedCollection: false,
+        },
+      ],
+      lastReportedBinTime: 0,
+      deviceId: TEST_DEVICE_ID,
+      alexaDevice: mockAlexaDevice,
+      fetchedOnDate: yesterday,
+      currentBinType: null,
+      logLevel: "silent",
+    };
+
+    let clockStub;
+    beforeEach(() => {
+      // Mock the current time to be 6 PM
+      clockStub = sinon.useFakeTimers(afternoonToday.getTime());
+    });
+
+    afterEach(() => {
+      clockStub.restore();
+    });
+
+    alexaTest.test([
+      {
+        description:
+          "should ask 'did you miss it?' when collection is today and it's afternoon",
+        request: new LaunchRequestBuilder(skillSettings).build(),
+        says: `Your next collection is the black bin, today.${messages.DID_YOU_MISS_IT}`,
+        shouldEndSession: false,
+        withSessionAttributes: afternoonTodayAttributes,
+        hasAttributes: {
+          missedQuestion: true,
+          currentBinType: "DOMESTIC",
+        },
+      },
+    ]);
+  });
+
+  describe("LaunchRequest (today morning)", function () {
+    const morningToday = new SpeakableDate();
+    morningToday.setHours(9, 0); // 9 AM
+
+    const morningTodayAttributes = {
+      collections: [
+        {
+          date: morningToday.toISOString(),
+          roundTypes: ["DOMESTIC"],
+          slippedCollection: false,
+        },
+      ],
+      lastReportedBinTime: 0,
+      deviceId: TEST_DEVICE_ID,
+      alexaDevice: mockAlexaDevice,
+      fetchedOnDate: yesterday,
+      currentBinType: null,
+      logLevel: "silent",
+    };
+
+    let clockStub;
+    beforeEach(() => {
+      // Mock the current time to be 9 AM
+      clockStub = sinon.useFakeTimers(morningToday.getTime());
+    });
+
+    afterEach(() => {
+      clockStub.restore();
+    });
+
+    alexaTest.test([
+      {
+        description:
+          "should NOT ask 'did you miss it?' when collection is today but it's morning",
+        request: new LaunchRequestBuilder(skillSettings).build(),
+        says: "Your next collection is the black bin, today.",
+        repromptsNothing: true,
+        withSessionAttributes: morningTodayAttributes,
+        hasAttributes: {
+          missedQuestion: false,
+          currentBinType: "DOMESTIC",
         },
       },
     ]);
@@ -255,7 +356,7 @@ describe("Bin Collections Skill", function () {
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "AMAZON.YesIntent"
+          "AMAZON.YesIntent",
         ).build(),
         says: messages.NO_QUESTION,
         repromptsNothing: true,
@@ -277,7 +378,7 @@ describe("Bin Collections Skill", function () {
           missedQuestion: false,
           currentBinType: "RECYCLE",
           lastReportedBinTime: new SpeakableDate(
-            datedAttributes.collections[1].date
+            datedAttributes.collections[1].date,
           ).getTime(),
         },
       },
@@ -285,6 +386,16 @@ describe("Bin Collections Skill", function () {
   });
 
   describe("NextColourBinIntent (today)", function () {
+    let clockStub;
+    beforeEach(() => {
+      // Mock the current time to be 1 PM (afternoon)
+      clockStub = sinon.useFakeTimers(today.getTime());
+    });
+
+    afterEach(() => {
+      clockStub.restore();
+    });
+
     todayAttributes.missedQuestion = false;
     todayAttributes.lastReportedBinTime = 0;
     alexaTest.test([
@@ -299,14 +410,14 @@ describe("Bin Collections Skill", function () {
           missedQuestion: true,
           currentBinType: "DOMESTIC",
           lastReportedBinTime: new SpeakableDate(
-            todayAttributes.collections[0].date
+            todayAttributes.collections[0].date,
           ).getTime(),
         },
       },
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "AMAZON.YesIntent"
+          "AMAZON.YesIntent",
         ).build(),
         saysLike: "OK then.  The next black landfill collection will be on",
         hasCardTitle: "Next landfill collection",
@@ -316,7 +427,7 @@ describe("Bin Collections Skill", function () {
           missedQuestion: false,
           currentBinType: "DOMESTIC",
           lastReportedBinTime: new SpeakableDate(
-            todayAttributes.collections[1].date
+            todayAttributes.collections[1].date,
           ).getTime(),
         },
       },
@@ -328,7 +439,7 @@ describe("Bin Collections Skill", function () {
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "WhichBinTodayIntent"
+          "WhichBinTodayIntent",
         ).build(),
         says: "Today's bin collection is the black bin",
         repromptsNothing: true,
@@ -342,7 +453,7 @@ describe("Bin Collections Skill", function () {
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "WhichBinTodayIntent"
+          "WhichBinTodayIntent",
         ).build(),
         says: "There is no bin collection due today.  But there is tomorrow.  It's the blue bin",
         hasCardTitle: "Collection tomorrow",
@@ -360,7 +471,7 @@ describe("Bin Collections Skill", function () {
       {
         request: new IntentRequestBuilder(
           skillSettings,
-          "WhoPutTheBinsOutIntent"
+          "WhoPutTheBinsOutIntent",
         ).build(),
         says: messages.WHOWHOWHO,
         repromptsNothing: true,
@@ -409,7 +520,7 @@ describe("Bin Collections Skill", function () {
         description: "should fetch fresh data and confirm",
         request: new IntentRequestBuilder(
           skillSettings,
-          "GetFreshDataIntent"
+          "GetFreshDataIntent",
         ).build(),
         saysLike: "I'm up to date with the council",
         shouldEndSession: false,
@@ -439,7 +550,7 @@ describe("Bin Collections Skill", function () {
         description: "should report no collection today or tomorrow",
         request: new IntentRequestBuilder(
           skillSettings,
-          "WhichBinTodayIntent"
+          "WhichBinTodayIntent",
         ).build(),
         says: "There is no bin collection due today.",
         hasCardTitle: "No collection today",

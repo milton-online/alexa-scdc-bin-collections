@@ -52,8 +52,22 @@ describe("SpeakableDate", function () {
     });
   });
   describe("isThisAfternoon()", function () {
+    const sinon = require("sinon");
+    let clock;
+
+    beforeEach(function () {
+      const mockTime = new Date();
+      mockTime.setHours(12, 3, 0, 0);
+      clock = sinon.useFakeTimers(mockTime.getTime());
+    });
+
+    afterEach(function () {
+      clock.restore();
+    });
+
     it("12:03 is the afternoon", function () {
-      this_afternoon.isThisAfternoon().should.equal(true);
+      const todayDate = new SpeakableDate();
+      todayDate.isThisAfternoon().should.equal(true);
     });
   });
   describe("getDateSpeech()", function () {
