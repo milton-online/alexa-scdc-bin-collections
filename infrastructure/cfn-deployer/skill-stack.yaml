@@ -12,6 +12,12 @@ Parameters:
     Type: String
   CodeVersion:
     Type: String
+  Environment:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - production
 Resources:
   AlexaSkillIAMRole:
     Type: AWS::IAM::Role
@@ -19,6 +25,8 @@ Resources:
       Tags:
         - Key: project
           Value: bin-collections
+        - Key: environment
+          Value: !Ref Environment
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -51,6 +59,8 @@ Resources:
       Tags:
         - Key: project
           Value: bin-collections
+        - Key: environment
+          Value: !Ref Environment
       Code:
         S3Bucket: !Ref CodeBucket
         S3Key: !Ref CodeKey
@@ -87,6 +97,8 @@ Resources:
       Tags:
         - Key: project
           Value: bin-collections
+        - Key: environment
+          Value: !Ref Environment
 Outputs:
   SkillEndpoint:
     Description: LambdaARN for the regional endpoint
