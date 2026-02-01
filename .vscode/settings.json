@@ -1,7 +1,8 @@
 {
     "githubPullRequests.remotes": [
         "origin",
-        "github"
+        "github",
+        "milton-online"
     ],
     "terminal.integrated.env.linux": {
         "DEBUG_SCDC": "1"

@@ -1,5 +1,5 @@
-// Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2026 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2020-2026 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -31,7 +31,8 @@ class SpeakableDate extends Date {
   }
 
   isThisAfternoon() {
-    return this.getHours() >= 12 && this.isToday();
+    const now = new Date();
+    return now.getHours() >= 12 && this.isToday();
   }
 
   isTomorrow() {

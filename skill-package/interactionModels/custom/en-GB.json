@@ -91,9 +91,7 @@
         {
           "name": "WhoPutTheBinsOutIntent",
           "slots": [],
-          "samples": [
-            "who put the bins out"
-          ]
+          "samples": ["who put the bins out"]
         },
         {
           "name": "SetLogLevelIntent",
@@ -161,12 +159,19 @@
               "id": "ORGANIC",
               "name": {
                 "value": "ORGANIC",
+                "synonyms": ["grass", "compost", "green", "garden waste"]
+              }
+            },
+            {
+              "id": "FOOD",
+              "name": {
+                "value": "FOOD",
                 "synonyms": [
-                  "grass",
                   "food",
-                  "compost",
-                  "green",
-                  "garden waste"
+                  "kitchen scraps",
+                  "food waste",
+                  "food caddy",
+                  "kitchen waste"
                 ]
               }
             }
@@ -185,28 +190,21 @@
               "id": "warn",
               "name": {
                 "value": "warn",
-                "synonyms": [
-                  "warning"
-                ]
+                "synonyms": ["warning"]
               }
             },
             {
               "id": "debug",
               "name": {
                 "value": "debug",
-                "synonyms": [
-                  "on"
-                ]
+                "synonyms": ["on"]
               }
             },
             {
               "id": "silent",
               "name": {
                 "value": "silent",
-                "synonyms": [
-                  "error",
-                  "off"
-                ]
+                "synonyms": ["error", "off"]
               }
             },
             {

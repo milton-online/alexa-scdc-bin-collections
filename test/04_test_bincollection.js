@@ -1,5 +1,5 @@
-// Copyright 2020,2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2026 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2020-2026 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -62,13 +62,27 @@ describe("BinCollection", function () {
         .getColoursSpeech()
         .should.equal("green, blue and black bins");
     });
+    const foodExample = new BinCollection({
+      roundTypes: ["FOOD"],
+    });
+    it("food bin", function () {
+      foodExample.getColoursSpeech().should.equal("food caddy bin");
+    });
+    const fourBinsExample = new BinCollection({
+      roundTypes: ["ORGANIC", "RECYCLE", "DOMESTIC", "FOOD"],
+    });
+    it("four bins", function () {
+      fourBinsExample
+        .getColoursSpeech()
+        .should.equal("green, blue, black and food caddy bins");
+    });
   });
 
   describe("error handling", function () {
     it("should throw error for unknown bin type", function () {
       (() => {
         BinCollection.getBinType("UNKNOWN");
-      }).should.throw(Error, { message: "Unknown bin type: UNKNOWN" });
+      }).should.throw(Error, { name: "DataError", message: "Unknown bin type: UNKNOWN" });
     });
 
     it("should throw error when getting colour for unknown bin type", function () {
@@ -79,12 +93,12 @@ describe("BinCollection", function () {
       });
       (() => {
         badCollection.getColour();
-      }).should.throw(Error, { message: "Unknown bin type: INVALID_TYPE" });
+      }).should.throw(Error, { name: "DataError", message: "Unknown bin type: INVALID_TYPE" });
     });
   });
 
   describe("image URLs", function () {
-    const binTypes = ["RECYCLE", "DOMESTIC", "ORGANIC"];
+    const binTypes = ["RECYCLE", "DOMESTIC", "ORGANIC", "FOOD"];
 
     binTypes.forEach((binType) => {
       it(`should have valid HTTPS URLs for ${binType}`, function () {
