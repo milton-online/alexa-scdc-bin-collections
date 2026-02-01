@@ -39,4 +39,9 @@ module.exports = {
   LOGGING_CARD:
     "Bin Collections logging level is set to %s.  To switch logging off, tell bin collections to set logging to off",
   LOGGING: "Bin Collections skill logging for your account is set to %s",
+  UNKNOWN_BIN_TYPE: "I don't know about %s bins yet. Please contact the developer to add support for this bin type.",
+  BETTER_GET_BINS_OUT: "  Better get ",
+  THOSE_BINS_OUT: "those bins out!",
+  THAT_BIN_OUT: "that bin out!",
+  NO_BIN_TODAY: "There is no bin collection due today.",
 };

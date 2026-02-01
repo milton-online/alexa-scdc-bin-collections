@@ -40,7 +40,7 @@ module.exports = class BinCollection {
     if (!binTypes[binType]) {
       throw new DataError(
         `Unknown bin type: ${binType}`,
-        `I don't know about ${binType} bins yet. Please contact the developer to add support for this bin type.`
+        messages.UNKNOWN_BIN_TYPE.replace('%s', binType)
       );
     }
     return binTypes[binType];
@@ -69,9 +69,9 @@ module.exports = class BinCollection {
       speech += messages.SLIPPED_COLLECTION;
     }
     if (this.isTomorrow()) {
-      speech += "  Better get ";
+      speech += messages.BETTER_GET_BINS_OUT;
       speech +=
-        this.roundTypes.length > 1 ? "those bins out!" : "that bin out!";
+        this.roundTypes.length > 1 ? messages.THOSE_BINS_OUT : messages.THAT_BIN_OUT;
     } else if (this.isThisAfternoon()) {
       speech += messages.DID_YOU_MISS_IT;
     }

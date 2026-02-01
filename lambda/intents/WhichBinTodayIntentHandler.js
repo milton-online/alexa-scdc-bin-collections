@@ -5,6 +5,7 @@
 
 const Alexa = require("ask-sdk-core");
 const { getNextCollection } = require("../searchcollections");
+const messages = require("../messages");
 
 function updateAttributes(attributes, collection) {
   attributes.lastReportedBinTime = collection.date.getTime();
@@ -29,12 +30,12 @@ function buildTodayResponse(collection, responseBuilder) {
 }
 
 function buildTomorrowResponse(collection, responseBuilder) {
-  const speech = `There is no bin collection due today.  But there is tomorrow.  It's the ${collection.getColoursSpeech()}`;
+  const speech = `${messages.NO_BIN_TODAY}  But there is tomorrow.  It's the ${collection.getColoursSpeech()}`;
   return responseBuilder.withStandardCard("Collection tomorrow", speech);
 }
 
 function buildNoCollectionResponse(responseBuilder) {
-  const speech = "There is no bin collection due today.";
+  const speech = messages.NO_BIN_TODAY;
   return responseBuilder.withSimpleCard("No collection today", speech);
 }
 
@@ -45,11 +46,11 @@ function buildResponse(collection, responseBuilder) {
   }
   
   if (collection.isTomorrow()) {
-    const speech = `There is no bin collection due today.  But there is tomorrow.  It's the ${collection.getColoursSpeech()}`;
+    const speech = `${messages.NO_BIN_TODAY}  But there is tomorrow.  It's the ${collection.getColoursSpeech()}`;
     return { speech, builder: buildTomorrowResponse(collection, responseBuilder) };
   }
   
-  const speech = "There is no bin collection due today.";
+  const speech = messages.NO_BIN_TODAY;
   return { speech, builder: buildNoCollectionResponse(responseBuilder) };
 }
 
