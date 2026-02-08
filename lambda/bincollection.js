@@ -118,6 +118,10 @@ module.exports = class BinCollection {
       (k) => BinCollection.getBinType(k).colour,
     );
 
+    return this._formatColoursSpeech(colours);
+  }
+
+  _formatColoursSpeech(colours) {
     if (colours.length === 1) {
       return `${colours[0]} bin`;
     }
