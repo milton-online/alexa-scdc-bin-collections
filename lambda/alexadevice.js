@@ -112,10 +112,38 @@ module.exports = class AlexaDevice {
       this.address = await deviceAddressServiceClient.getFullAddress(
         this.deviceId
       );
+      
+      // Validate that we got a valid address
+      if (!this.address) {
+        throw new DataError(
+          "Device address service returned null",
+          messages.NO_ADDRESS
+        );
+      }
+      
     } catch (e) {
+      // Log the actual error for debugging
+      console.error('Address retrieval error:', e);
+      
+      // Check for specific error types
+      if (e.statusCode === 403) {
+        throw new DataError(
+          "Address permission denied",
+          messages.NOTIFY_MISSING_PERMISSIONS
+        );
+      }
+      
+      if (e.statusCode === 204 || e.message?.includes('no address')) {
+        throw new DataError(
+          "No address configured on device",
+          messages.NO_ADDRESS
+        );
+      }
+      
+      // For other errors, provide more specific messaging
       throw new DataError(
-        "No address from device",
-        messages.NOTIFY_MISSING_PERMISSIONS
+        `Address service error: ${e.message || e.statusCode || 'Unknown error'}`,
+        messages.LOCATION_FAILURE
       );
     }
     return this;

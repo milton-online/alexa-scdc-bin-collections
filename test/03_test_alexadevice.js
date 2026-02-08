@@ -291,7 +291,38 @@ describe("AlexaDevice", function () {
         should.fail("Should have thrown DataError");
       } catch (e) {
         e.should.be.instanceOf(DataError);
-        e.message.should.equal("No address from device");
+        e.message.should.equal("Address service error: Permission denied");
+      }
+    });
+
+    it("should throw permission error for 403 status", async function () {
+      const device = new AlexaDevice();
+      const permissionError = new Error("Forbidden");
+      permissionError.statusCode = 403;
+
+      const handlerInput = {
+        requestEnvelope: {
+          context: {
+            System: {
+              device: {
+                deviceId: "device-123",
+              },
+            },
+          },
+        },
+        serviceClientFactory: {
+          getDeviceAddressServiceClient: () => ({
+            getFullAddress: sinon.stub().rejects(permissionError),
+          }),
+        },
+      };
+
+      try {
+        await device.getAddressFromDevice(handlerInput);
+        should.fail("Should have thrown DataError");
+      } catch (e) {
+        e.should.be.instanceOf(DataError);
+        e.message.should.equal("Address permission denied");
       }
     });
   });
