@@ -18,6 +18,7 @@ Parameters:
     AllowedValues:
       - development
       - production
+      - live
 Resources:
   AlexaSkillIAMRole:
     Type: AWS::IAM::Role
