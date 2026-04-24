@@ -1,5 +1,5 @@
-// Copyright 2020-2025 Tim Cutts <tim@thecutts.org>
-// SPDX-FileCopyrightText: 2025 Tim Cutts <tim@thecutts.org>
+// Copyright 2020-2026 Tim Cutts <tim@thecutts.org>
+// SPDX-FileCopyrightText: 2026 Tim Cutts <tim@thecutts.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -8,6 +8,8 @@
 const log = require("loglevel");
 const Alexa = require("ask-sdk-core");
 const getPersistenceAdapter = require("./persistenceAdapter");
+
+log.setLevel(process.env.LOG_LEVEL || "info");
 
 const handlers = [
   "LaunchRequestHandler",

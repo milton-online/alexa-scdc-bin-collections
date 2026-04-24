@@ -18,6 +18,7 @@ Parameters:
     AllowedValues:
       - development
       - production
+      - live
 Resources:
   AlexaSkillIAMRole:
     Type: AWS::IAM::Role
@@ -56,6 +57,7 @@ Resources:
   AlexaSkillFunction:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: !Sub "bin-collections-alexa-skill-${Environment}"
       Tags:
         - Key: project
           Value: bin-collections

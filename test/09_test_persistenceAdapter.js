@@ -6,8 +6,7 @@
 "use strict";
 
 const should = require("should");
-const sinon = require("sinon");
-const AWS = require("aws-sdk");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { execSync } = require("child_process");
 const path = require("path");
 
@@ -114,19 +113,41 @@ describe("persistenceAdapter", function () {
   });
 
   (dockerAvailable ? it : it.skip)(
-    "should configure local DynamoDB client with correct endpoint",
+    "should create DynamoDBClient with local endpoint when DYNAMODB_LOCAL is true",
     function () {
       process.env.DYNAMODB_LOCAL = "true";
-      const configSpy = sinon.spy(AWS.config, "update");
+
+      // Replace the @aws-sdk/client-dynamodb module with a spy wrapper
+      const sdkModulePath = require.resolve("@aws-sdk/client-dynamodb");
+      const originalModule = require.cache[sdkModulePath];
+
+      const constructorCalls = [];
+      function SpyDynamoDBClient(config) {
+        constructorCalls.push(config);
+        return new DynamoDBClient(config);
+      }
+
+      require.cache[sdkModulePath] = {
+        ...originalModule,
+        exports: {
+          ...originalModule.exports,
+          DynamoDBClient: SpyDynamoDBClient,
+        },
+      };
+
+      // Re-require persistenceAdapter so it picks up the spy
+      delete require.cache[require.resolve("../lambda/persistenceAdapter")];
+      getPersistenceAdapter = require("../lambda/persistenceAdapter");
 
       getPersistenceAdapter();
 
-      configSpy.calledOnce.should.be.true();
-      const config = configSpy.firstCall.args[0];
-      config.should.have.property("endpoint", LOCAL_DYNAMODB_ENDPOINT);
-      config.should.have.property("region", TEST_REGION_EU);
+      // Restore the original module
+      require.cache[sdkModulePath] = originalModule;
 
-      configSpy.restore();
+      constructorCalls.length.should.be.greaterThan(0);
+      const localConfig = constructorCalls[0];
+      localConfig.should.have.property("endpoint", LOCAL_DYNAMODB_ENDPOINT);
+      localConfig.should.have.property("region", TEST_REGION_EU);
     }
   );
 });
