@@ -13,3 +13,8 @@ if (!process.env.DEBUG_TESTS) {
 
 // Skip DynamoDB for skill tests (use withSessionAttributes instead)
 process.env.SKIP_DYNAMODB = "true";
+
+// Suppress AWS SDK v2 maintenance mode warning.
+// ask-sdk-dynamodb-persistence-adapter still bundles aws-sdk v2 internally;
+// our code uses v3 (@aws-sdk/client-dynamodb) directly.
+process.env.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE = "1";

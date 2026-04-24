@@ -222,11 +222,22 @@ getJSON(url, timeout?): Promise<object>
 
 #### `persistenceAdapter.js`
 
+Uses AWS SDK for JavaScript v3 modular packages (`@aws-sdk/client-dynamodb`) to construct DynamoDB clients. The `ask-sdk-dynamodb-persistence-adapter` (v2.14+) accepts a v3 `DynamoDBClient` instance via its `dynamoDBClient` option.
+
 ```
 getPersistenceAdapter(): PersistenceAdapter
   - SKIP_DYNAMODB=true  → NoOpPersistenceAdapter (used in tests)
   - DYNAMODB_LOCAL=true → local DynamoDB on port 8000
-  - default             → production DynamoDB (region from DYNAMODB_PERSISTENCE_REGION)
+    Creates DynamoDBClient({ region: "eu-west-1", endpoint: "http://localhost:8000" })
+  - default             → production DynamoDB
+    Creates DynamoDBClient({ region: DYNAMODB_PERSISTENCE_REGION || "us-east-1" })
+
+getLocalDynamoDBClient(options):
+  - Returns new DynamoDBClient({ region: "eu-west-1", endpoint: `http://localhost:${options.port}` })
+
+Dependencies:
+  - @aws-sdk/client-dynamodb (v3) — provides DynamoDBClient
+  - ask-sdk-dynamodb-persistence-adapter (v2.14+) — accepts v3 client via dynamoDBClient option
 ```
 
 #### `CacheManager` (cacheManager.js)

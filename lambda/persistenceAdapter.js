@@ -3,18 +3,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-const AWS = require("aws-sdk");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
 const process = require("process");
 const Alexa = require("ask-sdk-core");
 
 function getLocalDynamoDBClient(options) {
-  AWS.config.update({
+  return new DynamoDBClient({
     region: "eu-west-1",
     endpoint: `http://localhost:${options.port}`,
   });
-
-  return new AWS.DynamoDB();
 }
 
 class NoOpPersistenceAdapter {
@@ -43,8 +41,7 @@ function getPersistenceAdapter() {
     });
   }
   
-  const productionClient = new AWS.DynamoDB({
-    apiVersion: "latest",
+  const productionClient = new DynamoDBClient({
     region: process.env.DYNAMODB_PERSISTENCE_REGION || "us-east-1",
   });
   

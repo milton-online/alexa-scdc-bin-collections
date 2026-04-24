@@ -18,7 +18,7 @@ The Bin Collections skill is an Alexa skill for residents of South Cambridgeshir
 - AC-1.1: When the skill is launched or `NextBinCollectionIntent` is invoked, it responds with the colour(s) and date of the next upcoming collection.
 - AC-1.2: The response includes a standard Alexa card with the collection details and a bin colour image.
 - AC-1.3: If the next collection is tomorrow, the response appends "Better get that/those bin(s) out!"
-- AC-1.4: If the next collection is today, (today, hour >= 12), and the current time is after midday the session stays open and the skill asks "Did you miss it?"
+- AC-1.4: If the next collection is today, and the current time is after midday the session stays open and the skill asks "Did you miss it?"
 - AC-1.5: If no upcoming collections are found, the skill throws an error.
 
 ---

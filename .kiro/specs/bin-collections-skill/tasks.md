@@ -88,3 +88,12 @@ These tasks represent the current implementation state and areas for improvement
 - [x] 9.4 `.vscode` launch configuration for local debugging
 - [x] 9.5 Document required IAM permissions for Lambda execution role in README
 - [x] 9.6 Add `deploy-lambda.sh` documentation — clarify when to use vs `deploy.sh`
+
+## 10. Migrate AWS SDK v2 to v3
+
+- [x] 10.1 Replace `aws-sdk` dependency with `@aws-sdk/client-dynamodb` and `@aws-sdk/lib-dynamodb` in `lambda/package.json`
+- [x] 10.2 Update `lambda/persistenceAdapter.js` to import `DynamoDBClient` from `@aws-sdk/client-dynamodb` and construct v3 clients instead of using `AWS.DynamoDB`
+- [x] 10.3 Update `test/09_test_persistenceAdapter.js` to remove `require("aws-sdk")` and update any v2-specific assertions (e.g. `AWS.config.update` spy) to use v3 client patterns
+- [x] 10.4 Run `npm install` in `lambda/` to install v3 packages and remove v2
+- [x] 10.5 Run full test suite to verify no regressions from the SDK migration
+- [x] 10.6 Sync updated files to `.ask/lambda/` directory
