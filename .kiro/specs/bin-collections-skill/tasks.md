@@ -97,3 +97,11 @@ These tasks represent the current implementation state and areas for improvement
 - [x] 10.4 Run `npm install` in `lambda/` to install v3 packages and remove v2
 - [x] 10.5 Run full test suite to verify no regressions from the SDK migration
 - [x] 10.6 Sync updated files to `.ask/lambda/` directory
+
+## 11. Migrate to Node.js 22 runtime
+
+- [x] 11.1 Update `lambda/package.json` engine requirement to `node: ">=22.0.0"`
+- [x] 11.2 Update `ask-resources.json` Lambda runtime to `nodejs22.x`
+- [x] 11.3 Update `test/setup.js` with Node.js 22 compatibility notes
+- [ ] 11.4 Deploy updated infrastructure to AWS
+- [ ] 11.5 Run full test suite on Node.js 22 to verify no regressions

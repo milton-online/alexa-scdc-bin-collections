@@ -11,7 +11,7 @@
   "author": "Tim Cutts <tim@thecutts.org>",
   "license": "ISC",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1037.0",
