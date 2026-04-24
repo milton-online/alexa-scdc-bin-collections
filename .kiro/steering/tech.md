@@ -1,7 +1,7 @@
 # Tech Stack
 
 ## Runtime & Language
-- **Node.js** >= 18.0.0
+- **Node.js** >= 20.0.0
 - **JavaScript** (CommonJS modules, `"use strict"` in main files)
 - ES2021 syntax (configured in ESLint)
 
@@ -12,6 +12,8 @@
 - **axios** — HTTP requests to the SCDC waste calendar API
 - **loglevel** — Runtime-configurable logging (`log.setLevel`, `log.info`, `log.debug`)
 
+Core dependencies should be kept up to date to minimise security vulnerabilities if possible.
+
 ## Dev Dependencies
 - **mocha** — Test runner
 - **should** — BDD assertion library (`value.should.equal(...)`)
@@ -20,6 +22,8 @@
 - **ask-sdk-test** — Alexa skill testing utilities
 - **nyc** — Code coverage (HTML reporter)
 - **eslint** — Linting (`eslint:recommended` + custom rules)
+
+Security vulnerabilities in dev dependencies should be minimised, only if it's simple to do so.
 
 ## Infrastructure
 - **AWS Lambda** — Skill handler (`exports.handler`)
