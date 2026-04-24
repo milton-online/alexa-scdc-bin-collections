@@ -115,4 +115,156 @@ describe("BinCollection", function () {
       });
     });
   });
+
+  /**
+   * Property-based tests for _formatColoursSpeech() via getColoursSpeech()
+   *
+   * Validates: Requirements 1.4
+   *
+   * These tests generate arrays of bin type strings of varying lengths (1–8)
+   * using all ordered combinations of the 4 valid bin types, and assert that
+   * the Oxford-comma-free list format holds for every generated input.
+   */
+  describe("_formatColoursSpeech() — property-based tests", function () {
+    const ALL_BIN_TYPES = ["RECYCLE", "DOMESTIC", "ORGANIC", "FOOD"];
+
+    // Map each bin type key to its colour string (mirrors binTypes in bincollection.js)
+    const COLOUR_FOR = {
+      RECYCLE: "blue",
+      DOMESTIC: "black",
+      ORGANIC: "green",
+      FOOD: "food caddy",
+    };
+
+    /**
+     * Generate all ordered permutations of `arr` up to length `maxLen`.
+     * Returns arrays of length 1 through maxLen, without repeating elements
+     * within a single array (each bin type appears at most once per collection).
+     */
+    function generatePermutations(arr, maxLen) {
+      const results = [];
+
+      function build(current, remaining) {
+        if (current.length > 0) {
+          results.push(current.slice());
+        }
+        if (current.length === maxLen) return;
+        for (let i = 0; i < remaining.length; i++) {
+          current.push(remaining[i]);
+          build(current, remaining.filter((_, j) => j !== i));
+          current.pop();
+        }
+      }
+
+      build([], arr);
+      return results;
+    }
+
+    // All permutations of 1–4 bin types (4! = 24 permutations of length 4,
+    // plus shorter ones — 64 total test cases)
+    const allInputs = generatePermutations(ALL_BIN_TYPES, ALL_BIN_TYPES.length);
+
+    // -------------------------------------------------------------------------
+    // Property 1: length === 1 → "<colour> bin" (singular, no "and")
+    // -------------------------------------------------------------------------
+    describe("Property 1: single bin type → '<colour> bin'", function () {
+      const singleInputs = allInputs.filter((a) => a.length === 1);
+
+      singleInputs.forEach((roundTypes) => {
+        it(`roundTypes=${JSON.stringify(roundTypes)}`, function () {
+          const collection = new BinCollection({ roundTypes });
+          const result = collection.getColoursSpeech();
+          const expectedColour = COLOUR_FOR[roundTypes[0]];
+
+          result.should.equal(`${expectedColour} bin`);
+          result.should.not.containEql(" and ");
+        });
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Property 2: length === 2 → "<colour1> and <colour2> bins" (no comma)
+    // -------------------------------------------------------------------------
+    describe("Property 2: two bin types → '<colour1> and <colour2> bins'", function () {
+      const pairInputs = allInputs.filter((a) => a.length === 2);
+
+      pairInputs.forEach((roundTypes) => {
+        it(`roundTypes=${JSON.stringify(roundTypes)}`, function () {
+          const collection = new BinCollection({ roundTypes });
+          const result = collection.getColoursSpeech();
+          const c0 = COLOUR_FOR[roundTypes[0]];
+          const c1 = COLOUR_FOR[roundTypes[1]];
+
+          result.should.equal(`${c0} and ${c1} bins`);
+          result.should.not.containEql(",");
+        });
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Property 3: length >= 3 → comma-separated list with " and " before last,
+    //             no Oxford comma, ends with "bins"
+    // -------------------------------------------------------------------------
+    describe("Property 3: three+ bin types → Oxford-comma-free list ending 'bins'", function () {
+      const multiInputs = allInputs.filter((a) => a.length >= 3);
+
+      multiInputs.forEach((roundTypes) => {
+        it(`roundTypes=${JSON.stringify(roundTypes)}`, function () {
+          const collection = new BinCollection({ roundTypes });
+          const result = collection.getColoursSpeech();
+          const colours = roundTypes.map((k) => COLOUR_FOR[k]);
+          const lastColour = colours[colours.length - 1];
+          const otherColours = colours.slice(0, -1);
+
+          // Ends with "bins"
+          result.should.endWith("bins");
+
+          // Last two items joined with " and " (no Oxford comma)
+          result.should.containEql(` and ${lastColour} bins`);
+          result.should.not.containEql(`, and `);
+
+          // All items except the last are comma-separated in order
+          const expectedPrefix = otherColours.join(", ");
+          result.should.startWith(expectedPrefix);
+        });
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Property 4: any length >= 1 → result ends with "bin" or "bins"
+    // -------------------------------------------------------------------------
+    describe("Property 4: any input → result ends with 'bin' or 'bins'", function () {
+      allInputs.forEach((roundTypes) => {
+        it(`roundTypes=${JSON.stringify(roundTypes)}`, function () {
+          const collection = new BinCollection({ roundTypes });
+          const result = collection.getColoursSpeech();
+
+          (result.endsWith("bin") || result.endsWith("bins")).should.equal(
+            true,
+            `Expected "${result}" to end with "bin" or "bins"`
+          );
+        });
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Property 5: any length >= 1 → every input colour appears in the output
+    // -------------------------------------------------------------------------
+    describe("Property 5: any input → every colour from input appears in output", function () {
+      allInputs.forEach((roundTypes) => {
+        it(`roundTypes=${JSON.stringify(roundTypes)}`, function () {
+          const collection = new BinCollection({ roundTypes });
+          const result = collection.getColoursSpeech();
+
+          roundTypes.forEach((binType) => {
+            const colour = COLOUR_FOR[binType];
+            result.should.containEql(
+              colour,
+              `Expected "${result}" to contain colour "${colour}" for bin type "${binType}"`
+            );
+          });
+        });
+      });
+    });
+  });
 });

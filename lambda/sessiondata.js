@@ -9,6 +9,7 @@ const DataError = require("./errors/dataerror");
 const messages = require("./messages");
 const SpeakableDate = require("./speakabledate");
 const AlexaDevice = require("./alexadevice");
+const globalCache = require("./memoryCache");
 const {
   CACHE_TTL,
   SCDC_API_BASE_URL,
@@ -42,6 +43,14 @@ function getLocationListFromSearchResults(postcodeSearchResults, address) {
 
 async function getPostcodeSearchFromSCDCWeb(postcode) {
   log.debug(`getPostcodeSearchFromSCDCWeb(postcode=${postcode})`);
+
+  const cacheKey = `postcode:${postcode}`;
+  const cached = globalCache.get(cacheKey);
+  if (cached) {
+    log.debug(`getPostcodeSearchFromSCDCWeb: cache hit for ${postcode}`);
+    return cached;
+  }
+
   const postcodeSearchResults = await getJSON(
     `${SCDC_API_BASE_URL}/address/search/?postCode=${postcode}`
   );
@@ -57,6 +66,8 @@ async function getPostcodeSearchFromSCDCWeb(postcode) {
       messages.POSTCODE_LOOKUP_FAIL
     );
   }
+
+  globalCache.set(cacheKey, postcodeSearchResults, 300000);
   return postcodeSearchResults;
 }
 
