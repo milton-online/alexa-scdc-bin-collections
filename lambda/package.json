@@ -17,14 +17,14 @@
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "aws-sdk": "^2.1692.0",
-    "axios": "^1.13.1",
+    "axios": "^1.15.0",
     "loglevel": "^1.9.2"
   },
   "devDependencies": {
     "ask-sdk-local-debug": "^1.1.0",
     "ask-sdk-test": "^2.7.42",
     "eslint": "^8.45.0",
-    "mocha": "^10.8.2",
+    "mocha": "^8.4.0",
     "nock": "^14.0.10",
     "nyc": "^17.1.0",
     "should": "^13.2.3",
