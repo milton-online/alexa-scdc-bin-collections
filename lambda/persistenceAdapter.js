@@ -98,7 +98,7 @@ class DynamoDbV3PersistenceAdapter {
       [this.attributesName]: attributes,
     };
     const putParams = {
-      Item: marshall(item, { removeUndefinedValues: true, convertEmptyValues: true }),
+      Item: marshall(item, { removeUndefinedValues: true, convertEmptyValues: true, convertClassInstanceToMap: true }),
       TableName: this.tableName,
     };
     try {

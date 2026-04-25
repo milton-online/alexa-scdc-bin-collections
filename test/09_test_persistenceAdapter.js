@@ -491,6 +491,48 @@ describe("persistenceAdapter", function () {
 
         retrieved.should.deepEqual(savedAttrs);
       });
+
+      it("should handle class instances in attributes (convertClassInstanceToMap)", async function () {
+        const AlexaDevice = require("../lambda/alexadevice");
+        const device = new AlexaDevice();
+        device.deviceId = "amzn1.ask.device.TEST";
+        device.address = {
+          addressLine1: "42 Fake Street",
+          postalCode: "CB24 8AY",
+          countryCode: "GB",
+        };
+        device.postalcode = "CB248AY";
+
+        const savedAttrs = {
+          collections: [{ date: "2026-05-01T00:00:00Z", roundTypes: ["DOMESTIC"] }],
+          fetchedOnDate: Date.now(),
+          deviceId: device.deviceId,
+          alexaDevice: device,
+        };
+
+        let savedItem;
+        mockClient.callsFake((command) => {
+          if (command instanceof PutItemCommand) {
+            savedItem = command.input.Item;
+            return Promise.resolve({});
+          }
+          if (command instanceof GetItemCommand) {
+            return Promise.resolve({ Item: savedItem });
+          }
+          return Promise.resolve({});
+        });
+
+        const envelope = makeRequestEnvelope();
+
+        // Should not throw — class instance must be marshalled correctly
+        await adapter.saveAttributes(envelope, savedAttrs);
+        const retrieved = await adapter.getAttributes(envelope);
+
+        retrieved.should.have.property("alexaDevice");
+        retrieved.alexaDevice.should.have.property("deviceId", device.deviceId);
+        retrieved.alexaDevice.should.have.property("postalcode", "CB248AY");
+        retrieved.alexaDevice.address.addressLine1.should.equal("42 Fake Street");
+      });
     });
   });
 });
