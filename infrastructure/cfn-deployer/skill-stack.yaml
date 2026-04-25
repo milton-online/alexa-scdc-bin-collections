@@ -14,10 +14,11 @@ Parameters:
     Type: String
   Environment:
     Type: String
-    Default: development
+    Default: live
     AllowedValues:
       - development
       - production
+      - live
       - live
 Resources:
   AlexaSkillIAMRole:
