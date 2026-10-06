@@ -17,7 +17,7 @@
     "@aws-sdk/client-dynamodb": "^3.1037.0",
     "@aws-sdk/lib-dynamodb": "^3.1037.0",
     "ask-sdk-core": "^2.14.0",
-    "axios": "^1.16.0",
+    "axios": "^1.18.0",
     "loglevel": "^1.9.2"
   },
   "devDependencies": {
